@@ -120,6 +120,8 @@ CSRC = $(ALLCSRC) cfg/board.c
 # setting.
 CPPSRC = $(ALLCPPSRC) \
           pwm.cpp \
+          can.cpp \
+          can_helper.cpp \
           main.cpp
 
 # List ASM source files here.
