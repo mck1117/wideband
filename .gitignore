@@ -55,3 +55,7 @@ Icon
 Network Trash Folder
 Temporary Items
 .apdisk
+
+# Firmware build intermediates & products
+build/
+.dep/
