@@ -1,6 +1,5 @@
 #include "pwm.h"
 
-#include "ch.h"
 #include "hal.h"
 
 Pwm::Pwm(PWMDriver& driver, uint8_t channel, uint32_t counterFrequency, uint32_t counterPeriod)
