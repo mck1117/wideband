@@ -1,6 +1,7 @@
 #include "ch.h"
 #include "hal.h"
 
+#include "can.h"
 #include "pwm.h"
 
 // 400khz / 1024 = 390hz PWM
@@ -14,13 +15,17 @@ Pwm pumpDac(PWMD3, 1, 48000000, 1024);
  * Application entry point.
  */
 int main(void) {
-  halInit();
-  chSysInit();
+    halInit();
+    chSysInit();
 
-  heaterPwm.Start();
-  pumpDac.Start();
+    InitCan();
 
-  while (true) {
+    heaterPwm.Start();
+    pumpDac.Start();
 
-  }
+    while (true) {
+        // dummy data
+        SendCanData(0.5f, 300);
+        chThdSleepMilliseconds(10);
+    }
 }
