@@ -4,6 +4,7 @@
 #include "pwm.h"
 
 // 400khz / 1024 = 390hz PWM
+// TODO: this is wired to an inverted output, what do?
 Pwm heaterPwm(PWMD1, 1, 400000, 1024);
 
 // 48MHz / 1024 = 46.8khz PWM
