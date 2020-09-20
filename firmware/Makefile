@@ -122,6 +122,7 @@ CPPSRC = $(ALLCPPSRC) \
           analog_input.cpp \
           can.cpp \
           can_helper.cpp \
+          lambda_lookup.cpp \
           pwm.cpp \
           main.cpp
 
