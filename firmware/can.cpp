@@ -12,8 +12,6 @@ static const CANConfig canConfig500 =
 void InitCan()
 {
     canStart(&CAND1, &canConfig500);
-
-    CanTxMessage::setDevice(CAND1);
 }
 
 struct StandardDataFrame
