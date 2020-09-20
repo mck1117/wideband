@@ -1792,4 +1792,6 @@ F 4 "C25744" H 1100 1025 50  0001 C CNN "LCSC"
 	1    1100 1025
 	1    0    0    -1  
 $EndComp
+Text Notes 1175 5150 0    50   ~ 0
+0.2v reference
 $EndSCHEMATC
