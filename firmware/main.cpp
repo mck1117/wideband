@@ -23,6 +23,9 @@ int main(void) {
     heaterPwm.Start();
     pumpDac.Start();
 
+    heaterPwm.SetDuty(0.2f);
+    pumpDac.SetDuty(0.4f);
+
     while (true) {
         // dummy data
         SendCanData(0.5f, 300);
