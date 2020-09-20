@@ -25,7 +25,9 @@ static float AverageSamples(adcsample_t* buffer, size_t idx)
         idx += ADC_OVERSAMPLE;
     }
 
-    return (float)sum / ADC_OVERSAMPLE;
+    constexpr float scale = 3.3f / (2048 * ADC_OVERSAMPLE);
+
+    return (float)sum * scale;
 }
 
 AnalogResult AnalogSample()
