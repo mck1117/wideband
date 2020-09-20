@@ -1,6 +1,7 @@
 #include "ch.h"
 #include "hal.h"
 
+#include "analog_input.h"
 #include "can.h"
 #include "pwm.h"
 
@@ -14,7 +15,7 @@ Pwm pumpDac(PWMD3, 1, 48000000, 1024);
 /*
  * Application entry point.
  */
-int main(void) {
+int main() {
     halInit();
     chSysInit();
 
@@ -27,6 +28,8 @@ int main(void) {
     pumpDac.SetDuty(0.4f);
 
     while (true) {
+        auto result = AnalogSample();
+
         // dummy data
         SendCanData(0.5f, 300);
         chThdSleepMilliseconds(10);

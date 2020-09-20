@@ -119,9 +119,10 @@ CSRC = $(ALLCSRC) cfg/board.c
 # C++ sources that can be compiled in ARM or THUMB mode depending on the global
 # setting.
 CPPSRC = $(ALLCPPSRC) \
-          pwm.cpp \
+          analog_input.cpp \
           can.cpp \
           can_helper.cpp \
+          pwm.cpp \
           main.cpp
 
 # List ASM source files here.
