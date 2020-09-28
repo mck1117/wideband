@@ -15,7 +15,7 @@ endif
 
 # C++ specific options here (added to USE_OPT).
 ifeq ($(USE_CPPOPT),)
-  USE_CPPOPT = -fno-rtti -fno-exceptions
+  USE_CPPOPT = -fno-rtti -fno-exceptions -ffast-math -funsafe-math-optimizations
 endif
 
 # Enable this if you want the linker to remove unused code and data.
@@ -83,7 +83,7 @@ endif
 #
 
 # Define project name here
-PROJECT = ch
+PROJECT = wideband
 
 # Target settings.
 MCU  = cortex-m0
@@ -119,9 +119,11 @@ CSRC = $(ALLCSRC) cfg/board.c
 # C++ sources that can be compiled in ARM or THUMB mode depending on the global
 # setting.
 CPPSRC = $(ALLCPPSRC) \
-          pwm.cpp \
+          analog_input.cpp \
           can.cpp \
           can_helper.cpp \
+          lambda_lookup.cpp \
+          pwm.cpp \
           main.cpp
 
 # List ASM source files here.

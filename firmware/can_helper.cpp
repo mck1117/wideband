@@ -2,12 +2,6 @@
 
 #include <cstring>
 
-/*static*/ CANDriver* CanTxMessage::s_device = nullptr;
-
-/*static*/ void CanTxMessage::setDevice(CANDriver& device) {
-	s_device = &device;
-}
-
 CanTxMessage::CanTxMessage(uint32_t eid, uint8_t dlc) {
 	m_frame.IDE = CAN_IDE_STD;
 	m_frame.EID = eid;
@@ -17,10 +11,8 @@ CanTxMessage::CanTxMessage(uint32_t eid, uint8_t dlc) {
 }
 
 CanTxMessage::~CanTxMessage() {
-	auto device = s_device;
-
 	// 100 ms timeout
-	canTransmit(device, CAN_ANY_MAILBOX, &m_frame, TIME_MS2I(100));
+	canTransmit(&CAND1, CAN_ANY_MAILBOX, &m_frame, TIME_MS2I(100));
 }
 
 uint8_t& CanTxMessage::operator[](size_t index) {
