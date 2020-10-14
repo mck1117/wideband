@@ -408,17 +408,6 @@ F 3 "" H 2900 1750 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L Connector_Generic:Conn_02x05_Odd_Even J1
-U 1 1 5ECAA616
-P 9675 1225
-F 0 "J1" H 9725 1642 50  0000 C CNN
-F 1 "Conn_02x05_Odd_Even" H 9725 1551 50  0000 C CNN
-F 2 "Connector_PinHeader_1.27mm:PinHeader_2x05_P1.27mm_Vertical_SMD" H 9675 1225 50  0001 C CNN
-F 3 "~" H 9675 1225 50  0001 C CNN
-	1    9675 1225
-	1    0    0    -1  
-$EndComp
-$Comp
 L power:+3.3V #PWR019
 U 1 1 5ECABBC7
 P 9475 1025
@@ -432,16 +421,14 @@ $EndComp
 $Comp
 L power:GND #PWR017
 U 1 1 5ECABF9C
-P 9375 1475
-F 0 "#PWR017" H 9375 1225 50  0001 C CNN
-F 1 "GND" H 9380 1302 50  0000 C CNN
-F 2 "" H 9375 1475 50  0001 C CNN
-F 3 "" H 9375 1475 50  0001 C CNN
-	1    9375 1475
-	1    0    0    -1  
+P 9300 1225
+F 0 "#PWR017" H 9300 975 50  0001 C CNN
+F 1 "GND" H 9305 1052 50  0000 C CNN
+F 2 "" H 9300 1225 50  0001 C CNN
+F 3 "" H 9300 1225 50  0001 C CNN
+	1    9300 1225
+	0    1    1    0   
 $EndComp
-Wire Wire Line
-	9375 1475 9375 1425
 Wire Wire Line
 	9375 1125 9475 1125
 Wire Wire Line
@@ -451,7 +438,6 @@ Wire Wire Line
 	9375 1225 9375 1125
 Wire Wire Line
 	9475 1425 9375 1425
-Connection ~ 9375 1425
 Wire Wire Line
 	9375 1425 9375 1225
 Wire Wire Line
@@ -1516,8 +1502,6 @@ Wire Wire Line
 	8850 2625 8375 2625
 NoConn ~ 7375 2925
 NoConn ~ 7375 2825
-NoConn ~ 7375 3825
-NoConn ~ 7375 3925
 $Comp
 L power:GND #PWR0120
 U 1 1 60687757
@@ -1539,8 +1523,6 @@ NoConn ~ 8375 2825
 NoConn ~ 8375 2925
 NoConn ~ 8375 3025
 NoConn ~ 8375 3325
-NoConn ~ 8375 3425
-NoConn ~ 8375 3525
 NoConn ~ 7375 3425
 NoConn ~ 7375 3325
 NoConn ~ 7375 3225
@@ -1852,4 +1834,37 @@ Wire Wire Line
 	4750 3450 4850 3450
 Wire Wire Line
 	8375 2725 8850 2725
+$Comp
+L Connector_Generic:Conn_02x07_Odd_Even J4
+U 1 1 5FAC09D3
+P 9675 1225
+F 0 "J4" H 9725 1742 50  0000 C CNN
+F 1 "FTSH-107-01-F-DV-K" H 9725 1651 50  0000 C CNN
+F 2 "Connector_PinHeader_1.27mm:PinHeader_2x07_P1.27mm_Vertical_SMD" H 9675 1225 50  0001 C CNN
+F 3 "~" H 9675 1225 50  0001 C CNN
+	1    9675 1225
+	1    0    0    -1  
+$EndComp
+NoConn ~ 9975 925 
+NoConn ~ 9475 925 
+Text Label 9100 1525 0    50   ~ 0
+UART_RX
+Text Label 10325 1525 2    50   ~ 0
+UART_TX
+Wire Wire Line
+	9975 1525 10325 1525
+Wire Wire Line
+	9300 1225 9375 1225
+Wire Wire Line
+	9100 1525 9475 1525
+Text Label 6875 3925 0    50   ~ 0
+UART_RX
+Text Label 6875 3825 0    50   ~ 0
+UART_TX
+Wire Wire Line
+	6875 3825 7375 3825
+Wire Wire Line
+	7375 3925 6875 3925
+NoConn ~ 8375 3425
+NoConn ~ 8375 3525
 $EndSCHEMATC
