@@ -7,9 +7,6 @@ Comment,Designator,Footprint, LCSC
 100n,"C8,C5,C9,C11,C13,C12",Capacitor_SMD:C_0402_1005Metric,C1525
 RED,D1,LED_SMD:LED_0603_1608Metric,C2286
 GREEN,D2,LED_SMD:LED_0603_1608Metric,C72043
-Conn_02x05_Odd_Even,J1,Connector_PinHeader_1.27mm:PinHeader_2x05_P1.27mm_Vertical_SMD,
-Conn_01x06,J2,"Connector_Phoenix_MSTB:PhoenixContact_MSTBVA_2,5_6-G-5,08_1x06_P5.08mm_Vertical",
-Conn_01x08,J3,Connector_PinHeader_2.54mm:PinHeader_1x08_P2.54mm_Vertical,
 BTS3028,Q1,Package_TO_SOT_SMD:TO-252-2,C112639
 61.9,R10,Resistor_SMD:R_0603_1608Metric,C23092
 51k,R13,Resistor_SMD:R_0402_1005Metric,C25794
