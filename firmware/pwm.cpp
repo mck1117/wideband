@@ -5,7 +5,7 @@
 Pwm::Pwm(PWMDriver& driver, uint8_t channel, uint32_t counterFrequency, uint32_t counterPeriod)
     : m_driver(&driver)
     , m_channel(channel)
-    , m_counterFrequency(m_counterFrequency)
+    , m_counterFrequency(counterFrequency)
     , m_counterPeriod(counterPeriod)
 {
 }
