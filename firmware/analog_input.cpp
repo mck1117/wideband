@@ -26,10 +26,10 @@ static float AverageSamples(adcsample_t* buffer, size_t idx)
     for (size_t i = 0; i < ADC_OVERSAMPLE; i++)
     {
         sum += buffer[idx];
-        idx += ADC_OVERSAMPLE;
+        idx += ADC_CHANNEL_COUNT;
     }
 
-    constexpr float scale = 3.3f / (2048 * ADC_OVERSAMPLE);
+    constexpr float scale = 3.3f / (4095 * ADC_OVERSAMPLE);
 
     return (float)sum * scale;
 }
