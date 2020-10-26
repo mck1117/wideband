@@ -17,10 +17,10 @@ void Pwm::Start()
         m_counterPeriod,
         nullptr,
         {
-            {PWM_OUTPUT_ACTIVE_HIGH, nullptr},
-            {PWM_OUTPUT_ACTIVE_HIGH, nullptr},
-            {PWM_OUTPUT_ACTIVE_HIGH, nullptr},
-            {PWM_OUTPUT_ACTIVE_HIGH, nullptr}
+            {PWM_OUTPUT_ACTIVE_HIGH | PWM_COMPLEMENTARY_OUTPUT_ACTIVE_LOW, nullptr},
+            {PWM_OUTPUT_ACTIVE_HIGH | PWM_COMPLEMENTARY_OUTPUT_ACTIVE_LOW, nullptr},
+            {PWM_OUTPUT_ACTIVE_HIGH | PWM_COMPLEMENTARY_OUTPUT_ACTIVE_LOW, nullptr},
+            {PWM_OUTPUT_ACTIVE_HIGH | PWM_COMPLEMENTARY_OUTPUT_ACTIVE_LOW, nullptr}
         },
         0,
         0

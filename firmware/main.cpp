@@ -7,10 +7,10 @@
 
 // 400khz / 1024 = 390hz PWM
 // TODO: this is wired to an inverted output, what do?
-Pwm heaterPwm(PWMD1, 1, 400000, 1024);
+Pwm heaterPwm(PWMD1, 0, 400'000, 1024);
 
 // 48MHz / 1024 = 46.8khz PWM
-Pwm pumpDac(PWMD3, 1, 48000000, 1024);
+Pwm pumpDac(PWMD3, 0, 48'000'000, 1024);
 
 /*
  * Application entry point.
@@ -20,6 +20,10 @@ int main() {
     chSysInit();
 
     InitCan();
+
+    palSetPadMode(GPIOA, 6, PAL_MODE_ALTERNATE(1));
+
+    adcStart(&ADCD1, nullptr);
 
     heaterPwm.Start();
     pumpDac.Start();
