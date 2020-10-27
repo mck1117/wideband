@@ -12,6 +12,22 @@ Pwm heaterPwm(PWMD1, 0, 400'000, 1024);
 // 48MHz / 1024 = 46.8khz PWM
 Pwm pumpDac(PWMD3, 0, 48'000'000, 1024);
 
+static const UARTConfig uartCfg =
+{
+    .txend1_cb = nullptr,
+    .txend2_cb = nullptr,
+    .rxend_cb = nullptr,
+    .rxchar_cb = nullptr,
+    .rxerr_cb = nullptr,
+    .timeout_cb = nullptr,
+
+    .timeout = 0,
+    .speed = 230400,
+    .cr1 = 0,
+    .cr2 = 0,
+    .cr3 = 0,
+};
+
 /*
  * Application entry point.
  */
@@ -21,7 +37,7 @@ int main() {
 
     InitCan();
 
-    palSetPadMode(GPIOA, 6, PAL_MODE_ALTERNATE(1));
+    uartStart(&UARTD1, &uartCfg);
 
     adcStart(&ADCD1, nullptr);
 
@@ -36,6 +52,8 @@ int main() {
 
         // dummy data
         SendCanData(0.5f, 300);
+
+        uartStartSend(&UARTD1, 13, "Hello, world!");
         chThdSleepMilliseconds(10);
     }
 }
