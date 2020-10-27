@@ -4,13 +4,11 @@
 #include "analog_input.h"
 #include "can.h"
 #include "pwm.h"
+#include "pump_dac.h"
 
 // 400khz / 1024 = 390hz PWM
 // TODO: this is wired to an inverted output, what do?
 Pwm heaterPwm(PWMD1, 0, 400'000, 1024);
-
-// 48MHz / 1024 = 46.8khz PWM
-Pwm pumpDac(PWMD3, 0, 48'000'000, 1024);
 
 static const UARTConfig uartCfg =
 {
@@ -35,6 +33,8 @@ int main() {
     halInit();
     chSysInit();
 
+    InitPumpDac();
+
     InitCan();
 
     uartStart(&UARTD1, &uartCfg);
@@ -42,10 +42,8 @@ int main() {
     adcStart(&ADCD1, nullptr);
 
     heaterPwm.Start();
-    pumpDac.Start();
 
     heaterPwm.SetDuty(0.2f);
-    pumpDac.SetDuty(0.4f);
 
     while (true) {
         auto result = AnalogSample();

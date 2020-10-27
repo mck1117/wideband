@@ -124,6 +124,7 @@ CPPSRC = $(ALLCPPSRC) \
           can_helper.cpp \
           lambda_lookup.cpp \
           pwm.cpp \
+          pump_dac.cpp \
           main.cpp
 
 # List ASM source files here.
