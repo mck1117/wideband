@@ -3,7 +3,7 @@
 #include "hal.h"
 
 #define ADC_CHANNEL_COUNT 3
-#define ADC_OVERSAMPLE 8
+#define ADC_OVERSAMPLE 4
 
 static adcsample_t adcBuffer[ADC_CHANNEL_COUNT * ADC_OVERSAMPLE];
 
