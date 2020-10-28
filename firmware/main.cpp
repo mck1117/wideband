@@ -45,13 +45,23 @@ int main() {
 
     heaterPwm.SetDuty(0.2f);
 
-    while (true) {
-        auto result = AnalogSample();
+     while (true) {
+//         auto result = AnalogSample();
 
-        // dummy data
-        SendCanData(0.5f, 300);
+//         // dummy data
+//         SendCanData(0.5f, 300);
 
-        uartStartSend(&UARTD1, 13, "Hello, world!");
+//         uartStartSend(&UARTD1, 13, "Hello, world!");
+//         chThdSleepMilliseconds(10);
+
+
+        SetPumpCurrentTarget(-1000);
+        chThdSleepMilliseconds(10);
+        
+        SetPumpCurrentTarget(0);
+        chThdSleepMilliseconds(10);
+
+        SetPumpCurrentTarget(1000);
         chThdSleepMilliseconds(10);
     }
 }
