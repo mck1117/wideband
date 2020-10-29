@@ -20,7 +20,7 @@ void SetPumpCurrentTarget(int32_t microampere)
     // 47 ohm resistor
     // 0.147 gain
     // effective resistance of 317 ohms
-    float volts = 0.000317308f * microampere;
+    float volts = 0.000321162f * microampere;
 
     // offset by 
     volts += 1.65f;
