@@ -30,14 +30,13 @@ static void SamplingThread(void*)
 
         float r_1 = result.NernstVoltage;
 
-        // Compute results
-
         // r2_opposite_phase estimates where the previous sample would be had we not been toggling
         // AKA the absolute value of the difference between r2_opposite_phase and r2 is the amplitude
         // of the AC component on the nernst voltage.  We have to pull this trick so as to use the past 3
         // samples to cancel out any slope in the DC (aka actual nernst cell output) from the AC measurement
         float r2_opposite_phase = (r_1 + r_3) / 2;
 
+        // Compute AC (difference) and DC (average) components
         nernstAc = f_abs(r2_opposite_phase - r_2);
         nernstDc = (r2_opposite_phase + r_2) / 2;
 
