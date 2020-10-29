@@ -1,10 +1,11 @@
 #include "ch.h"
 #include "hal.h"
+#include "chprintf.h"
 
-#include "analog_input.h"
 #include "can.h"
 #include "pwm.h"
 #include "pump_dac.h"
+#include "sampling.h"
 
 // 400khz / 1024 = 390hz PWM
 // TODO: this is wired to an inverted output, what do?
@@ -20,11 +21,13 @@ static const UARTConfig uartCfg =
     .timeout_cb = nullptr,
 
     .timeout = 0,
-    .speed = 230400,
+    .speed = 500000,
     .cr1 = 0,
     .cr2 = 0,
     .cr3 = 0,
 };
+
+char strBuffer[200];
 
 /*
  * Application entry point.
@@ -33,35 +36,36 @@ int main() {
     halInit();
     chSysInit();
 
+    StartSampling();
+
     InitPumpDac();
 
     InitCan();
 
     uartStart(&UARTD1, &uartCfg);
 
-    adcStart(&ADCD1, nullptr);
-
     heaterPwm.Start();
 
     heaterPwm.SetDuty(0.2f);
 
-     while (true) {
-//         auto result = AnalogSample();
 
-//         // dummy data
-//         SendCanData(0.5f, 300);
+    /*for (int i = 0; i < 500; i++) {
+        SetPumpCurrentTarget(current);
+        chThdSleepMilliseconds(50);
 
-//         uartStartSend(&UARTD1, 13, "Hello, world!");
-//         chThdSleepMilliseconds(10);
+        auto result = AnalogSample();
 
+        //size_t writeCount = chsnprintf(strBuffer, 200, "I: %d\t\tVM: %.3f\tIp: %.3f\n", current, result.VirtualGroundVoltage, result.PumpCurrentVoltage);
+        size_t writeCount = chsnprintf(strBuffer, 200, "%d\t%.4f\n", current, result.PumpCurrentVoltage);
+        uartStartSend(&UARTD1, writeCount, strBuffer);
 
-        SetPumpCurrentTarget(-1000);
-        chThdSleepMilliseconds(10);
-        
-        SetPumpCurrentTarget(0);
-        chThdSleepMilliseconds(10);
+        //current += 10;
+    }*/
 
-        SetPumpCurrentTarget(1000);
-        chThdSleepMilliseconds(10);
+    while(1) {
+        size_t writeCount = chsnprintf(strBuffer, 200, "%.4f\t%.2f\n", GetNernstDc() * 1000, GetSensorInternalResistance());
+        uartStartSend(&UARTD1, writeCount, strBuffer);
+
+        chThdSleepMilliseconds(5);
     }
 }

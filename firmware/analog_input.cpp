@@ -3,7 +3,7 @@
 #include "hal.h"
 
 #define ADC_CHANNEL_COUNT 3
-#define ADC_OVERSAMPLE 4
+#define ADC_OVERSAMPLE 16
 
 static adcsample_t adcBuffer[ADC_CHANNEL_COUNT * ADC_OVERSAMPLE];
 
@@ -38,9 +38,11 @@ AnalogResult AnalogSample()
 {
     adcConvert(&ADCD1, &convGroup, adcBuffer, ADC_OVERSAMPLE);
 
+    constexpr float nernstInputGain = 1 / 2.7f;
+
     return
     {
-        .NernstVoltage = AverageSamples(adcBuffer, 0),
+        .NernstVoltage = AverageSamples(adcBuffer, 0) * nernstInputGain,
         .VirtualGroundVoltage = AverageSamples(adcBuffer, 1),
         .PumpCurrentVoltage = AverageSamples(adcBuffer, 2),
     };
