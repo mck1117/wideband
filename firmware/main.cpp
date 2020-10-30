@@ -3,13 +3,9 @@
 #include "chprintf.h"
 
 #include "can.h"
-#include "pwm.h"
+#include "heater_control.h"
 #include "pump_dac.h"
 #include "sampling.h"
-
-// 400khz / 1024 = 390hz PWM
-// TODO: this is wired to an inverted output, what do?
-Pwm heaterPwm(PWMD1, 0, 400'000, 1024);
 
 static const UARTConfig uartCfg =
 {
@@ -44,10 +40,7 @@ int main() {
 
     uartStart(&UARTD1, &uartCfg);
 
-    heaterPwm.Start();
-
-    heaterPwm.SetDuty(0.2f);
-
+    StartHeaterControl();
 
     /*for (int i = 0; i < 500; i++) {
         SetPumpCurrentTarget(current);
