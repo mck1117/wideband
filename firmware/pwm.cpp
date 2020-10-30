@@ -29,8 +29,20 @@ void Pwm::Start()
     pwmStart(m_driver, &config);
 }
 
+float maxF(float i1, float i2) {
+	return i1 > i2 ? i1 : i2;
+}
+
+float minF(float i1, float i2) {
+	return i1 < i2 ? i1 : i2;
+}
+
+float clampF(float min, float clamp, float max) {
+	return maxF(min, minF(clamp, max));
+}
+
 void Pwm::SetDuty(float duty) {
-    pwmcnt_t highTime = m_counterPeriod * duty;
+    pwmcnt_t highTime = m_counterPeriod * clampF(0, duty, 1);
 
     pwm_lld_enable_channel(m_driver, m_channel, highTime);
 }
