@@ -34,6 +34,7 @@ static void SamplingThread(void*)
         // AKA the absolute value of the difference between r2_opposite_phase and r2 is the amplitude
         // of the AC component on the nernst voltage.  We have to pull this trick so as to use the past 3
         // samples to cancel out any slope in the DC (aka actual nernst cell output) from the AC measurement
+        // See firmware/sampling.png for a drawing of what's going on here
         float r2_opposite_phase = (r_1 + r_3) / 2;
 
         // Compute AC (difference) and DC (average) components
