@@ -5,7 +5,7 @@
 Pwm::Pwm(PWMDriver& driver, uint8_t channel, uint32_t counterFrequency, uint32_t counterPeriod)
     : m_driver(&driver)
     , m_channel(channel)
-    , m_counterFrequency(m_counterFrequency)
+    , m_counterFrequency(counterFrequency)
     , m_counterPeriod(counterPeriod)
 {
 }
@@ -17,10 +17,10 @@ void Pwm::Start()
         m_counterPeriod,
         nullptr,
         {
-            {PWM_OUTPUT_ACTIVE_HIGH, nullptr},
-            {PWM_OUTPUT_ACTIVE_HIGH, nullptr},
-            {PWM_OUTPUT_ACTIVE_HIGH, nullptr},
-            {PWM_OUTPUT_ACTIVE_HIGH, nullptr}
+            {PWM_OUTPUT_ACTIVE_HIGH | PWM_COMPLEMENTARY_OUTPUT_ACTIVE_LOW, nullptr},
+            {PWM_OUTPUT_ACTIVE_HIGH | PWM_COMPLEMENTARY_OUTPUT_ACTIVE_LOW, nullptr},
+            {PWM_OUTPUT_ACTIVE_HIGH | PWM_COMPLEMENTARY_OUTPUT_ACTIVE_LOW, nullptr},
+            {PWM_OUTPUT_ACTIVE_HIGH | PWM_COMPLEMENTARY_OUTPUT_ACTIVE_LOW, nullptr}
         },
         0,
         0

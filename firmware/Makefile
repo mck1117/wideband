@@ -108,6 +108,7 @@ include $(CHIBIOS)/os/common/ports/ARMv6-M/compilers/GCC/mk/port.mk
 # Auto-build files in ./source recursively.
 include $(CHIBIOS)/tools/mk/autobuild.mk
 # Other files (optional).
+include $(CHIBIOS)/os/hal/lib/streams/streams.mk
 
 # Define linker script file here
 LDSCRIPT= $(STARTUPLD)/STM32F042x6.ld
@@ -124,6 +125,8 @@ CPPSRC = $(ALLCPPSRC) \
           can_helper.cpp \
           lambda_lookup.cpp \
           pwm.cpp \
+          pump_dac.cpp \
+          sampling.cpp \
           main.cpp
 
 # List ASM source files here.
@@ -150,7 +153,8 @@ CPPWARN = -Wall -Wextra -Wundef
 #
 
 # List all user C define here, like -D_DEBUG=1
-UDEFS =
+UDEFS = -DCHPRINTF_USE_FLOAT=1
+
 
 # Define ASM defines here
 UADEFS =
