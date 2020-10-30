@@ -3,6 +3,8 @@
 #include "ch.h"
 #include "hal.h"
 
+#include "wideband_config.h"
+
 #include "analog_input.h"
 
 // Stored results
@@ -41,7 +43,7 @@ static void SamplingThread(void*)
         nernstAc = f_abs(r2_opposite_phase - r_2);
         nernstDc = (r2_opposite_phase + r_2) / 2;
 
-        pumpCurrentSenseVoltage = 0.8f * pumpCurrentSenseVoltage + 0.2f * (result.PumpCurrentVoltage - 1.65f);
+        pumpCurrentSenseVoltage = 0.8f * pumpCurrentSenseVoltage + 0.2f * (result.PumpCurrentVoltage - HALF_VCC);
 
         // Shift history over by one
         r_3 = r_2;
@@ -63,7 +65,7 @@ float GetNernstAc()
 float GetSensorInternalResistance()
 {
     // Sensor is the lowside of a divider, top side is 22k, and 3.3v AC pk-pk is injected
-    return 22000 / (3.3f / GetNernstAc() - 1);
+    return ESR_SUPPLY_R / (VCC_VOLTS / GetNernstAc() - 1);
 }
 
 float GetNernstDc()
@@ -76,6 +78,6 @@ float GetPumpNominalCurrent()
     // Gain is 10x, then a 61.9 ohm resistor
     // Effective resistance with the gain is 619 ohms
     // 1000 is to convert to milliamperes
-    constexpr float ratio = 1000 / 619.0f;
+    constexpr float ratio = 1000 / (PUMP_CURRENT_SENSE_GAIN * LSU_SENSE_R);
     return pumpCurrentSenseVoltage * ratio;
 }

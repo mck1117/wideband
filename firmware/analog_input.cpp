@@ -1,9 +1,10 @@
 #include "analog_input.h"
 
+#include "wideband_config.h"
+
 #include "hal.h"
 
 #define ADC_CHANNEL_COUNT 3
-#define ADC_OVERSAMPLE 16
 
 static adcsample_t adcBuffer[ADC_CHANNEL_COUNT * ADC_OVERSAMPLE];
 
@@ -29,7 +30,7 @@ static float AverageSamples(adcsample_t* buffer, size_t idx)
         idx += ADC_CHANNEL_COUNT;
     }
 
-    constexpr float scale = 3.3f / (4095 * ADC_OVERSAMPLE);
+    constexpr float scale = VCC_VOLTS / (ADC_MAX_COUNT * ADC_OVERSAMPLE);
 
     return (float)sum * scale;
 }
@@ -38,11 +39,9 @@ AnalogResult AnalogSample()
 {
     adcConvert(&ADCD1, &convGroup, adcBuffer, ADC_OVERSAMPLE);
 
-    constexpr float nernstInputGain = 1 / 2.7f;
-
     return
     {
-        .NernstVoltage = AverageSamples(adcBuffer, 0) * nernstInputGain,
+        .NernstVoltage = AverageSamples(adcBuffer, 0) * NERNST_INPUT_GAIN,
         .VirtualGroundVoltage = AverageSamples(adcBuffer, 1),
         .PumpCurrentVoltage = AverageSamples(adcBuffer, 2),
     };

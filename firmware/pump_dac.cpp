@@ -1,6 +1,8 @@
 #include "pump_dac.h"
 #include "pwm.h"
 
+#include "wideband_config.h"
+
 #include "hal.h"
 
 // 48MHz / 1024 = 46.8khz PWM
@@ -22,8 +24,8 @@ void SetPumpCurrentTarget(int32_t microampere)
     // effective resistance of 317 ohms
     float volts = 0.000321162f * microampere;
 
-    // offset by 
-    volts += 1.65f;
+    // offset by half vcc
+    volts += HALF_VCC;
 
-    pumpDac.SetDuty(volts / 3.3f);
+    pumpDac.SetDuty(volts / VCC_VOLTS);
 }
