@@ -128,6 +128,7 @@ CPPSRC = $(ALLCPPSRC) \
           pump_dac.cpp \
           sampling.cpp \
           heater_control.cpp \
+          pid.cpp \
           main.cpp
 
 # List ASM source files here.

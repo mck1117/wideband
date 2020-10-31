@@ -28,3 +28,10 @@
 // *******************************
 
 // todo
+
+
+// *******************************
+//    Heater controller config
+// *******************************
+#define HEATER_CONTROL_PERIOD 50
+#define HEATER_TARGET_ESR 300
