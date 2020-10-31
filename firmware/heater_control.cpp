@@ -32,17 +32,20 @@ static HeaterState GetNextState(HeaterState state, float sensorEsr)
                 rampDuty = 0.5f;
                 return HeaterState::WarmupRamp;
             }
-            else
-            {
-                // Stay in preheat - wait for time to elapse
-                return HeaterState::Preheat;
-            }
+
+            // Stay in preheat - wait for time to elapse
+            break;
         case HeaterState::WarmupRamp:
             if (sensorEsr < 2000)
             {
                 return HeaterState::ClosedLoop;
             }
+
+            break;
+        case HeaterState::ClosedLoop: break;
     }
+
+    return state;
 }
 
 static float GetDutyForState(HeaterState state, float heaterEsr)
@@ -61,17 +64,18 @@ static float GetDutyForState(HeaterState state, float heaterEsr)
         case HeaterState::ClosedLoop:
         {
             // do something more intelligent here
-            float error = (300 - heaterEsr) / 100;
+            float error = (heaterEsr - 250) / 100;
 
             return error * 1.0f;
         }
     }
 }
 
+static HeaterState state = HeaterState::Preheat;
+
 static THD_WORKING_AREA(waHeaterThread, 256);
 static void HeaterThread(void*)
 {
-    HeaterState state = HeaterState::Preheat;
 
     while (true)
     {
@@ -96,4 +100,9 @@ void StartHeaterControl()
     heaterPwm.SetDuty(0);
 
     chThdCreateStatic(waHeaterThread, sizeof(waHeaterThread), NORMALPRIO + 1, HeaterThread, nullptr);
+}
+
+bool IsRunningClosedLoop()
+{
+    return state == HeaterState::ClosedLoop;
 }

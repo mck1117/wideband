@@ -78,6 +78,6 @@ float GetPumpNominalCurrent()
     // Gain is 10x, then a 61.9 ohm resistor
     // Effective resistance with the gain is 619 ohms
     // 1000 is to convert to milliamperes
-    constexpr float ratio = 1000 / (PUMP_CURRENT_SENSE_GAIN * LSU_SENSE_R);
+    constexpr float ratio = -1000 / (PUMP_CURRENT_SENSE_GAIN * LSU_SENSE_R);
     return pumpCurrentSenseVoltage * ratio;
 }
