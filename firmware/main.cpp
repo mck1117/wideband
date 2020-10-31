@@ -4,6 +4,7 @@
 
 #include "can.h"
 #include "heater_control.h"
+#include "pump_control.h"
 #include "pump_dac.h"
 #include "sampling.h"
 
@@ -32,15 +33,16 @@ int main() {
     halInit();
     chSysInit();
 
+    // Fire up all of our threads
     StartSampling();
-
     InitPumpDac();
-
-    InitCan();
+    StartHeaterControl();
+    StartPumpControl();
 
     uartStart(&UARTD1, &uartCfg);
 
-    StartHeaterControl();
+
+    InitCan();
 
     /*for (int i = 0; i < 500; i++) {
         SetPumpCurrentTarget(current);

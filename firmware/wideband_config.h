@@ -24,11 +24,9 @@
 #define LSU_SENSE_R (61.9f)
 
 // *******************************
-//          Pump driver
+//        Pump controller
 // *******************************
-
-// todo
-
+#define NERNST_TARGET (0.45f)
 
 // *******************************
 //    Heater controller config
