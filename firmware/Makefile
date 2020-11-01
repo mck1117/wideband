@@ -123,7 +123,7 @@ CPPSRC = $(ALLCPPSRC) \
           analog_input.cpp \
           can.cpp \
           can_helper.cpp \
-          lambda_lookup.cpp \
+          lambda_conversion.cpp \
           pwm.cpp \
           pump_dac.cpp \
           sampling.cpp \

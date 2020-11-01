@@ -7,6 +7,7 @@
 #include "pump_control.h"
 #include "pump_dac.h"
 #include "sampling.h"
+#include "lambda_conversion.h"
 
 static const UARTConfig uartCfg =
 {
@@ -58,7 +59,7 @@ int main() {
     }*/
 
     while(1) {
-        size_t writeCount = chsnprintf(strBuffer, 200, "%.4f\t%.2f\t%.2f\n", GetSensorInternalResistance(), nernstVolt, GetPumpNominalCurrent());
+        size_t writeCount = chsnprintf(strBuffer, 200, "%.4f\t%.2f\t%.3f\n", GetSensorInternalResistance(), GetNernstDc(), GetLambda());
         uartStartSend(&UARTD1, writeCount, strBuffer);
 
         chThdSleepMilliseconds(5);
