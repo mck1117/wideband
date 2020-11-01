@@ -50,7 +50,7 @@ static HeaterState GetNextState(HeaterState state, float sensorEsr)
     return state;
 }
 
-static Pid heaterPid(0.1f, 0, HEATER_CONTROL_PERIOD);
+static Pid heaterPid(0.1f, 0.1f, HEATER_CONTROL_PERIOD);
 
 static float GetDutyForState(HeaterState state, float heaterEsr)
 {
@@ -66,7 +66,8 @@ static float GetDutyForState(HeaterState state, float heaterEsr)
 
             return rampDuty;
         case HeaterState::ClosedLoop:
-            return heaterPid.GetOutput(HEATER_TARGET_ESR, heaterEsr);
+            // Negated because lower resistance -> hotter
+            return heaterPid.GetOutput(-HEATER_TARGET_ESR, -heaterEsr);
     }
 }
 
