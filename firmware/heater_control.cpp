@@ -50,7 +50,7 @@ static HeaterState GetNextState(HeaterState state, float sensorEsr)
     return state;
 }
 
-static Pid heaterPid(0.1f, 0.1f, HEATER_CONTROL_PERIOD);
+static Pid heaterPid(0.05f, 0.15f, HEATER_CONTROL_PERIOD);
 
 static float GetDutyForState(HeaterState state, float heaterEsr)
 {
