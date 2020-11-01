@@ -7,7 +7,7 @@
 
 #include "ch.h"
 
-static Pid pumpPid(0, 0.01f, 2);
+static Pid pumpPid(50.0f, 300.0f, 2);
 
 static THD_WORKING_AREA(waPumpThread, 256);
 static void PumpThread(void*)
@@ -22,7 +22,7 @@ static void PumpThread(void*)
             float result = pumpPid.GetOutput(NERNST_TARGET, nernstVoltage);
 
             // result is in mA
-            SetPumpCurrentTarget(result / 1000.0f);
+            SetPumpCurrentTarget(result * 1000);
         }
 
         // Run at 500hz
