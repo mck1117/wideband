@@ -23,10 +23,10 @@ static void PumpThread(void*)
 
             // result is in mA
             SetPumpCurrentTarget(result / 1000.0f);
-
-            // Run at 500hz
-            chThdSleepMilliseconds(2);
         }
+
+        // Run at 500hz
+        chThdSleepMilliseconds(2);
     }
 }
 
