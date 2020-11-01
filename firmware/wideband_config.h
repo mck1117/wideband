@@ -24,7 +24,12 @@
 #define LSU_SENSE_R (61.9f)
 
 // *******************************
-//          Pump driver
+//        Pump controller
 // *******************************
+#define NERNST_TARGET (0.45f)
 
-// todo
+// *******************************
+//    Heater controller config
+// *******************************
+#define HEATER_CONTROL_PERIOD 50
+#define HEATER_TARGET_ESR 300

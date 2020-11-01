@@ -1,9 +1,11 @@
 #include "heater_control.h"
+#include "wideband_config.h"
 
 #include "ch.h"
 #include "hal.h"
 #include "pwm.h"
 #include "sampling.h"
+#include "pid.h"
 
 // 400khz / 1024 = 390hz PWM
 Pwm heaterPwm(PWMD1, 0, 400'000, 1024);
@@ -48,6 +50,8 @@ static HeaterState GetNextState(HeaterState state, float sensorEsr)
     return state;
 }
 
+static Pid heaterPid(0.1f, 0, HEATER_CONTROL_PERIOD);
+
 static float GetDutyForState(HeaterState state, float heaterEsr)
 {
     switch (state)
@@ -62,12 +66,7 @@ static float GetDutyForState(HeaterState state, float heaterEsr)
 
             return rampDuty;
         case HeaterState::ClosedLoop:
-        {
-            // do something more intelligent here
-            float error = (heaterEsr - 250) / 100;
-
-            return error * 1.0f;
-        }
+            return heaterPid.GetOutput(HEATER_TARGET_ESR, heaterEsr);
     }
 }
 
@@ -90,7 +89,7 @@ static void HeaterThread(void*)
         heaterPwm.SetDuty(duty);
 
         // Loop at ~20hz
-        chThdSleepMilliseconds(50);
+        chThdSleepMilliseconds(HEATER_CONTROL_PERIOD);
     }
 }
 
