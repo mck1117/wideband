@@ -56,7 +56,7 @@ int main() {
     }*/
 
     while(1) {
-        size_t writeCount = chsnprintf(strBuffer, 200, "%.4f\t%.2f\n", GetNernstDc() * 1000, GetSensorInternalResistance());
+        size_t writeCount = chsnprintf(strBuffer, 200, "%.4f\t%.2f\t%.2f\n", GetSensorInternalResistance(), nernstVolt, GetPumpNominalCurrent());
         uartStartSend(&UARTD1, writeCount, strBuffer);
 
         chThdSleepMilliseconds(5);
