@@ -16,7 +16,7 @@ ADCConversionGroup convGroup =
     nullptr,
     ADC_CFGR1_CONT | ADC_CFGR1_RES_12BIT,                  // CFGR1
     ADC_TR(0, 0),       // TR
-    ADC_SMPR_SMP_28P5,      // SMPR
+    ADC_SMPR_SMP_7P5,      // SMPR
     ADC_CHSELR_CHSEL0 | ADC_CHSELR_CHSEL1 | ADC_CHSELR_CHSEL2
 };
 
