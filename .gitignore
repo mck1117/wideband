@@ -58,3 +58,6 @@ Temporary Items
 # Firmware build intermediates & products
 build/
 .dep/
+
+# cortex-debug vscode extension local state
+.vscode/.cortex-debug*state.json
