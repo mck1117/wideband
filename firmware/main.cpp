@@ -45,9 +45,9 @@ int main() {
     InitCan();
 
     while(1) {
-        size_t writeCount = chsnprintf(strBuffer, 200, "%.4f\t%.2f\t%.3f\n", GetSensorInternalResistance(), GetNernstDc(), GetLambda());
-        uartStartSend(&UARTD1, writeCount, strBuffer);
+        float esr = GetSensorInternalResistance();
+        float lambda = GetLambda();
 
-        chThdSleepMilliseconds(10);
+        SendCanData(lambda, esr);
     }
 }
