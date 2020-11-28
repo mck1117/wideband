@@ -25,6 +25,6 @@ void SendCanData(float lambda, uint16_t measuredResistance)
 {
     CanTxTyped<StandardDataFrame> frame(0x130);
 
-    frame.get().lambda = lambda / 1000.0f;
+    frame.get().lambda = lambda * 10000;
     frame.get().measuredResistance = measuredResistance;
 }
