@@ -42,26 +42,12 @@ int main() {
 
     uartStart(&UARTD1, &uartCfg);
 
-
     InitCan();
-
-    /*for (int i = 0; i < 500; i++) {
-        SetPumpCurrentTarget(current);
-        chThdSleepMilliseconds(50);
-
-        auto result = AnalogSample();
-
-        //size_t writeCount = chsnprintf(strBuffer, 200, "I: %d\t\tVM: %.3f\tIp: %.3f\n", current, result.VirtualGroundVoltage, result.PumpCurrentVoltage);
-        size_t writeCount = chsnprintf(strBuffer, 200, "%d\t%.4f\n", current, result.PumpCurrentVoltage);
-        uartStartSend(&UARTD1, writeCount, strBuffer);
-
-        //current += 10;
-    }*/
 
     while(1) {
         size_t writeCount = chsnprintf(strBuffer, 200, "%.4f\t%.2f\t%.3f\n", GetSensorInternalResistance(), GetNernstDc(), GetLambda());
         uartStartSend(&UARTD1, writeCount, strBuffer);
 
-        chThdSleepMilliseconds(5);
+        chThdSleepMilliseconds(10);
     }
 }
