@@ -69,6 +69,20 @@
 #endif
 
 /**
+ * @brief   Enables the MAC subsystem.
+ */
+#if !defined(HAL_USE_MAC) || defined(__DOXYGEN__)
+#define HAL_USE_MAC                         FALSE
+#endif
+
+/**
+ * @brief   Enables the MMC_SPI subsystem.
+ */
+#if !defined(HAL_USE_MMC_SPI) || defined(__DOXYGEN__)
+#define HAL_USE_MMC_SPI                     FALSE
+#endif
+
+/**
  * @brief   Enables the PWM subsystem.
  */
 #if !defined(HAL_USE_PWM) || defined(__DOXYGEN__)
@@ -87,6 +101,13 @@
  */
 #if !defined(HAL_USE_SERIAL) || defined(__DOXYGEN__)
 #define HAL_USE_SERIAL                      FALSE
+#endif
+
+/**
+ * @brief   Enables the SERIAL over USB subsystem.
+ */
+#if !defined(HAL_USE_SERIAL_USB) || defined(__DOXYGEN__)
+#define HAL_USE_SERIAL_USB                  FALSE
 #endif
 
 /**

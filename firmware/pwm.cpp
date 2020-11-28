@@ -23,6 +23,7 @@ void Pwm::Start()
             {PWM_OUTPUT_ACTIVE_HIGH | PWM_COMPLEMENTARY_OUTPUT_ACTIVE_LOW, nullptr}
         },
         0,
+        0,
         0
     };
 

@@ -1,5 +1,4 @@
-#pragma once
-
+#include "lambda_conversion.h"
 #include "sampling.h"
 
 static float GetPhi(float pumpCurrent)

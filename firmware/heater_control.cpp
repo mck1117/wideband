@@ -68,6 +68,7 @@ static float GetDutyForState(HeaterState state, float heaterEsr)
         case HeaterState::ClosedLoop:
             // Negated because lower resistance -> hotter
             return heaterPid.GetOutput(-HEATER_TARGET_ESR, -heaterEsr);
+        default: return 0;
     }
 }
 
@@ -76,7 +77,6 @@ static HeaterState state = HeaterState::Preheat;
 static THD_WORKING_AREA(waHeaterThread, 256);
 static void HeaterThread(void*)
 {
-
     while (true)
     {
         // Read sensor state
