@@ -407,95 +407,98 @@ Wire Wire Line
 	2125 2450 2125 2500
 Text Label 2700 2450 2    50   ~ 0
 LSU_Heater-
-Text Label 4100 3200 2    50   ~ 0
+Text Label 925  4250 0    50   ~ 0
 LSU_Heater-
-Text Label 4100 3000 2    50   ~ 0
+Text Label 925  4150 0    50   ~ 0
 LSU_Ip
-Text Label 4100 3100 2    50   ~ 0
+Text Label 2525 4050 2    50   ~ 0
 LSU_Vm
-Text Label 4100 3400 2    50   ~ 0
+Text Label 2525 4150 2    50   ~ 0
 LSU_Rtrim
-Text Label 4100 3500 2    50   ~ 0
+Text Label 2525 4250 2    50   ~ 0
 LSU_Un
 Text Label 1825 675  0    50   ~ 0
 LSU_Heater+
 Wire Wire Line
 	1825 675  1825 1075
-Text Label 4100 3300 2    50   ~ 0
+Text Label 925  4350 0    50   ~ 0
 LSU_Heater+
-$Comp
-L Connector_Generic:Conn_01x06 J_LSU1
-U 1 1 5FBB3B15
-P 3350 3200
-F 0 "J_LSU1" H 3268 3525 50  0000 C CNN
-F 1 "Conn_01x06" H 3268 2766 50  0001 C CNN
-F 2 "Connector_Molex:Molex_Micro-Fit_3.0_43650-0615_1x06_P3.00mm_Vertical" H 3350 3200 50  0001 C CNN
-F 3 "~" H 3350 3200 50  0001 C CNN
-	1    3350 3200
-	-1   0    0    -1  
-$EndComp
 Wire Wire Line
-	3550 3300 4100 3300
+	1475 4350 925  4350
 Wire Wire Line
-	4100 3200 3550 3200
+	925  4250 1475 4250
 Wire Wire Line
-	4100 3000 3550 3000
+	925  4150 1475 4150
 Wire Wire Line
-	3550 3100 4100 3100
+	1975 4050 2525 4050
 Wire Wire Line
-	3550 3400 4100 3400
+	1975 4150 2525 4150
 Wire Wire Line
-	3550 3500 4100 3500
-Text Notes 4175 3000 0    50   ~ 0
+	1975 4250 2525 4250
+Text Notes 850  4150 2    50   ~ 0
 red
-Text Notes 4175 3100 0    50   ~ 0
+Text Notes 2600 4050 0    50   ~ 0
 yellow
-Text Notes 4175 3200 0    50   ~ 0
+Text Notes 850  4300 2    50   ~ 0
 white
-Text Notes 4175 3300 0    50   ~ 0
+Text Notes 850  4400 2    50   ~ 0
 grey
-Text Notes 4175 3400 0    50   ~ 0
+Text Notes 2600 4150 0    50   ~ 0
 green
-Text Notes 4175 3500 0    50   ~ 0
+Text Notes 2600 4250 0    50   ~ 0
 black
 Text Notes 4175 2875 0    50   ~ 0
 LSU 4.9 Wire Colors:
 $Comp
-L Connector_Generic:Conn_01x04 J3
-U 1 1 5FBCCED0
-P 1325 3800
-F 0 "J3" H 1243 4025 50  0000 C CNN
-F 1 "Conn_01x04" H 1243 4026 50  0001 C CNN
-F 2 "Connector_Molex:Molex_Micro-Fit_3.0_43650-0415_1x04_P3.00mm_Vertical" H 1325 3800 50  0001 C CNN
-F 3 "~" H 1325 3800 50  0001 C CNN
-	1    1325 3800
-	-1   0    0    -1  
-$EndComp
-$Comp
 L power:GND #PWR0114
 U 1 1 5FBCD9A4
-P 1600 4100
-F 0 "#PWR0114" H 1600 3850 50  0001 C CNN
-F 1 "GND" V 1605 3972 50  0000 R CNN
-F 2 "" H 1600 4100 50  0001 C CNN
-F 3 "" H 1600 4100 50  0001 C CNN
-	1    1600 4100
+P 5475 4925
+F 0 "#PWR0114" H 5475 4675 50  0001 C CNN
+F 1 "GND" V 5480 4797 50  0000 R CNN
+F 2 "" H 5475 4925 50  0001 C CNN
+F 3 "" H 5475 4925 50  0001 C CNN
+	1    5475 4925
 	1    0    0    -1  
 $EndComp
 Wire Wire Line
-	1525 4000 1600 4000
+	5400 4825 5475 4825
 Wire Wire Line
-	1600 4000 1600 4100
-Text GLabel 1650 3625 2    50   Input ~ 0
+	5475 4825 5475 4925
+Text GLabel 1400 4550 0    50   Input ~ 0
 12V_RAW
 Wire Wire Line
-	1650 3625 1525 3700
-Text Label 1825 3800 2    50   ~ 0
+	1400 4550 1475 4550
+Text Label 2275 4450 2    50   ~ 0
 CAN_H
-Text Label 1825 3900 2    50   ~ 0
+Text Label 2275 4550 2    50   ~ 0
 CAN_L
 Wire Wire Line
-	1825 3900 1525 3900
+	2275 4550 1975 4550
 Wire Wire Line
-	1825 3800 1525 3800
+	2275 4450 1975 4450
+$Comp
+L Connector_Generic:Conn_02x06_Top_Bottom J3
+U 1 1 5FD3D185
+P 1675 4250
+F 0 "J3" H 1725 4667 50  0000 C CNN
+F 1 "Conn_02x06_Top_Bottom" H 1725 4576 50  0000 C CNN
+F 2 "mx120:mx120g-12" H 1675 4250 50  0001 C CNN
+F 3 "~" H 1675 4250 50  0001 C CNN
+	1    1675 4250
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GND #PWR0115
+U 1 1 5FD4C273
+P 1350 4050
+F 0 "#PWR0115" H 1350 3800 50  0001 C CNN
+F 1 "GND" V 1355 3922 50  0000 R CNN
+F 2 "" H 1350 4050 50  0001 C CNN
+F 3 "" H 1350 4050 50  0001 C CNN
+	1    1350 4050
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	1350 4050 1475 4050
+NoConn ~ 1475 4450
 $EndSCHEMATC
