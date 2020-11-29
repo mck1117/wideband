@@ -501,4 +501,5 @@ $EndComp
 Wire Wire Line
 	1350 4050 1475 4050
 NoConn ~ 1475 4450
+NoConn ~ 1975 4350
 $EndSCHEMATC
