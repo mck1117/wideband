@@ -1,5 +1,6 @@
 Comment,Designator,Footprint, LCSC
 1u,"C1,C2,C3",Capacitor_SMD:C_0603_1608Metric,C15849
+47p,"C4,C5",Capacitor_SMD:C_0402_1005Metric,C1567
 D_TVS,D1,Diode_SMD:D_SMC,C133648
 D_Schottky,D2,Diode_SMD:D_SMA,C8678
 220,R1,Resistor_SMD:R_0603_1608Metric,C22962
