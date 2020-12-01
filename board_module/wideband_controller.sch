@@ -581,8 +581,6 @@ F 4 "C50282" H 1775 1375 50  0001 C CNN "LCSC"
 	4    1775 1375
 	1    0    0    -1  
 $EndComp
-Text Notes 3575 7350 0    50   ~ 0
-Place a guard ring around the LSU_Un node \nwith the buffered LSU_Un_sense node
 Connection ~ 1900 5775
 Wire Wire Line
 	2850 4100 2850 4825
@@ -1700,4 +1698,6 @@ Wire Wire Line
 	6450 3200 7125 3200
 Text Label 6450 3200 0    50   ~ 0
 Nernst_esr_drive
+Text Notes 3775 5075 0    50   ~ 0
+Nernst Bias Current
 $EndSCHEMATC
