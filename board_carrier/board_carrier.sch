@@ -16,12 +16,12 @@ $EndDescr
 $Comp
 L power:GND #PWR0101
 U 1 1 5FB6223C
-P 5475 1800
-F 0 "#PWR0101" H 5475 1550 50  0001 C CNN
-F 1 "GND" H 5480 1627 50  0000 C CNN
-F 2 "" H 5475 1800 50  0001 C CNN
-F 3 "" H 5475 1800 50  0001 C CNN
-	1    5475 1800
+P 5075 1800
+F 0 "#PWR0101" H 5075 1550 50  0001 C CNN
+F 1 "GND" H 5080 1627 50  0000 C CNN
+F 2 "" H 5075 1800 50  0001 C CNN
+F 3 "" H 5075 1800 50  0001 C CNN
+	1    5075 1800
 	1    0    0    -1  
 $EndComp
 $Comp
@@ -139,35 +139,35 @@ Wire Wire Line
 $Comp
 L Interface_CAN_LIN:TJA1051T-3 U1
 U 1 1 5FB6A2CB
-P 5475 1400
-F 0 "U1" H 5150 1775 50  0000 C CNN
-F 1 "TJA1051T-3" H 5750 1775 50  0000 C CNN
-F 2 "Package_SO:SOIC-8_3.9x4.9mm_P1.27mm" H 5475 900 50  0001 C CIN
-F 3 "http://www.nxp.com/documents/data_sheet/TJA1051.pdf" H 5475 1400 50  0001 C CNN
-F 4 "C38695" H 5475 1400 50  0001 C CNN "LCSC"
-	1    5475 1400
+P 5075 1400
+F 0 "U1" H 4750 1775 50  0000 C CNN
+F 1 "TJA1051T-3" H 5350 1775 50  0000 C CNN
+F 2 "Package_SO:SOIC-8_3.9x4.9mm_P1.27mm" H 5075 900 50  0001 C CIN
+F 3 "http://www.nxp.com/documents/data_sheet/TJA1051.pdf" H 5075 1400 50  0001 C CNN
+F 4 "C38695" H 5075 1400 50  0001 C CNN "LCSC"
+	1    5075 1400
 	1    0    0    -1  
 $EndComp
 $Comp
 L power:+5V #PWR0106
 U 1 1 5FB6B936
-P 5475 1000
-F 0 "#PWR0106" H 5475 850 50  0001 C CNN
-F 1 "+5V" H 5490 1173 50  0000 C CNN
-F 2 "" H 5475 1000 50  0001 C CNN
-F 3 "" H 5475 1000 50  0001 C CNN
-	1    5475 1000
+P 5075 1000
+F 0 "#PWR0106" H 5075 850 50  0001 C CNN
+F 1 "+5V" H 5090 1173 50  0000 C CNN
+F 2 "" H 5075 1000 50  0001 C CNN
+F 3 "" H 5075 1000 50  0001 C CNN
+	1    5075 1000
 	1    0    0    -1  
 $EndComp
 $Comp
 L power:GND #PWR0107
 U 1 1 5FB6BFE5
-P 4975 1600
-F 0 "#PWR0107" H 4975 1350 50  0001 C CNN
-F 1 "GND" V 4980 1472 50  0000 R CNN
-F 2 "" H 4975 1600 50  0001 C CNN
-F 3 "" H 4975 1600 50  0001 C CNN
-	1    4975 1600
+P 4575 1600
+F 0 "#PWR0107" H 4575 1350 50  0001 C CNN
+F 1 "GND" V 4580 1472 50  0000 R CNN
+F 2 "" H 4575 1600 50  0001 C CNN
+F 3 "" H 4575 1600 50  0001 C CNN
+	1    4575 1600
 	0    1    1    0   
 $EndComp
 $Comp
@@ -196,22 +196,22 @@ F 3 "" H 2875 1475 50  0001 C CNN
 	1    2875 1475
 	1    0    0    -1  
 $EndComp
-Text Label 4650 1200 0    50   ~ 0
+Text Label 4250 1200 0    50   ~ 0
 CAN_TX
 Wire Wire Line
-	4650 1200 4975 1200
+	4250 1200 4575 1200
 Wire Wire Line
-	4975 1300 4650 1300
-Text Label 4650 1300 0    50   ~ 0
+	4575 1300 4250 1300
+Text Label 4250 1300 0    50   ~ 0
 CAN_RX
-Text Label 6275 1300 2    50   ~ 0
+Text Label 5875 1300 2    50   ~ 0
 CAN_H
-Text Label 6275 1500 2    50   ~ 0
+Text Label 5875 1500 2    50   ~ 0
 CAN_L
 Wire Wire Line
-	6275 1500 5975 1500
+	5875 1500 5575 1500
 Wire Wire Line
-	6275 1300 5975 1300
+	5875 1300 5575 1300
 $Comp
 L Device:R R1
 U 1 1 5FB83149
@@ -285,7 +285,7 @@ Wire Wire Line
 	3800 1575 3800 1500
 Connection ~ 3800 1500
 Wire Wire Line
-	3800 1500 4975 1500
+	3800 1500 4575 1500
 Text Notes 3350 2350 0    50   ~ 0
 VIO pin only draws 500uA max so\na divider will work fine
 $Comp
@@ -407,99 +407,82 @@ Wire Wire Line
 	2125 2450 2125 2500
 Text Label 2700 2450 2    50   ~ 0
 LSU_Heater-
-Text Label 925  4250 0    50   ~ 0
+Text Label 1525 3900 0    50   ~ 0
 LSU_Heater-
-Text Label 925  4150 0    50   ~ 0
+Text Label 1525 3800 0    50   ~ 0
 LSU_Ip
-Text Label 2525 4050 2    50   ~ 0
-LSU_Vm
-Text Label 2525 4150 2    50   ~ 0
-LSU_Rtrim
-Text Label 2525 4250 2    50   ~ 0
-LSU_Un
 Text Label 1825 675  0    50   ~ 0
 LSU_Heater+
 Wire Wire Line
 	1825 675  1825 1075
-Text Label 925  4350 0    50   ~ 0
+Text Label 1525 4000 0    50   ~ 0
 LSU_Heater+
 Wire Wire Line
-	1475 4350 925  4350
+	2075 4000 1525 4000
 Wire Wire Line
-	925  4250 1475 4250
+	1525 3900 2075 3900
 Wire Wire Line
-	925  4150 1475 4150
-Wire Wire Line
-	1975 4050 2525 4050
-Wire Wire Line
-	1975 4150 2525 4150
-Wire Wire Line
-	1975 4250 2525 4250
-Text Notes 850  4150 2    50   ~ 0
+	1525 3800 2075 3800
+Text Notes 1450 3800 2    50   ~ 0
 red
-Text Notes 2600 4050 0    50   ~ 0
-yellow
-Text Notes 850  4300 2    50   ~ 0
+Text Notes 1450 3950 2    50   ~ 0
 white
-Text Notes 850  4400 2    50   ~ 0
+Text Notes 1450 4050 2    50   ~ 0
 grey
-Text Notes 2600 4150 0    50   ~ 0
-green
-Text Notes 2600 4250 0    50   ~ 0
-black
-Text Notes 4175 2875 0    50   ~ 0
-LSU 4.9 Wire Colors:
-$Comp
-L power:GND #PWR0114
-U 1 1 5FBCD9A4
-P 5475 4925
-F 0 "#PWR0114" H 5475 4675 50  0001 C CNN
-F 1 "GND" V 5480 4797 50  0000 R CNN
-F 2 "" H 5475 4925 50  0001 C CNN
-F 3 "" H 5475 4925 50  0001 C CNN
-	1    5475 4925
-	1    0    0    -1  
-$EndComp
-Wire Wire Line
-	5400 4825 5475 4825
-Wire Wire Line
-	5475 4825 5475 4925
-Text GLabel 1400 4550 0    50   Input ~ 0
+Text GLabel 2000 4200 0    50   Input ~ 0
 12V_RAW
 Wire Wire Line
-	1400 4550 1475 4550
-Text Label 2275 4450 2    50   ~ 0
+	2000 4200 2075 4200
+Text Label 2875 4100 2    50   ~ 0
 CAN_H
-Text Label 2275 4550 2    50   ~ 0
+Text Label 2875 4200 2    50   ~ 0
 CAN_L
 Wire Wire Line
-	2275 4550 1975 4550
+	2875 4200 2575 4200
 Wire Wire Line
-	2275 4450 1975 4450
+	2875 4100 2575 4100
 $Comp
 L Connector_Generic:Conn_02x06_Top_Bottom J3
 U 1 1 5FD3D185
-P 1675 4250
-F 0 "J3" H 1725 4667 50  0000 C CNN
-F 1 "Conn_02x06_Top_Bottom" H 1725 4576 50  0000 C CNN
-F 2 "mx120:mx120g-12" H 1675 4250 50  0001 C CNN
-F 3 "~" H 1675 4250 50  0001 C CNN
-	1    1675 4250
+P 2275 3900
+F 0 "J3" H 2325 4317 50  0000 C CNN
+F 1 "Conn_02x06_Top_Bottom" H 2325 4226 50  0000 C CNN
+F 2 "mx120:mx120g-12" H 2275 3900 50  0001 C CNN
+F 3 "~" H 2275 3900 50  0001 C CNN
+	1    2275 3900
 	1    0    0    -1  
 $EndComp
 $Comp
 L power:GND #PWR0115
 U 1 1 5FD4C273
-P 1350 4050
-F 0 "#PWR0115" H 1350 3800 50  0001 C CNN
-F 1 "GND" V 1355 3922 50  0000 R CNN
-F 2 "" H 1350 4050 50  0001 C CNN
-F 3 "" H 1350 4050 50  0001 C CNN
-	1    1350 4050
+P 1950 3700
+F 0 "#PWR0115" H 1950 3450 50  0001 C CNN
+F 1 "GND" V 1955 3572 50  0000 R CNN
+F 2 "" H 1950 3700 50  0001 C CNN
+F 3 "" H 1950 3700 50  0001 C CNN
+	1    1950 3700
 	0    1    1    0   
 $EndComp
 Wire Wire Line
-	1350 4050 1475 4050
-NoConn ~ 1475 4450
-NoConn ~ 1975 4350
+	1950 3700 2075 3700
+NoConn ~ 2075 4100
+Text Notes 3200 4000 0    50   ~ 0
+black
+Text Notes 3200 3900 0    50   ~ 0
+green
+Text Notes 3200 3800 0    50   ~ 0
+yellow
+Wire Wire Line
+	2575 4000 3125 4000
+Wire Wire Line
+	2575 3900 3125 3900
+Wire Wire Line
+	2575 3800 3125 3800
+Text Label 3125 4000 2    50   ~ 0
+LSU_Un
+Text Label 3125 3900 2    50   ~ 0
+LSU_Rtrim
+Text Label 3125 3800 2    50   ~ 0
+LSU_Vm
+NoConn ~ 2575 3700
 $EndSCHEMATC
