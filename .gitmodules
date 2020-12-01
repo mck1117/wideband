@@ -4,3 +4,6 @@
 [submodule "firmware/cmsis-svd"]
 	path = firmware/cmsis-svd
 	url = https://github.com/posborne/cmsis-svd
+[submodule "kicad-libraries"]
+	path = kicad-libraries
+	url = https://github.com/rusefi/kicad-libraries
