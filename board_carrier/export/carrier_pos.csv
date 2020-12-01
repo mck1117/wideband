@@ -1,0 +1,10 @@
+Designator,Val,Package,Mid X,Mid Y,Rotation,Layer
+C1,1u,C_0603_1608Metric,60.9,-79.1,0,top
+C2,1u,C_0603_1608Metric,58.8,-88,0,top
+C3,1u,C_0603_1608Metric,55.2,-84.4,180,top
+D1,D_TVS,D_SMC,67.1,-73.8,90,top
+D2,D_Schottky,D_SMA,56.25,-69.75,180,top
+R1,220,R_0603_1608Metric,55.2,-86,180,top
+R2,470,R_0603_1608Metric,55.2,-82.8,180,top
+U1,TJA1051T-3,SOIC-8_3.9x4.9mm_P1.27mm,53,-79.25,270,top
+U2,LM78M05_TO252,TO-252-2,63,-83.5,0,top
