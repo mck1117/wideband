@@ -1768,4 +1768,6 @@ F 4 "" H 2750 7225 50  0001 C CNN "LCSC"
 	1    2750 7225
 	1    0    0    -1  
 $EndComp
+NoConn ~ 7125 2400
+NoConn ~ 7125 2300
 $EndSCHEMATC
