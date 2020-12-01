@@ -1,0 +1,112 @@
+EESchema Schematic File Version 4
+EELAYER 30 0
+EELAYER END
+$Descr A4 11693 8268
+encoding utf-8
+Sheet 1 1
+Title ""
+Date ""
+Rev ""
+Comp ""
+Comment1 ""
+Comment2 ""
+Comment3 ""
+Comment4 ""
+$EndDescr
+$Comp
+L Connector_Generic:Conn_01x08 J2
+U 1 1 5FC61831
+P 2975 2700
+F 0 "J2" H 3055 2692 50  0000 L CNN
+F 1 "Conn_01x08" H 3055 2601 50  0000 L CNN
+F 2 "Connector_PinSocket_2.54mm:PinSocket_1x08_P2.54mm_Vertical" H 2975 2700 50  0001 C CNN
+F 3 "~" H 2975 2700 50  0001 C CNN
+	1    2975 2700
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GND #PWR0101
+U 1 1 5FC62791
+P 2775 2500
+F 0 "#PWR0101" H 2775 2250 50  0001 C CNN
+F 1 "GND" V 2780 2372 50  0000 R CNN
+F 2 "" H 2775 2500 50  0001 C CNN
+F 3 "" H 2775 2500 50  0001 C CNN
+	1    2775 2500
+	0    1    1    0   
+$EndComp
+NoConn ~ 2775 2600
+NoConn ~ 2775 2700
+$Comp
+L Connector:USB_B J1
+U 1 1 5FC62D25
+P 1525 2600
+F 0 "J1" H 1582 3067 50  0000 C CNN
+F 1 "USB_B" H 1582 2976 50  0000 C CNN
+F 2 "Connector_USB:USB_B_TE_5787834_Vertical" H 1675 2550 50  0001 C CNN
+F 3 " ~" H 1675 2550 50  0001 C CNN
+	1    1525 2600
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	1825 2400 1975 2400
+Wire Wire Line
+	1825 2600 2425 2600
+Wire Wire Line
+	2425 2600 2425 2900
+Wire Wire Line
+	2425 2900 2775 2900
+Wire Wire Line
+	2775 2800 2350 2800
+Wire Wire Line
+	2350 2800 2350 2700
+Wire Wire Line
+	2350 2700 1825 2700
+$Comp
+L power:GND #PWR0102
+U 1 1 5FC656EB
+P 1425 3000
+F 0 "#PWR0102" H 1425 2750 50  0001 C CNN
+F 1 "GND" H 1430 2827 50  0001 C CNN
+F 2 "" H 1425 3000 50  0001 C CNN
+F 3 "" H 1425 3000 50  0001 C CNN
+	1    1425 3000
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GND #PWR0103
+U 1 1 5FC66205
+P 1525 3000
+F 0 "#PWR0103" H 1525 2750 50  0001 C CNN
+F 1 "GND" H 1530 2827 50  0001 C CNN
+F 2 "" H 1525 3000 50  0001 C CNN
+F 3 "" H 1525 3000 50  0001 C CNN
+	1    1525 3000
+	1    0    0    -1  
+$EndComp
+$Comp
+L Switch:SW_Push SW1
+U 1 1 5FC67930
+P 2325 3450
+F 0 "SW1" H 2325 3735 50  0000 C CNN
+F 1 "SW_Push" H 2325 3644 50  0000 C CNN
+F 2 "Button_Switch_THT:SW_PUSH_6mm" H 2325 3650 50  0001 C CNN
+F 3 "~" H 2325 3650 50  0001 C CNN
+	1    2325 3450
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	2525 3450 2575 3450
+Wire Wire Line
+	2575 3450 2575 3100
+Wire Wire Line
+	2575 3100 2775 3100
+Wire Wire Line
+	2125 3450 1975 3450
+Wire Wire Line
+	1975 3450 1975 2400
+Connection ~ 1975 2400
+Wire Wire Line
+	1975 2400 2775 2400
+NoConn ~ 2775 3000
+$EndSCHEMATC
