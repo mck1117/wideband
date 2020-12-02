@@ -21,11 +21,11 @@ void boot_app() {
     // Reset peripherals we might have used
     rccDisableCAN1();
 
-    volatile uint32_t* appFlash = &__appflash_start__;
+    const uint32_t* appFlash = &__appflash_start__;
 
     // copy vector table to sram
     // TODO: use __ram_vectors_size__
-    memcpy(reinterpret_cast<char*>(&__ram_vectors_start__), reinterpret_cast<char*>(&__appflash_start__), 256);
+    memcpy(reinterpret_cast<char*>(&__ram_vectors_start__), appFlash, 256);
 
     // The reset vector is at offset 4 (second uint32)
     uint32_t reset_vector = appFlash[1];
