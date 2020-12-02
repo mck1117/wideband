@@ -8,18 +8,6 @@ extern uint32_t __appflash_start__;
 extern uint32_t __ram_vectors_start__;
 extern int __ram_vectors_size__;
 
-void memcpy_wrapped(char* dst, const char* src, int size)
-{
-    //memcpy(dst, src, size);
-    //return;
-
-    for (size_t i = 0; i < size; i++)
-    {
-        char c = src[i];
-        dst[i] = c;
-    }
-}
-
 __attribute__((noreturn))
 void jump_to(uint32_t address) {
     __asm__ __volatile__ ("bx r0");
@@ -37,7 +25,7 @@ void boot_app() {
 
     // copy vector table to sram
     // TODO: use __ram_vectors_size__
-    memcpy_wrapped(reinterpret_cast<char*>(&__ram_vectors_start__), reinterpret_cast<char*>(&__appflash_start__), 256);
+    memcpy(reinterpret_cast<char*>(&__ram_vectors_start__), reinterpret_cast<char*>(&__appflash_start__), 256);
 
     // The reset vector is at offset 4 (second uint32)
     uint32_t reset_vector = appFlash[1];
