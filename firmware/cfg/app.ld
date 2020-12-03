@@ -14,13 +14,15 @@
     limitations under the License.
 */
 
-/*
- * STM32F042x6 memory setup.
- */
+/*INCLUDE wideband_layout.ld*/
+
+
+blsize = 8k;
+
 MEMORY
 {
-    /* bootloader (rx) : org = 0x08000000, len = 8k */
-    flash0 (rx) : org = 0x08000000, len = 24k
+    blflash (rx) : org = 0x08000000, len = blsize
+    appflash (rx) : org = 0x08000000 + blsize, len = 32k - blsize
     flash1 (rx) : org = 0x00000000, len = 0
     flash2 (rx) : org = 0x00000000, len = 0
     flash3 (rx) : org = 0x00000000, len = 0
@@ -28,7 +30,8 @@ MEMORY
     flash5 (rx) : org = 0x00000000, len = 0
     flash6 (rx) : org = 0x00000000, len = 0
     flash7 (rx) : org = 0x00000000, len = 0
-    ram0   (wx) : org = 0x20000000, len = 6k
+    ram_vectors (wx) : org = 0x20000000, len = 256
+    ram0   (wx) : org = 0x20000200, len = 6k - 256
     ram1   (wx) : org = 0x00000000, len = 0
     ram2   (wx) : org = 0x00000000, len = 0
     ram3   (wx) : org = 0x00000000, len = 0
@@ -37,6 +40,13 @@ MEMORY
     ram6   (wx) : org = 0x00000000, len = 0
     ram7   (wx) : org = 0x00000000, len = 0
 }
+
+__appflash_start__ = ORIGIN(appflash);
+__ram_vectors_start__ = ORIGIN(ram_vectors);
+__ram_vectors_size__ = LENGTH(ram_vectors);
+
+
+REGION_ALIAS("flash0", appflash);
 
 /* For each data/text section two region are defined, a virtual region
    and a load region (_LMA suffix).*/
@@ -81,6 +91,18 @@ REGION_ALIAS("BSS_RAM", ram0);
 
 /* RAM region to be used for the default heap.*/
 REGION_ALIAS("HEAP_RAM", ram0);
+
+/* Bootloader section */
+SECTIONS
+{
+.bl : ALIGN(4)
+    {
+        . = ALIGN(4);
+        *(.bl)
+        *(.bl.*)
+        . = ALIGN(4);
+    } > blflash AT > blflash
+}
 
 /* Generic rules inclusion.*/
 INCLUDE rules.ld

@@ -20,12 +20,12 @@ endif
 
 # Enable this if you want the linker to remove unused code and data.
 ifeq ($(USE_LINK_GC),)
-  USE_LINK_GC = yes
+  USE_LINK_GC = no
 endif
 
 # Linker extra options here.
 ifeq ($(USE_LDOPT),)
-  USE_LDOPT = 
+  USE_LDOPT =
 endif
 
 # Enable this if you want link time optimizations (LTO).
@@ -111,7 +111,7 @@ include $(CHIBIOS)/tools/mk/autobuild.mk
 include $(CHIBIOS)/os/hal/lib/streams/streams.mk
 
 # Define linker script file here
-LDSCRIPT= $(CONFDIR)/STM32F042x6.ld
+LDSCRIPT= $(CONFDIR)/app.ld
 
 # C sources that can be compiled in ARM or THUMB mode depending on the global
 # setting.
@@ -169,7 +169,7 @@ UINCDIR =
 ULIBDIR =
 
 # List all user libraries here
-ULIBS =
+ULIBS = bootloader/build/wideband_bootloader.o
 
 #
 # End of user section
