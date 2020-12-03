@@ -9,11 +9,6 @@ extern uint32_t __ram_vectors_start__;
 extern int __ram_vectors_size__;
 
 __attribute__((noreturn))
-void jump_to(uint32_t address) {
-    __asm__ __volatile__ ("bx r0");
-}
-
-__attribute__((noreturn))
 void boot_app() {
     // Goodbye, ChibiOS
     chSysDisable();
@@ -37,7 +32,8 @@ void boot_app() {
     //uint32_t app_msp = appLocation[0];
     //__set_MSP(app_msp);
 
-    jump_to(reset_vector);
+    typedef void (*ResetVectorFunction)(void);
+    ((ResetVectorFunction)reset_vector)();
 }
 
 /*
