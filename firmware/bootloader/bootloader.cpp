@@ -39,9 +39,10 @@ void boot_app() {
     ((ResetVectorFunction)reset_vector)();
 }
 
+uint32_t appFlashAddr = (uint32_t)&__appflash_start__;
+
 void EraseAppPages()
 {
-    uint32_t appFlashAddr = (uint32_t)&__appflash_start__;
     uintptr_t blSize = (uintptr_t)(appFlashAddr - 0x08000000);
     size_t pageIdx = blSize / 1024;
 
@@ -53,6 +54,129 @@ void EraseAppPages()
         pageIdx++;
     }
 }
+
+bool holdBoot = false;
+
+void WaitForBootloaderCmd()
+{
+    while(true)
+    {
+        CANRxFrame frame;
+        msg_t result = canReceiveTimeout(&CAND1, CAN_ANY_MAILBOX, &frame, TIME_INFINITE);
+
+        // Ignore non-ok results
+        if (result != MSG_OK) 
+        {
+            continue;
+        }
+
+        // if we got a bootloader-init message, here we go!
+        if (frame.EID == 0xEF0'0000)
+        {
+            return;
+        }
+    }
+}
+
+void sendAck()
+{
+    CANTxFrame frame;
+
+    frame.IDE = CAN_IDE_EXT;
+    frame.EID = 0x727573;   // ascii "rus"
+    frame.RTR = CAN_RTR_DATA;
+    frame.DLC = 0;
+
+    canTransmitTimeout(&CAND1, CAN_ANY_MAILBOX, &frame, TIME_INFINITE);
+}
+
+void sendNak()
+{
+    // TODO: implement
+}
+
+void RunBootloaderLoop()
+{
+    // First ack that the bootloader is alive
+    sendAck();
+
+    while (true)
+    {
+        CANRxFrame frame;
+        msg_t result = canReceiveTimeout(&CAND1, CAN_ANY_MAILBOX, &frame, TIME_INFINITE);
+
+        // Ignore non-ok results
+        if (result != MSG_OK) 
+        {
+            continue;
+        }
+
+        // 29-bit extended ID:
+        //  0 xxxy zzzz
+        // xx = header, always equals 0xEF
+        //  y = opcode
+        // zzzz = extra 2 data bytes hidden in the address!
+
+        uint16_t header = frame.EID >> 20;
+
+        // All rusEfi bootloader packets start with 0x0EF, ignore other traffic on the bus
+        if (header != 0x0EF)
+        {
+            continue;
+        }
+
+        uint8_t opcode = (frame.EID >> 16) & 0xFF;
+        uint16_t embeddedData = frame.EID & 0xFFFF;
+
+        switch (opcode) {
+            case 0x00: // opcode 0 is simply the "enter BL" command, but we're already here.  Send an ack.
+                sendAck();
+                break;
+            case 0x01: // opcode 1 is "erase app flash"
+                // embedded data must be 0x5A5A
+                if (embeddedData == 0x5A5A)
+                {
+                    EraseAppPages();
+                    sendAck();
+                }
+                else
+                {
+                    sendNak();
+                }
+
+                break;
+            case 0x02: // opcode 2 is "write flash data"
+                // Embedded data is the flash address
+
+                Flash::Write(appFlashAddr + embeddedData, &frame.data8[0], frame.DLC);
+
+                break;
+            case 0x03: // opcode 3 is "boot app"
+                // Clear the flag
+                holdBoot = false;
+                // Kill this thread
+                return;
+        }
+    }
+}
+
+THD_WORKING_AREA(waBootloaderThread, 512);
+THD_FUNCTION(BootloaderThread, arg)
+{
+    WaitForBootloaderCmd();
+
+    // We've rx'd a BL command, don't load the app!
+    holdBoot = true;
+
+    RunBootloaderLoop();
+}
+
+/*
+ * Threads creation table, one entry per thread.
+ */
+THD_TABLE_BEGIN
+  THD_TABLE_THREAD(0, "bootloader", waBootloaderThread, BootloaderThread, nullptr)
+THD_TABLE_END
 
 /*
  * Application entry point.
@@ -69,7 +193,8 @@ int main(void) {
         chThdSleepMilliseconds(40);
     }
 
-    //EraseAppPages();
+    // Block until booting the app is allowed
+    while (holdBoot) ;
 
     boot_app();
 }
