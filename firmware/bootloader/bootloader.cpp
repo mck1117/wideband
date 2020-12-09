@@ -37,6 +37,8 @@ void boot_app() {
 
     typedef void (*ResetVectorFunction)(void);
     ((ResetVectorFunction)reset_vector)();
+
+    while(1);
 }
 
 uint32_t appFlashAddr = (uint32_t)&__appflash_start__;
@@ -48,7 +50,7 @@ void EraseAppPages()
 
     size_t appSizeKb = __appflash_size__ / 1024;
 
-    for (int i = 0; i <= appSizeKb; i++)
+    for (size_t i = 0; i <= appSizeKb; i++)
     {
         Flash::ErasePage(pageIdx);
         pageIdx++;
@@ -163,6 +165,8 @@ void RunBootloaderLoop()
 THD_WORKING_AREA(waBootloaderThread, 512);
 THD_FUNCTION(BootloaderThread, arg)
 {
+    (void)arg;
+
     WaitForBootloaderCmd();
 
     // We've rx'd a BL command, don't load the app!
