@@ -17,7 +17,7 @@
 /*INCLUDE wideband_layout.ld*/
 
 
-blsize = 8k;
+blsize = 10k;
 
 MEMORY
 {
