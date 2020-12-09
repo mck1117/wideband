@@ -2,6 +2,7 @@
 #include "hal.h"
 
 #include "can_helper.h"
+#include "heater_control.h"
 
 static const CANConfig canConfig500 =
 {
@@ -20,6 +21,25 @@ struct StandardDataFrame
     uint16_t measuredResistance;
     uint8_t pad[4];
 };
+
+#define SWAP_UINT16(x) (((x) << 8) | ((x) >> 8))
+
+void SendEmulatedAemXseries(float lambda, uint8_t idx) {
+    CanTxMessage frame(0x180 + idx);
+
+    bool isValid = IsRunningClosedLoop();
+
+    uint16_t intLambda = lambda * 10000;
+
+    // swap endian
+    intLambda = SWAP_UINT16(intLambda);
+
+    *reinterpret_cast<uint16_t*>(&frame[0]) = intLambda;
+
+    // bit 1 = LSU 4.9 detected
+    // bit 7 = reading valid
+    frame[6] = 0x02 | (isValid ? 0x80 : 0x00);
+}
 
 void SendCanData(float lambda, uint16_t measuredResistance)
 {
