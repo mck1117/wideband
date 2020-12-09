@@ -156,7 +156,8 @@ UINCDIR =
 ULIBDIR =
 
 # List all user libraries here
-ULIBS =
+# Add the search path of the firmware/ dir, we need wideband_layout.ld
+ULIBS = -L..
 
 #
 # End of user section
