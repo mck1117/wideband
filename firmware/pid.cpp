@@ -2,7 +2,6 @@
 
 float Pid::GetOutput(float setpoint, float observation)
 {
-    // TODO: is this backwards?
     float error = setpoint - observation;
 
     // Integrate error
