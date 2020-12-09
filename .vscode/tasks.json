@@ -4,11 +4,24 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "make",
+            "label": "Build Firmware",
             "type": "shell",
             "command": "make -j8",
             "options": {
                 "cwd": "${workspaceRoot}/firmware"
+            },
+            "problemMatcher": [],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "Build Bootloader",
+            "type": "shell",
+            "command": "./build_bootloader.sh",
+            "options": {
+                "cwd": "${workspaceRoot}/firmware/bootloader"
             },
             "problemMatcher": [],
             "group": {
