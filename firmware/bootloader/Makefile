@@ -118,7 +118,7 @@ CSRC = $(ALLCSRC)
 
 # C++ sources that can be compiled in ARM or THUMB mode depending on the global
 # setting.
-CPPSRC = $(ALLCPPSRC) bootloader.cpp
+CPPSRC = $(ALLCPPSRC) bootloader.cpp ../shared/flash.cpp
 
 # List ASM source files here.
 ASMSRC = $(ALLASMSRC)
@@ -127,7 +127,7 @@ ASMSRC = $(ALLASMSRC)
 ASMXSRC = $(ALLXASMSRC)
 
 # Inclusion directories.
-INCDIR = $(CONFDIR) $(ALLINC) $(TESTINC)
+INCDIR = $(CONFDIR) $(ALLINC) $(TESTINC) ../shared/
 
 # Define C warning options here.
 CWARN = -Wall -Wextra -Wundef -Wstrict-prototypes

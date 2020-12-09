@@ -1,12 +1,15 @@
 #include "ch.h"
 #include "hal.h"
 
+#include "flash.h"
+
 #include <cstring>
 
 // These are defined in the linker script
 extern uint32_t __appflash_start__;
+extern uint32_t __appflash_size__;
 extern uint32_t __ram_vectors_start__;
-extern int __ram_vectors_size__;
+extern uint32_t __ram_vectors_size__;
 
 __attribute__((noreturn))
 void boot_app() {
@@ -36,6 +39,21 @@ void boot_app() {
     ((ResetVectorFunction)reset_vector)();
 }
 
+void EraseAppPages()
+{
+    uint32_t appFlashAddr = (uint32_t)&__appflash_start__;
+    uintptr_t blSize = (uintptr_t)(appFlashAddr - 0x08000000);
+    size_t pageIdx = blSize / 1024;
+
+    size_t appSizeKb = __appflash_size__ / 1024;
+
+    for (int i = 0; i <= appSizeKb; i++)
+    {
+        Flash::ErasePage(pageIdx);
+        pageIdx++;
+    }
+}
+
 /*
  * Application entry point.
  */
@@ -50,6 +68,8 @@ int main(void) {
         palTogglePad(GPIOB, 3);
         chThdSleepMilliseconds(40);
     }
+
+    //EraseAppPages();
 
     boot_app();
 }
