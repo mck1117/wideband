@@ -66,7 +66,7 @@ static void flashWriteData(flashaddr_t address, const flashdata_t data) {
 	FLASH->CR &= ~FLASH_CR_PG;
 }
 
-void Flash::Write(flashaddr_t address, const char* buffer, size_t size) {
+void Flash::Write(flashaddr_t address, const uint8_t* buffer, size_t size) {
     /* Unlock flash for write access */
     flashUnlock();
 

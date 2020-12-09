@@ -10,5 +10,5 @@ using flashdata_t = uint16_t;
 
 struct Flash {
     static void ErasePage(uint8_t pageIndex);
-    static void Write(flashaddr_t address, const char* buffer, size_t size);
+    static void Write(flashaddr_t address, const uint8_t* buffer, size_t size);
 };
