@@ -49,5 +49,8 @@ int main() {
         float lambda = GetLambda();
 
         SendCanData(lambda, esr);
+        SendEmulatedAemXseries(lambda, 0);
+
+        chThdSleepMilliseconds(10);
     }
 }
