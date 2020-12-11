@@ -46,7 +46,7 @@ int main() {
     while(true)
     {
         palTogglePad(GPIOB, 6);
-        chThdSleepMilliseconds(400);
+        chThdSleepMilliseconds(IsRunningClosedLoop() ? 50 : 400);
     }
 
 }
