@@ -1,0 +1,1 @@
+The file wideband_image.h is generated for use by rusEFI to be able to beam firmware updates to attached wideband contollers.
