@@ -2,6 +2,8 @@
 #include "hal.h"
 #include "chprintf.h"
 
+#include "lambda_conversion.h"
+#include "sampling.h"
 #include "uart.h"
 
 static const UARTConfig uartCfg =
@@ -25,7 +27,17 @@ static char printBuffer[200];
 static THD_WORKING_AREA(waUartThread, 256);
 static void UartThread(void*)
 {
+    while(true)
+    {
+        float lambda = GetLambda();
+        int lambdaIntPart = lambda;
+        int lambdaThousandths = (lambda - lambdaIntPart) * 1000;
 
+        size_t writeCount = chsnprintf(printBuffer, 200, "%d.%03d\t%d\n", lambdaIntPart, lambdaThousandths, (int)GetSensorInternalResistance());
+        uartStartSend(&UARTD1, writeCount, printBuffer);
+
+        chThdSleepMilliseconds(100);
+    }
 }
 
 void InitUart()
