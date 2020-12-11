@@ -132,6 +132,7 @@ CPPSRC = $(ALLCPPSRC) \
           heater_control.cpp \
           pid.cpp \
           pump_control.cpp \
+          uart.cpp \
           main.cpp
 
 # List ASM source files here.
