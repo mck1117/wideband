@@ -124,6 +124,7 @@ CPPSRC = $(ALLCPPSRC) \
           analog_input.cpp \
           can.cpp \
           can_helper.cpp \
+          fault.cpp \
           lambda_conversion.cpp \
           pwm.cpp \
           pump_dac.cpp \
