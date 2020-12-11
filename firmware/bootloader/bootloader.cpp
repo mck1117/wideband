@@ -202,7 +202,7 @@ int main(void) {
     {
         palTogglePad(GPIOB, 5);
         palTogglePad(GPIOB, 6);
-        chThdSleepMilliseconds(80);
+        chThdSleepMilliseconds(200);
     }
 
     boot_app();
