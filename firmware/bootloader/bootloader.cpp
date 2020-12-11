@@ -156,6 +156,11 @@ void RunBootloaderLoop()
                 {
                     sendNak();
                 }
+                // Don't allow out of bounds writes
+                else if (embeddedData < 0 || embeddedData > 26 * 1024)
+                {
+                    sendNak();
+                }
                 else
                 {
                     Flash::Write(appFlashAddr + embeddedData, &frame.data8[0], frame.DLC);
