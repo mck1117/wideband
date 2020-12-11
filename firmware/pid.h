@@ -3,10 +3,11 @@
 class Pid
 {
 public:
-    Pid(float kP, float kI, int periodMs) 
+    Pid(float kP, float kI, float clamp, int periodMs) 
         : m_period(periodMs / 1000.0f)
         , m_kp(kP)
         , m_ki(kI)
+        , m_clamp(clamp)
     {
     }
 
@@ -16,6 +17,7 @@ private:
     const float m_period;
     const float m_kp;
     const float m_ki;
+    const float m_clamp;
 
     float m_lastError;
     float m_integrator;

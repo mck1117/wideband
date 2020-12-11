@@ -8,7 +8,7 @@
 #include "ch.h"
 
 // Bosch CJ125 is somewhere VERY ROUGHLY like 200-400A/(v*s) integrator gain
-static Pid pumpPid(50.0f, 5000.0f, 2);
+static Pid pumpPid(50.0f, 5000.0f, 10, 2);
 
 static THD_WORKING_AREA(waPumpThread, 256);
 static void PumpThread(void*)
