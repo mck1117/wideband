@@ -27,7 +27,7 @@ static void SamplingThread(void*)
     while(true)
     {
         // First toggle the pin
-        palTogglePad(GPIOB, 8);
+        palTogglePad(GPIOB, 7);
         auto result = AnalogSample();
 
         float r_1 = result.NernstVoltage;
