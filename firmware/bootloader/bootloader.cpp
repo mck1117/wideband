@@ -157,7 +157,7 @@ void RunBootloaderLoop()
                     sendNak();
                 }
                 // Don't allow out of bounds writes
-                else if (embeddedData < 0 || embeddedData > 26 * 1024)
+                else if (embeddedData >= 26 * 1024)
                 {
                     sendNak();
                 }
