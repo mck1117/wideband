@@ -169,6 +169,8 @@
  * PA2  - Ip_sense                  (analog in).
  * PA6  - Ip_dac (PWM)              (output pushpull, alternate 1).
  * PA7  - Heater PWM                (output pushpull, alternate 2).
+ * PA9  - UART TX                   (alternate 1).
+ * PA10 - UART RX                   (alternate 1).
  * PA11 - CAN RX                    (alternate 4).
  * PA12 - CAN TX                    (alternate 4).
  * PA13 - SWDIO                     (alternate 0).
@@ -184,8 +186,8 @@
                                      PIN_MODE_ALTERNATE(GPIOA_PIN6) |         \
                                      PIN_MODE_ALTERNATE(GPIOA_PIN7) |         \
                                      PIN_MODE_INPUT(GPIOA_PIN8) |         \
-                                     PIN_MODE_INPUT(GPIOA_PIN9) |         \
-                                     PIN_MODE_INPUT(GPIOA_PIN10) |         \
+                                     PIN_MODE_ALTERNATE(GPIOA_PIN9) |         \
+                                     PIN_MODE_ALTERNATE(GPIOA_PIN10) |         \
                                      PIN_MODE_ALTERNATE(GPIOA_PIN11) |        \
                                      PIN_MODE_ALTERNATE(GPIOA_PIN12) |         \
                                      PIN_MODE_ALTERNATE(GPIOA_SWDIO) |      \
@@ -263,8 +265,8 @@
                                      PIN_AFIO_AF(GPIOA_PIN5, 0U) |        \
                                      PIN_AFIO_AF(GPIOA_PIN6, 1U) |        \
                                      PIN_AFIO_AF(GPIOA_PIN7, 2U))
-#define VAL_GPIOA_AFRH              (PIN_AFIO_AF(GPIOA_PIN8, 0U) |        \
-                                     PIN_AFIO_AF(GPIOA_PIN9, 0U) |        \
+#define VAL_GPIOA_AFRH              (PIN_AFIO_AF(GPIOA_PIN8, 1U) |        \
+                                     PIN_AFIO_AF(GPIOA_PIN9, 1U) |        \
                                      PIN_AFIO_AF(GPIOA_PIN10, 0U) |        \
                                      PIN_AFIO_AF(GPIOA_PIN11, 4U) |       \
                                      PIN_AFIO_AF(GPIOA_PIN12, 4U) |        \
