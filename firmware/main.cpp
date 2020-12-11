@@ -48,5 +48,4 @@ int main() {
         palTogglePad(GPIOB, 6);
         chThdSleepMilliseconds(IsRunningClosedLoop() ? 50 : 400);
     }
-
 }
