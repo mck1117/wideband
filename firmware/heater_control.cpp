@@ -89,6 +89,9 @@ static float GetDutyForState(HeaterState state, float heaterEsr)
             // Something has gone wrong, return 0.
             return 0;
     }
+
+    // should be unreachable
+    return 0;
 }
 
 static HeaterState state = HeaterState::Preheat;
