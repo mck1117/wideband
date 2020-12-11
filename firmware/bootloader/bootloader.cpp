@@ -189,11 +189,12 @@ int main(void) {
     halInit();
     chSysInit();
 
-    palSetPadMode(GPIOB, 3, PAL_MODE_OUTPUT_PUSHPULL);
+    // PB5 is blue LED
+    palSetPadMode(GPIOB, 5, PAL_MODE_OUTPUT_PUSHPULL);
 
     for (size_t i = 0; i < 20; i++)
     {
-        palTogglePad(GPIOB, 3);
+        palTogglePad(GPIOB, 5);
         chThdSleepMilliseconds(40);
     }
 
