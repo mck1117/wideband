@@ -3,6 +3,8 @@
 
 #include "can_helper.h"
 #include "heater_control.h"
+#include "lambda_conversion.h"
+#include "sampling.h"
 
 static const CANConfig canConfig500 =
 {
@@ -10,9 +12,25 @@ static const CANConfig canConfig500 =
     CAN_BTR_SJW(0) | CAN_BTR_BRP(5)  | CAN_BTR_TS1(12) | CAN_BTR_TS2(1) | CAN_BTR_LBKM,
 };
 
+static THD_WORKING_AREA(waCanTxThread, 256);
+void CanTxThread(void*)
+{
+    while(1)
+    {
+        float esr = GetSensorInternalResistance();
+        float lambda = GetLambda();
+
+        SendCanData(lambda, esr);
+        SendEmulatedAemXseries(lambda, 0);
+
+        chThdSleepMilliseconds(10);
+    }
+}
+
 void InitCan()
 {
     canStart(&CAND1, &canConfig500);
+    chThdCreateStatic(waCanTxThread, sizeof(waCanTxThread), NORMALPRIO, CanTxThread, nullptr);
 }
 
 struct StandardDataFrame

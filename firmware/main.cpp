@@ -7,7 +7,6 @@
 #include "pump_control.h"
 #include "pump_dac.h"
 #include "sampling.h"
-#include "lambda_conversion.h"
 
 static const UARTConfig uartCfg =
 {
@@ -44,13 +43,10 @@ int main() {
 
     InitCan();
 
-    while(1) {
-        float esr = GetSensorInternalResistance();
-        float lambda = GetLambda();
-
-        SendCanData(lambda, esr);
-        SendEmulatedAemXseries(lambda, 0);
-
-        chThdSleepMilliseconds(10);
+    while(true)
+    {
+        palTogglePad(GPIOB, 6);
+        chThdSleepMilliseconds(400);
     }
+
 }
