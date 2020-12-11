@@ -38,7 +38,7 @@ static HeaterState GetNextState(HeaterState state, float sensorEsr)
             // Stay in preheat - wait for time to elapse
             break;
         case HeaterState::WarmupRamp:
-            if (sensorEsr < 2000)
+            if (sensorEsr < 1000)
             {
                 return HeaterState::ClosedLoop;
             }
