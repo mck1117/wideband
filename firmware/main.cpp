@@ -44,7 +44,9 @@ int main() {
 
     while(true)
     {
-        if (!hasFault())
+        auto fault = getCurrentFault();
+
+        if (fault == Fault::None)
         {
             // blue is off
             palClearPad(GPIOB, 5);
@@ -54,25 +56,23 @@ int main() {
 
             // Fast blink if closed loop, slow if not
             chThdSleepMilliseconds(IsRunningClosedLoop() ? 50 : 400);
-
-            continue;
         }
-
-        auto fault = getCurrentFault();
-
-        // green is off
-        palClearPad(GPIOB, 6);
-
-        // Blink out the error code
-        for (int i = 0; i < 2 * static_cast<int>(fault); i++)
+        else
         {
-            // Blue is blinking
-            palTogglePad(GPIOB, 5);
+            // green is off
+            palClearPad(GPIOB, 6);
 
-            // fast blink
-            chThdSleepMilliseconds(300);
+            // Blink out the error code
+            for (int i = 0; i < 2 * static_cast<int>(fault); i++)
+            {
+                // Blue is blinking
+                palTogglePad(GPIOB, 5);
+
+                // fast blink
+                chThdSleepMilliseconds(300);
+            }
+
+            chThdSleepMilliseconds(2000);
         }
-
-        chThdSleepMilliseconds(2000);
     }
 }
