@@ -60,25 +60,17 @@ int main() {
 
         auto fault = getCurrentFault();
 
-        switch (fault)
+        // green is off
+        palClearPad(GPIOB, 6);
+
+        // Blink out the error code
+        for (int i = 0; i < 2 * static_cast<int>(fault); i++)
         {
-            case Fault::None:
-                break;
-            case Fault::SensorDidntHeat:
-                // green is off
-                palClearPad(GPIOB, 6);
+            // Blue is blinking
+            palTogglePad(GPIOB, 5);
 
-                // Blink out the error code
-                for (int i = 0; i < 2 * static_cast<int>(fault); i++)
-                {
-                    // Blue is blinking
-                    palTogglePad(GPIOB, 5);
-
-                    // fast blink
-                    chThdSleepMilliseconds(300);
-                }
-
-                break;
+            // fast blink
+            chThdSleepMilliseconds(300);
         }
 
         chThdSleepMilliseconds(2000);
