@@ -182,7 +182,7 @@ int main(void) {
     halInit();
     chSysInit();
 
-    chThdCreateStatic(waBootloaderThread, sizeof(waBootloaderThread), NORMALPRIO, BootloaderThread, nullptr);
+    chThdCreateStatic(waBootloaderThread, sizeof(waBootloaderThread), NORMALPRIO + 1, BootloaderThread, nullptr);
 
     // PB5 is blue LED
     palSetPadMode(GPIOB, 5, PAL_MODE_OUTPUT_PUSHPULL);
@@ -198,7 +198,12 @@ int main(void) {
     }
 
     // Block until booting the app is allowed
-    while (holdBoot) ;
+    while (holdBoot)
+    {
+        palTogglePad(GPIOB, 5);
+        palTogglePad(GPIOB, 6);
+        chThdSleepMilliseconds(80);
+    }
 
     boot_app();
 }
