@@ -9,7 +9,7 @@ void setFault(Fault fault)
 
 bool hasFault()
 {
-    return currentFault == Fault::None;
+    return currentFault != Fault::None;
 }
 
 Fault getCurrentFault()
