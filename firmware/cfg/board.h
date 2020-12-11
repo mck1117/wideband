@@ -275,22 +275,19 @@
 /*
  * GPIOB setup:
  *
- * PB3  - SPI SCK LED_GREEN         (alternate 0).
- * PB4  - SPI MISO                  (alternate 0).
- * PB5  - SPI MOSI                  (alternate 0).
- * PB6  - Debug UART TX             (alternate 0).
- * PB7  - Debug UART RX             (alternate 0).
- * PB8  - Nernst ESR driver (GPIO)  (output pushpull).
+ * PB5  - Blue LED                  (output pushpull)
+ * PB6  - Green LED                 (output pushpull)
+ * PB7  - Nernst ESR driver (GPIO)  (output pushpull)
  */
 #define VAL_GPIOB_MODER             (PIN_MODE_INPUT(GPIOB_PIN0) |         \
                                      PIN_MODE_INPUT(GPIOB_PIN1) |         \
                                      PIN_MODE_INPUT(GPIOB_PIN2) |           \
-                                     PIN_MODE_ALTERNATE(GPIOB_PIN3) |       \
-                                     PIN_MODE_ALTERNATE(GPIOB_PIN4) |        \
-                                     PIN_MODE_ALTERNATE(GPIOB_PIN5) |        \
-                                     PIN_MODE_ALTERNATE(GPIOB_PIN6) |         \
-                                     PIN_MODE_ALTERNATE(GPIOB_PIN7) |         \
-                                     PIN_MODE_OUTPUT(GPIOB_PIN8) |           \
+                                     PIN_MODE_INPUT(GPIOB_PIN3) |       \
+                                     PIN_MODE_INPUT(GPIOB_PIN4) |        \
+                                     PIN_MODE_OUTPUT(GPIOB_PIN5) |        \
+                                     PIN_MODE_OUTPUT(GPIOB_PIN6) |         \
+                                     PIN_MODE_OUTPUT(GPIOB_PIN7) |         \
+                                     PIN_MODE_INPUT(GPIOB_PIN8) |           \
                                      PIN_MODE_INPUT(GPIOB_PIN9) |           \
                                      PIN_MODE_INPUT(GPIOB_PIN10) |          \
                                      PIN_MODE_INPUT(GPIOB_PIN11) |          \
