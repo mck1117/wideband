@@ -2,7 +2,7 @@
  * STM32F042x6 memory setup.
  */
 
-blsize = 4k;
+blsize = 6k;
 
 MEMORY
 {

@@ -176,25 +176,24 @@ THD_FUNCTION(BootloaderThread, arg)
 }
 
 /*
- * Threads creation table, one entry per thread.
- */
-THD_TABLE_BEGIN
-  THD_TABLE_THREAD(0, "bootloader", waBootloaderThread, BootloaderThread, nullptr)
-THD_TABLE_END
-
-/*
  * Application entry point.
  */
 int main(void) {
     halInit();
     chSysInit();
 
+    chThdCreateStatic(waBootloaderThread, sizeof(waBootloaderThread), NORMALPRIO, BootloaderThread, nullptr);
+
     // PB5 is blue LED
     palSetPadMode(GPIOB, 5, PAL_MODE_OUTPUT_PUSHPULL);
+    // PB6 is green LED
+    palSetPadMode(GPIOB, 6, PAL_MODE_OUTPUT_PUSHPULL);
+    palTogglePad(GPIOB, 6);
 
     for (size_t i = 0; i < 20; i++)
     {
         palTogglePad(GPIOB, 5);
+        palTogglePad(GPIOB, 6);
         chThdSleepMilliseconds(40);
     }
 
