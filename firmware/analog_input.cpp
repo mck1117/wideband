@@ -17,7 +17,7 @@ ADCConversionGroup convGroup =
     ADC_CFGR1_CONT | ADC_CFGR1_RES_12BIT,                  // CFGR1
     ADC_TR(0, 0),       // TR
     ADC_SMPR_SMP_7P5,      // SMPR
-    ADC_CHSELR_CHSEL0 | ADC_CHSELR_CHSEL1 | ADC_CHSELR_CHSEL2
+    ADC_CHSELR_CHSEL0 | ADC_CHSELR_CHSEL2 | ADC_CHSELR_CHSEL3
 };
 
 static float AverageSamples(adcsample_t* buffer, size_t idx)
@@ -42,7 +42,7 @@ AnalogResult AnalogSample()
     return
     {
         .NernstVoltage = AverageSamples(adcBuffer, 0) * NERNST_INPUT_GAIN,
-        .VirtualGroundVoltage = AverageSamples(adcBuffer, 1),
-        .PumpCurrentVoltage = AverageSamples(adcBuffer, 2),
+        .PumpCurrentVoltage = AverageSamples(adcBuffer, 1),
+        .VirtualGroundVoltageInt = AverageSamples(adcBuffer, 2),
     };
 }

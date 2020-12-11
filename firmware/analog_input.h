@@ -3,8 +3,8 @@
 struct AnalogResult
 {
     float NernstVoltage;
-    float VirtualGroundVoltage;
     float PumpCurrentVoltage;
+    float VirtualGroundVoltageInt;
 };
 
 AnalogResult AnalogSample();
