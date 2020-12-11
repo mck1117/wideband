@@ -63,6 +63,7 @@ static HeaterState GetNextState(HeaterState state, float sensorEsr)
             if (sensorEsr < HEATER_FAULT_ESR)
             {
                 setFault(Fault::SensorOverheat);
+                return HeaterState::Stopped;
             }
 
             break;
