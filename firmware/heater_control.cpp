@@ -20,7 +20,7 @@ enum class HeaterState
     Stopped,
 };
 
-int timeCounter = 5000 / 50;
+int timeCounter = HEATER_PREHEAT_TIME / HEATER_CONTROL_PERIOD;
 float rampDuty = 0.5f;
 
 static HeaterState GetNextState(HeaterState state, float sensorEsr)
@@ -37,7 +37,7 @@ static HeaterState GetNextState(HeaterState state, float sensorEsr)
                 rampDuty = 0.5f;
 
                 // Next phase times out at 15 seconds
-                timeCounter = 15000 / 50;
+                timeCounter = HEATER_WARMUP_TIMEOUT / HEATER_CONTROL_PERIOD;
 
                 return HeaterState::WarmupRamp;
             }
@@ -45,7 +45,7 @@ static HeaterState GetNextState(HeaterState state, float sensorEsr)
             // Stay in preheat - wait for time to elapse
             break;
         case HeaterState::WarmupRamp:
-            if (sensorEsr < 1000)
+            if (sensorEsr < HEATER_CLOSED_LOOP_THRESHOLD_ESR)
             {
                 return HeaterState::ClosedLoop;
             }
@@ -60,6 +60,11 @@ static HeaterState GetNextState(HeaterState state, float sensorEsr)
             break;
         case HeaterState::ClosedLoop:
             // TODO: handle departure from closed loop
+            if (sensorEsr < HEATER_FAULT_ESR)
+            {
+                setFault(Fault::SensorOverheat);
+            }
+
             break;
         case HeaterState::Stopped: break;
     }
