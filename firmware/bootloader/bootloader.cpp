@@ -151,7 +151,16 @@ void RunBootloaderLoop()
             case 0x02: // opcode 2 is "write flash data"
                 // Embedded data is the flash address
 
-                Flash::Write(appFlashAddr + embeddedData, &frame.data8[0], frame.DLC);
+                // Don't allow misaligned writes
+                if (embeddedData % sizeof(flashdata_t) != 0 || frame.DLC % sizeof(flashdata_t) != 0)
+                {
+                    sendNak();
+                }
+                else
+                {
+                    Flash::Write(appFlashAddr + embeddedData, &frame.data8[0], frame.DLC);
+                    sendAck();
+                }
 
                 break;
             case 0x03: // opcode 3 is "boot app"
