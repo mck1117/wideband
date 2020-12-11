@@ -59,10 +59,14 @@ static HeaterState GetNextState(HeaterState state, float sensorEsr)
 
             break;
         case HeaterState::ClosedLoop:
-            // TODO: handle departure from closed loop
-            if (sensorEsr < HEATER_FAULT_ESR)
+            if (sensorEsr < HEATER_OVERHEAT_ESR)
             {
                 setFault(Fault::SensorOverheat);
+                return HeaterState::Stopped;
+            }
+            else if (sensorEsr > HEATER_UNDERHEAT_ESR)
+            {
+                setFault(Fault::SensorUnderheat);
                 return HeaterState::Stopped;
             }
 

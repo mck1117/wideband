@@ -7,6 +7,7 @@ enum class Fault
     // First fault code at 3 so it's easier to see
     SensorDidntHeat = 3,
     SensorOverheat = 4,
+    SensorUnderheat = 5,
 };
 
 void setFault(Fault fault);
