@@ -57,7 +57,6 @@ void EraseAppPages()
     }
 }
 
-bool holdBoot = false;
 
 void WaitForBootloaderCmd()
 {
@@ -96,6 +95,8 @@ void sendNak()
 {
     // TODO: implement
 }
+
+bool bootloaderBusy = false;
 
 void RunBootloaderLoop()
 {
@@ -155,9 +156,12 @@ void RunBootloaderLoop()
                 break;
             case 0x03: // opcode 3 is "boot app"
                 // Clear the flag
-                holdBoot = false;
+                bootloaderBusy = false;
                 // Kill this thread
                 return;
+            default:
+                sendNak();
+                break;
         }
     }
 }
@@ -170,7 +174,7 @@ THD_FUNCTION(BootloaderThread, arg)
     WaitForBootloaderCmd();
 
     // We've rx'd a BL command, don't load the app!
-    holdBoot = true;
+    bootloaderBusy = true;
 
     RunBootloaderLoop();
 }
@@ -198,7 +202,7 @@ int main(void) {
     }
 
     // Block until booting the app is allowed
-    while (holdBoot)
+    while (bootloaderBusy)
     {
         palTogglePad(GPIOB, 5);
         palTogglePad(GPIOB, 6);
