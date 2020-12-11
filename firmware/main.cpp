@@ -3,6 +3,7 @@
 #include "chprintf.h"
 
 #include "can.h"
+#include "fault.h"
 #include "heater_control.h"
 #include "pump_control.h"
 #include "pump_dac.h"
@@ -45,7 +46,30 @@ int main() {
 
     while(true)
     {
-        palTogglePad(GPIOB, 6);
-        chThdSleepMilliseconds(IsRunningClosedLoop() ? 50 : 400);
+        auto fault = getCurrentFault();
+
+        switch (fault)
+        {
+            case Fault::None:
+                // blue is off
+                palClearPad(GPIOB, 5);
+
+                // Green is blinking
+                palTogglePad(GPIOB, 6);
+
+                // Fast blink if closed loop, slow if not
+                chThdSleepMilliseconds(IsRunningClosedLoop() ? 50 : 400);
+                break;
+            case Fault::SensorDidntHeat:
+                // Blue is blinking
+                palTogglePad(GPIOB, 5);
+
+                // green is off
+                palClearPad(GPIOB, 6);
+
+                // fast blink
+                chThdSleepMilliseconds(50);
+                break;
+        }
     }
 }

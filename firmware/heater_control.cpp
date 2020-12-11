@@ -3,6 +3,8 @@
 
 #include "ch.h"
 #include "hal.h"
+
+#include "fault.h"
 #include "pwm.h"
 #include "sampling.h"
 #include "pid.h"
@@ -15,9 +17,10 @@ enum class HeaterState
     Preheat,
     WarmupRamp,
     ClosedLoop,
+    Stopped,
 };
 
-int preheatCounter = 5000 / 50;
+int timeCounter = 5000 / 50;
 float rampDuty = 0.5f;
 
 static HeaterState GetNextState(HeaterState state, float sensorEsr)
@@ -25,13 +28,17 @@ static HeaterState GetNextState(HeaterState state, float sensorEsr)
     switch (state)
     {
         case HeaterState::Preheat:
-            preheatCounter--;
+            timeCounter--;
 
-            if (preheatCounter <= 0)
+            if (timeCounter <= 0)
             {
                 // If enough time has elapsed, start the ramp
                 // Start the ramp at 50% duty - ~6-7 volts
                 rampDuty = 0.5f;
+
+                // Next phase times out at 15 seconds
+                timeCounter = 15000 / 50;
+
                 return HeaterState::WarmupRamp;
             }
 
@@ -42,9 +49,19 @@ static HeaterState GetNextState(HeaterState state, float sensorEsr)
             {
                 return HeaterState::ClosedLoop;
             }
+            else if (timeCounter == 0)
+            {
+                setFault(Fault::SensorDidntHeat);
+                return HeaterState::Stopped;
+            }
+
+            timeCounter--;
 
             break;
-        case HeaterState::ClosedLoop: break;
+        case HeaterState::ClosedLoop:
+            // TODO: handle departure from closed loop
+            break;
+        case HeaterState::Stopped: break;
     }
 
     return state;
@@ -68,7 +85,9 @@ static float GetDutyForState(HeaterState state, float heaterEsr)
         case HeaterState::ClosedLoop:
             // Negated because lower resistance -> hotter
             return heaterPid.GetOutput(-HEATER_TARGET_ESR, -heaterEsr);
-        default: return 0;
+        case HeaterState::Stopped:
+            // Something has gone wrong, return 0.
+            return 0;
     }
 }
 
