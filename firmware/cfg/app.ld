@@ -69,8 +69,8 @@ SECTIONS
 .bl : ALIGN(4)
     {
         . = ALIGN(4);
-        *(.bl)
-        *(.bl.*)
+        KEEP(*(.bl))
+        KEEP(*(.bl.*))
         . = ALIGN(4);
     } > blflash AT > blflash
 }
