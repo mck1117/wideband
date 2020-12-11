@@ -16,7 +16,7 @@ static const UARTConfig uartCfg =
     .timeout_cb = nullptr,
 
     .timeout = 0,
-    .speed = 500000,
+    .speed = 115200,
     .cr1 = 0,
     .cr2 = 0,
     .cr3 = 0,
@@ -33,7 +33,7 @@ static void UartThread(void*)
         int lambdaIntPart = lambda;
         int lambdaThousandths = (lambda - lambdaIntPart) * 1000;
 
-        size_t writeCount = chsnprintf(printBuffer, 200, "%d.%03d\t%d\n", lambdaIntPart, lambdaThousandths, (int)GetSensorInternalResistance());
+        size_t writeCount = chsnprintf(printBuffer, 200, "%d.%03d\t%d\r\n", lambdaIntPart, lambdaThousandths, (int)GetSensorInternalResistance());
         uartStartSend(&UARTD1, writeCount, printBuffer);
 
         chThdSleepMilliseconds(100);
