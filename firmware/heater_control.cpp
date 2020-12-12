@@ -94,7 +94,7 @@ static float GetDutyForState(HeaterState state, float heaterEsr)
             return rampDuty;
         case HeaterState::ClosedLoop:
             // Negated because lower resistance -> hotter
-            return heaterPid.GetOutput(-HEATER_TARGET_ESR, -heaterEsr);
+            return -heaterPid.GetOutput(HEATER_TARGET_ESR, heaterEsr);
         case HeaterState::Stopped:
             // Something has gone wrong, return 0.
             return 0;
