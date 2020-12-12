@@ -33,7 +33,7 @@ static void UartThread(void*)
         int lambdaIntPart = lambda;
         int lambdaThousandths = (lambda - lambdaIntPart) * 1000;
 
-        size_t writeCount = chsnprintf(printBuffer, 200, "%d.%03d\t%d\r\n", lambdaIntPart, lambdaThousandths, (int)GetSensorInternalResistance());
+        size_t writeCount = chsnprintf(printBuffer, 200, "%d.%03d\t%d\t%d\r\n", lambdaIntPart, lambdaThousandths, (int)GetSensorInternalResistance(), (int)(GetPumpNominalCurrent() * 1000));
         uartStartSend(&UARTD1, writeCount, printBuffer);
 
         chThdSleepMilliseconds(20);
