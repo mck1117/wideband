@@ -34,7 +34,7 @@ void Flash::ErasePage(uint8_t pageIdx) {
     FLASH->CR |= FLASH_CR_PER;
 
     // Set page number
-    FLASH->AR = pageIdx;
+    FLASH->AR = pageIdx * 1024;
 
     // Start the erase operation
     FLASH->CR |= FLASH_CR_STRT;
