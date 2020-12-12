@@ -48,9 +48,10 @@ void EraseAppPages()
     uintptr_t blSize = (uintptr_t)(appFlashAddr - 0x08000000);
     size_t pageIdx = blSize / 1024;
 
-    size_t appSizeKb = __appflash_size__ / 1024;
+    // size_t appSizeKb = __appflash_size__ / 1024;
+    size_t appSizeKb = 25;
 
-    for (size_t i = 0; i <= appSizeKb; i++)
+    for (size_t i = 0; i < appSizeKb; i++)
     {
         Flash::ErasePage(pageIdx);
         pageIdx++;
@@ -169,6 +170,8 @@ void RunBootloaderLoop()
 
                 break;
             case 0x03: // opcode 3 is "boot app"
+                sendAck();
+
                 // Clear the flag
                 bootloaderBusy = false;
                 // Kill this thread
@@ -180,10 +183,19 @@ void RunBootloaderLoop()
     }
 }
 
+static const CANConfig canConfig500 =
+{
+    CAN_MCR_ABOM | CAN_MCR_AWUM | CAN_MCR_TXFP,
+    CAN_BTR_SJW(0) | CAN_BTR_BRP(5)  | CAN_BTR_TS1(12) | CAN_BTR_TS2(1),
+};
+
 THD_WORKING_AREA(waBootloaderThread, 512);
 THD_FUNCTION(BootloaderThread, arg)
 {
     (void)arg;
+
+    // turn on CAN
+    canStart(&CAND1, &canConfig500);
 
     WaitForBootloaderCmd();
 
