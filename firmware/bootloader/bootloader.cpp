@@ -128,7 +128,7 @@ void RunBootloaderLoop()
             continue;
         }
 
-        uint8_t opcode = (frame.EID >> 16) & 0xFF;
+        uint8_t opcode = (frame.EID >> 16) & 0x0F;
         uint16_t embeddedData = frame.EID & 0xFFFF;
 
         switch (opcode) {
