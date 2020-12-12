@@ -28,6 +28,19 @@
                 "kind": "build",
                 "isDefault": true
             }
+        },
+        {
+            "label": "Full Build & Create Image",
+            "type": "shell",
+            "command": "./build_wideband.sh",
+            "options": {
+                "cwd": "${workspaceRoot}/firmware"
+            },
+            "problemMatcher": [],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
         }
     ]
 }
