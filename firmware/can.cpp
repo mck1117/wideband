@@ -12,12 +12,6 @@ static const CANConfig canConfig500 =
     CAN_BTR_SJW(0) | CAN_BTR_BRP(5)  | CAN_BTR_TS1(12) | CAN_BTR_TS2(1),
 };
 
-static const CANConfig canConfig1000 =
-{
-    CAN_MCR_ABOM | CAN_MCR_AWUM | CAN_MCR_TXFP | CAN_MCR_NART,
-    CAN_BTR_SJW(0) | CAN_BTR_BRP(2)  | CAN_BTR_TS1(12) | CAN_BTR_TS2(1),
-};
-
 static THD_WORKING_AREA(waCanTxThread, 256);
 void CanTxThread(void*)
 {
@@ -51,8 +45,14 @@ void CanRxThread(void*)
         if (frame.EID == 0xEF0'0000)
         {
             {
-                // ascii "rus"
-                CanTxMessage m(0x727573, 0, true);
+                CANTxFrame frame;
+
+                frame.IDE = CAN_IDE_EXT;
+                frame.EID = 0x727573;   // ascii "rus"
+                frame.RTR = CAN_RTR_DATA;
+                frame.DLC = 0;
+
+                canTransmitTimeout(&CAND1, CAN_ANY_MAILBOX, &frame, TIME_INFINITE);
             }
 
             // Let the message get out before we reset the chip
@@ -65,7 +65,7 @@ void CanRxThread(void*)
 
 void InitCan()
 {
-    canStart(&CAND1, &canConfig1000);
+    canStart(&CAND1, &canConfig500);
     chThdCreateStatic(waCanTxThread, sizeof(waCanTxThread), NORMALPRIO, CanTxThread, nullptr);
     chThdCreateStatic(waCanRxThread, sizeof(waCanRxThread), NORMALPRIO - 4, CanRxThread, nullptr);
 
