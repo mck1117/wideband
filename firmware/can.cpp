@@ -33,10 +33,42 @@ void CanTxThread(void*)
     }
 }
 
+static THD_WORKING_AREA(waCanRxThread, 256);
+void CanRxThread(void*)
+{
+    while(1)
+    {
+        CANRxFrame frame;
+        msg_t msg = canReceiveTimeout(&CAND1, CAN_ANY_MAILBOX, &frame, TIME_INFINITE);
+
+        // Ignore non-ok results...
+        if (msg != MSG_OK)
+        {
+            continue;
+        }
+
+        // If it's a bootloader entry request, reboot to the bootloader!
+        if (frame.EID == 0xEF0'0000)
+        {
+            {
+                // ascii "rus"
+                CanTxMessage m(0x727573, 0, true);
+            }
+
+            // Let the message get out before we reset the chip
+            chThdSleep(50);
+
+            NVIC_SystemReset();
+        }
+    }
+}
+
 void InitCan()
 {
     canStart(&CAND1, &canConfig1000);
     chThdCreateStatic(waCanTxThread, sizeof(waCanTxThread), NORMALPRIO, CanTxThread, nullptr);
+    chThdCreateStatic(waCanRxThread, sizeof(waCanRxThread), NORMALPRIO - 4, CanRxThread, nullptr);
+
 }
 
 struct StandardDataFrame
