@@ -2,8 +2,8 @@
 
 #include <cstring>
 
-CanTxMessage::CanTxMessage(uint32_t eid, uint8_t dlc) {
-	m_frame.IDE = CAN_IDE_STD;
+CanTxMessage::CanTxMessage(uint32_t eid, uint8_t dlc, bool isExtended) {
+	m_frame.IDE = isExtended ? CAN_IDE_EXT : CAN_IDE_STD;
 	m_frame.EID = eid;
 	m_frame.RTR = CAN_RTR_DATA;
 	m_frame.DLC = dlc;
@@ -12,7 +12,7 @@ CanTxMessage::CanTxMessage(uint32_t eid, uint8_t dlc) {
 
 CanTxMessage::~CanTxMessage() {
 	// 100 ms timeout
-	canTransmit(&CAND1, CAN_ANY_MAILBOX, &m_frame, TIME_MS2I(100));
+	canTransmitTimeout(&CAND1, CAN_ANY_MAILBOX, &m_frame, TIME_IMMEDIATE);
 }
 
 uint8_t& CanTxMessage::operator[](size_t index) {
