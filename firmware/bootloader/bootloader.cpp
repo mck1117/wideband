@@ -172,6 +172,9 @@ void RunBootloaderLoop()
             case 0x03: // opcode 3 is "boot app"
                 sendAck();
 
+                // Let the message get out
+                chThdSleepMilliseconds(100);
+
                 // Clear the flag
                 bootloaderBusy = false;
                 // Kill this thread
