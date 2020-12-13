@@ -9,10 +9,10 @@ static float GetPhi(float pumpCurrent)
         return 0.5f;
     }
 
-    // Minimum lambda ~0.65
-    if (pumpCurrent < -1.87f)
+    // Minimum lambda ~0.5
+    if (pumpCurrent < -3.5f)
     {
-        return 1 / 0.65f;
+        return 1 / 0.5f;
     }
 
     // This estimation is accurate within 0.5% from 0.8 to 1.0, and 0.01% from 1 to 1.2 lambda when compared to the lookup table in the Bosch datasheet
