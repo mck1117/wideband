@@ -117,7 +117,7 @@ CSRC = $(ALLCSRC) cfg/board.c
 
 # C++ sources that can be compiled in ARM or THUMB mode depending on the global
 # setting.
-CPPSRC = $(ALLCPPSRC) bootloader.cpp ../shared/flash.cpp
+CPPSRC = $(ALLCPPSRC) bootloader.cpp ../shared/flash.cpp crc.cpp
 
 # List ASM source files here.
 ASMSRC = $(ALLASMSRC)
