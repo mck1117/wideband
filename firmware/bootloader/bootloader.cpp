@@ -11,6 +11,20 @@ extern uint32_t __appflash_size__;
 extern uint32_t __ram_vectors_start__;
 extern uint32_t __ram_vectors_size__;
 
+#define SWAP_UINT32(x) ((((x) >> 24) & 0xff) | (((x) << 8) & 0xff0000) | (((x) >> 8) & 0xff00) | (((x) << 24) & 0xff000000))
+uint32_t crc32(const uint8_t *buf, uint32_t size);
+
+bool isAppValid() {
+    const uint32_t* appFlash = &__appflash_start__;
+
+    int appSize = 25600;
+
+    uint32_t expectedCrc = appFlash[appSize / 4 - 1];
+    uint32_t actualCrc = SWAP_UINT32(crc32(reinterpret_cast<const uint8_t*>(appFlash), appSize - 4));
+
+    return actualCrc == expectedCrc;
+}
+
 __attribute__((noreturn))
 void boot_app() {
     // Goodbye, ChibiOS
@@ -230,8 +244,8 @@ int main(void) {
         chThdSleepMilliseconds(40);
     }
 
-    // Block until booting the app is allowed
-    while (bootloaderBusy)
+    // Block until booting the app is allowed and CRC matches
+    while (bootloaderBusy || !isAppValid())
     {
         palTogglePad(GPIOB, 5);
         palTogglePad(GPIOB, 6);
