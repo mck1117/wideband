@@ -30,7 +30,8 @@ static HeaterState GetNextState(HeaterState state, float sensorEsr)
         case HeaterState::Preheat:
             timeCounter--;
 
-            if (timeCounter <= 0)
+            // If preheat timeout, or sensor is already hot (engine running?)
+            if (timeCounter <= 0 || sensorEsr < HEATER_CLOSED_LOOP_THRESHOLD_ESR)
             {
                 // If enough time has elapsed, start the ramp
                 // Start the ramp at 50% duty - ~6-7 volts
