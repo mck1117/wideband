@@ -23,6 +23,10 @@
 // LSU sense resistor - 61.9 ohms
 #define LSU_SENSE_R (61.9f)
 
+// Pump low pass filter alpha
+// sampling at 2.5khz, alpha of 0.1 gives about 42hz bandwidth
+#define PUMP_FILTER_ALPHA (0.1f)
+
 // *******************************
 //        Pump controller
 // *******************************

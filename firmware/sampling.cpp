@@ -43,7 +43,10 @@ static void SamplingThread(void*)
         nernstAc = f_abs(r2_opposite_phase - r_2);
         nernstDc = (r2_opposite_phase + r_2) / 2;
 
-        pumpCurrentSenseVoltage = 0.7f * pumpCurrentSenseVoltage + 0.3f * (result.PumpCurrentVoltage - result.VirtualGroundVoltageInt);
+        // Exponential moving average (aka first order lpf)
+        pumpCurrentSenseVoltage =
+            (1 - PUMP_FILTER_ALPHA) * pumpCurrentSenseVoltage +
+            PUMP_FILTER_ALPHA * (result.PumpCurrentVoltage - result.VirtualGroundVoltageInt);
 
         // Shift history over by one
         r_3 = r_2;
