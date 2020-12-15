@@ -12,6 +12,10 @@
 // 400khz / 1024 = 390hz PWM
 Pwm heaterPwm(PWMD1, 0, 400'000, 1024);
 
+uint16_t GetHeaterDuty() {
+    return heaterPwm.GetLastDuty();
+}
+
 enum class HeaterState
 {
     Preheat,
