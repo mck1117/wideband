@@ -5,6 +5,7 @@
 #include "heater_control.h"
 #include "lambda_conversion.h"
 #include "sampling.h"
+#include "pump_dac.h"
 
 static const CANConfig canConfig500 =
 {
@@ -68,7 +69,6 @@ void InitCan()
     canStart(&CAND1, &canConfig500);
     chThdCreateStatic(waCanTxThread, sizeof(waCanTxThread), NORMALPRIO, CanTxThread, nullptr);
     chThdCreateStatic(waCanRxThread, sizeof(waCanRxThread), NORMALPRIO - 4, CanRxThread, nullptr);
-
 }
 
 struct StandardDataFrame
@@ -89,12 +89,24 @@ void SendEmulatedAemXseries(float lambda, uint8_t idx) {
 
     // swap endian
     intLambda = SWAP_UINT16(intLambda);
-
     *reinterpret_cast<uint16_t*>(&frame[0]) = intLambda;
 
     // bit 1 = LSU 4.9 detected
     // bit 7 = reading valid
     frame[6] = 0x02 | (isValid ? 0x80 : 0x00);
+
+    // Now we embed some extra data for debug
+    // bytes 2-3 are officially oxygen percent
+    // byte 4 is officially supply voltage
+
+    // Report pump output PWM in byte 2, 0-255 for min to max target (128 = 0 current)
+    frame[2] = GetPumpOutputDuty() / 4;
+
+    // Report sensor ESR in byte 3, 4 ohm steps
+    frame[3] = (int)GetSensorInternalResistance() / 4;
+
+    // Report current nernst voltage in byte 4, 5mv steps
+    frame[4] = (int)(GetNernstDc() * 200);
 }
 
 void SendCanData(float lambda, uint16_t measuredResistance)
