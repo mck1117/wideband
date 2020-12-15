@@ -36,3 +36,8 @@ void SetPumpCurrentTarget(int32_t microampere)
 
     pumpDac.SetDuty(volts / VCC_VOLTS);
 }
+
+uint16_t GetPumpOutputDuty()
+{
+    return pumpDac.GetLastDuty();
+}
