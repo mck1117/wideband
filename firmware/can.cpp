@@ -95,6 +95,9 @@ void SendEmulatedAemXseries(float lambda, uint8_t idx) {
     // bit 7 = reading valid
     frame[6] = 0x02 | (isValid ? 0x80 : 0x00);
 
+    // Hijack a reserved bit to indicate that we're NOT an AEM controller
+    frame[7] = 0x80;
+
     // Now we embed some extra data for debug
     // bytes 2-3 are officially oxygen percent
     // byte 4 is officially supply voltage
