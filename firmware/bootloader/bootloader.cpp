@@ -86,8 +86,14 @@ void WaitForBootloaderCmd()
             continue;
         }
 
+        // Ignore std frames, only listen to ext
+        if (frame.IDE != CAN_IDE_EXT)
+        {
+            continue;
+        }
+
         // if we got a bootloader-init message, here we go!
-        if (frame.EID == 0xEF0'0000)
+        if (frame.DLC == 0 && frame.EID == 0xEF0'0000)
         {
             return;
         }
@@ -125,6 +131,12 @@ void RunBootloaderLoop()
 
         // Ignore non-ok results
         if (result != MSG_OK) 
+        {
+            continue;
+        }
+
+        // Ignore std frames, only listen to ext
+        if (frame.IDE != CAN_IDE_EXT)
         {
             continue;
         }

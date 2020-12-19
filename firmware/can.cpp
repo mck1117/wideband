@@ -42,8 +42,14 @@ void CanRxThread(void*)
             continue;
         }
 
+        // Ignore std frames, only listen to ext
+        if (frame.IDE != CAN_IDE_EXT)
+        {
+            continue;
+        }
+
         // If it's a bootloader entry request, reboot to the bootloader!
-        if (frame.EID == 0xEF0'0000)
+        if (frame.DLC == 0 && frame.EID == 0xEF0'0000)
         {
             {
                 CANTxFrame frame;
