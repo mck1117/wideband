@@ -38,8 +38,8 @@ int main() {
             // Green is blinking
             palTogglePad(GPIOB, 6);
 
-            // Fast blink if closed loop, slow if not
-            chThdSleepMilliseconds(IsRunningClosedLoop() ? 50 : 400);
+            // Slow blink if closed loop, fast if not
+            chThdSleepMilliseconds(IsRunningClosedLoop() ? 700 : 50);
         }
         else
         {
