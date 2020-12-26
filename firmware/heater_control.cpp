@@ -88,12 +88,12 @@ static float GetDutyForState(HeaterState state, float heaterEsr)
 {
     switch (state)
     {
-        case HeaterState::Preheat: return 0.125f;
+        case HeaterState::Preheat: return 0.04f;
         case HeaterState::WarmupRamp:
-            if (rampDuty < 0.9f)
+            if (rampDuty < 0.75f)
             {
-                // 0.4 volt per second, divided by battery voltage and update rate
-                rampDuty += (0.4f / (14 * 20));
+                // 0.3 volt per second, divided by battery voltage and update rate
+                rampDuty += (0.3f / (14 * 20));
             }
 
             return rampDuty;
