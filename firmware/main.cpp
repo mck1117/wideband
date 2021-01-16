@@ -24,7 +24,7 @@ int main() {
     StartPumpControl();
 
     InitCan();
-    InitUart();
+    //InitUart();
 
     while(true)
     {
