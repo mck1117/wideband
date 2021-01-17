@@ -13,6 +13,7 @@
 
 // Nernst AC injection resistor value
 #define ESR_SUPPLY_R (22000)
+#define VM_RESISTOR_VALUE (10)
 
 // *******************************
 //       Pump current sense

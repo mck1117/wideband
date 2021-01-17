@@ -68,7 +68,11 @@ float GetNernstAc()
 float GetSensorInternalResistance()
 {
     // Sensor is the lowside of a divider, top side is 22k, and 3.3v AC pk-pk is injected
-    return ESR_SUPPLY_R / (VCC_VOLTS / GetNernstAc() - 1);
+    float totalEsr = ESR_SUPPLY_R / (VCC_VOLTS / GetNernstAc() - 1);
+
+    // There is a resistor between the opamp and Vm sensor pin.  Remove the effect of that
+    // resistor so that the remainder is only the ESR of the sensor itself
+    return totalEsr - VM_RESISTOR_VALUE;
 }
 
 float GetNernstDc()
