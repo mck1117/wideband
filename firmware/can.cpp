@@ -18,11 +18,7 @@ void CanTxThread(void*)
 {
     while(1)
     {
-        float esr = GetSensorInternalResistance();
-        float lambda = GetLambda();
-
-        //SendCanData(lambda, esr);
-        SendEmulatedAemXseries(lambda, 1);
+        SendEmulatedAemXseries(1);
 
         chThdSleepMilliseconds(10);
     }
@@ -86,11 +82,12 @@ struct StandardDataFrame
 
 #define SWAP_UINT16(x) (((x) << 8) | ((x) >> 8))
 
-void SendEmulatedAemXseries(float lambda, uint8_t idx) {
+void SendEmulatedAemXseries(uint8_t idx) {
     CanTxMessage frame(0x180 + idx);
 
     bool isValid = IsRunningClosedLoop();
 
+    float lambda = GetLambda();
     uint16_t intLambda = lambda * 10000;
 
     // swap endian
