@@ -26,9 +26,10 @@ static void SamplingThread(void*)
 
     while(true)
     {
-        // First toggle the pin
-        palTogglePad(GPIOB, 7);
         auto result = AnalogSample();
+
+        // Toggle the pin after sampling so that any switching noise occurs while we're doing our math instead of when sampling
+        palTogglePad(GPIOB, 7);
 
         float r_1 = result.NernstVoltage;
 
