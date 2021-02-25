@@ -18,7 +18,7 @@ void CanTxThread(void*)
 {
     while(1)
     {
-        SendEmulatedAemXseries(1);
+        SendEmulatedAemXseries(0);
 
         chThdSleepMilliseconds(10);
     }
