@@ -1,4 +1,4 @@
-#include "analog_input.h"
+#include "port.h"
 
 #include "wideband_config.h"
 

@@ -5,7 +5,7 @@
 
 #include "wideband_config.h"
 
-#include "analog_input.h"
+#include "port.h"
 
 // Stored results
 float nernstAc = 0;
