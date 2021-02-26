@@ -15,7 +15,10 @@ static const UARTConfig uartCfg =
     .rxerr_cb = nullptr,
     .timeout_cb = nullptr,
 
+#ifdef STM32F0XX
     .timeout = 0,
+#endif
+
     .speed = 115200,
     .cr1 = 0,
     .cr2 = 0,
