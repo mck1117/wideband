@@ -11,11 +11,6 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Install crc32
-        run: |
-          sudo apt-get update
-          sudo apt-get install perl-Archive-Zip
-
       # Build machines don't have arm-none-eabi gcc, so let's download it and put it on the path
       - name: Download & Install GCC
         env:
