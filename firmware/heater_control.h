@@ -4,4 +4,3 @@
 
 void StartHeaterControl();
 bool IsRunningClosedLoop();
-uint16_t GetHeaterDuty();
