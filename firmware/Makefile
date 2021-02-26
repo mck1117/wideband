@@ -3,6 +3,12 @@
 # NOTE: Can be overridden externally.
 #
 
+ifeq ($(BOARD),)
+  BOARD = f0_module
+endif
+
+BOARDDIR = boards/$(BOARD)
+
 # Compiler options here.
 ifeq ($(USE_OPT),)
   USE_OPT = -O2 -ggdb -fomit-frame-pointer -falign-functions=16 -fsingle-precision-constant
@@ -90,7 +96,7 @@ MCU  = cortex-m0
 
 # Imported source files and paths.
 CHIBIOS  := ChibiOS
-CONFDIR  := ./cfg
+CONFDIR  := $(BOARDDIR)
 BUILDDIR := ./build
 DEPDIR   := ./.dep
 
@@ -111,11 +117,11 @@ include $(CHIBIOS)/tools/mk/autobuild.mk
 include $(CHIBIOS)/os/hal/lib/streams/streams.mk
 
 # Define linker script file here
-LDSCRIPT= $(CONFDIR)/app.ld
+LDSCRIPT=app.ld
 
 # C sources that can be compiled in ARM or THUMB mode depending on the global
 # setting.
-CSRC = $(ALLCSRC) cfg/board.c
+CSRC = $(ALLCSRC) $(BOARDDIR)/board.c
 
 # C++ sources that can be compiled in ARM or THUMB mode depending on the global
 # setting.
@@ -169,10 +175,10 @@ UADEFS =
 UINCDIR =
 
 # List the user directory to look for the libraries here
-ULIBDIR =
+ULIBDIR = $(BOARDDIR)
 
 # List all user libraries here
-ULIBS = bootloader/build/wideband_bootloader.o
+ULIBS = boards/f0_module/bootloader/build/wideband_bootloader.o
 
 #
 # End of user section

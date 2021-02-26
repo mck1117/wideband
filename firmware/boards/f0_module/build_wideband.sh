@@ -3,7 +3,9 @@
 # first build the bootloader
 cd bootloader
 ./build_bootloader.sh
-cd ..
+
+# back out to the root
+cd ../../..
 
 # delete the elf to force a re-link (it might not pick up the bootloader otherwise)
 rm -r build/
@@ -25,7 +27,7 @@ crc32 build/wideband_fullsize_nocrc.bin | xxd -r -p - > build/wideband_crc.bin
 cat build/wideband_fullsize_nocrc.bin build/wideband_crc.bin > build/wideband_image.bin
 
 # For good measure build a complete bin that includes the bootloader
-cat bootloader/build/wideband_bootloader.padded.bin build/wideband_image.bin > ../for_rusefi/wideband_image_with_bl.bin
+cat boards/f0_module/bootloader/build/wideband_bootloader.padded.bin build/wideband_image.bin > ../for_rusefi/wideband_image_with_bl.bin
 
 # Convert to a header file, and tack "static const " on the front of it
 xxd -i build/wideband_image.bin \
