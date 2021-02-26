@@ -31,7 +31,7 @@ endif
 
 # Linker extra options here.
 ifeq ($(USE_LDOPT),)
-  USE_LDOPT =
+  USE_LDOPT = 
 endif
 
 # Enable this if you want link time optimizations (LTO).
@@ -94,9 +94,6 @@ endif
 
 # Define project name here
 PROJECT = wideband
-
-# Target settings.
-MCU  = cortex-m0
 
 # Imported source files and paths.
 CHIBIOS  := ChibiOS
