@@ -9,6 +9,9 @@ endif
 
 BOARDDIR = boards/$(BOARD)
 
+# optionally include board.mk that sets per-board options
+-include $(BOARDDIR)/board.mk
+
 # Compiler options here.
 ifeq ($(USE_OPT),)
   USE_OPT = -O2 -ggdb -fomit-frame-pointer -falign-functions=16 -fsingle-precision-constant
@@ -48,6 +51,10 @@ endif
 # modules not used in the current configuration.
 ifeq ($(USE_SMART_BUILD),)
   USE_SMART_BUILD = yes
+endif
+
+ifeq ($(USE_BOOTLOADER),)
+  USE_BOOTLOADER = no
 endif
 
 #
@@ -177,8 +184,10 @@ UINCDIR =
 # List the user directory to look for the libraries here
 ULIBDIR = $(BOARDDIR)
 
-# List all user libraries here
-ULIBS = boards/f0_module/bootloader/build/wideband_bootloader.o
+ifeq ($(USE_BOOTLOADER),yes)
+  ULIBS = boards/f0_module/bootloader/build/wideband_bootloader.o
+  USE_OPT += -Wl,--defsym=USE_BOOTLOADER=1
+endif
 
 #
 # End of user section

@@ -159,6 +159,7 @@ ULIBDIR =
 # List all user libraries here
 # Add the search path of the firmware/ dir, we need wideband_layout.ld
 ULIBS = -L..
+USE_OPT += -Wl,--defsym=USE_BOOTLOADER=1
 
 #
 # End of user section

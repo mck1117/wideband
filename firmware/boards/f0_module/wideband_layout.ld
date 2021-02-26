@@ -2,7 +2,7 @@
  * STM32F042x6 memory setup.
  */
 
-blsize = 6k;
+blsize = DEFINED(USE_BOOTLOADER) ? 6k : 0;
 
 MEMORY
 {
