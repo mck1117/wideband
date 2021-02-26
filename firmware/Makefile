@@ -9,9 +9,6 @@ endif
 
 BOARDDIR = boards/$(BOARD)
 
-# optionally include board.mk that sets per-board options
--include $(BOARDDIR)/board.mk
-
 # Compiler options here.
 ifeq ($(USE_OPT),)
   USE_OPT = -O2 -ggdb -fomit-frame-pointer -falign-functions=16 -fsingle-precision-constant
@@ -109,17 +106,16 @@ DEPDIR   := ./.dep
 
 # Licensing files.
 include $(CHIBIOS)/os/license/license.mk
-# Startup files.
-include $(CHIBIOS)/os/common/startup/ARMCMx/compilers/GCC/mk/startup_stm32f0xx.mk
 # HAL-OSAL files (optional).
 include $(CHIBIOS)/os/hal/hal.mk
-include $(CHIBIOS)/os/hal/ports/STM32/STM32F0xx/platform.mk
 include $(CHIBIOS)/os/hal/osal/rt-nil/osal.mk
 # RTOS files (optional).
 include $(CHIBIOS)/os/rt/rt.mk
-include $(CHIBIOS)/os/common/ports/ARMv6-M/compilers/GCC/mk/port.mk
 # Other files (optional).
 include $(CHIBIOS)/os/hal/lib/streams/streams.mk
+
+# include board.mk that sets per-board options
+include $(BOARDDIR)/board.mk
 
 # Define linker script file here
 LDSCRIPT=app.ld
