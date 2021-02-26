@@ -41,6 +41,19 @@
                 "kind": "build",
                 "isDefault": true
             }
+        },
+        {
+            "label": "Build Dave's Board",
+            "type": "shell",
+            "command": "make -j8 BOARD=f1_dave",
+            "options": {
+                "cwd": "${workspaceRoot}/firmware"
+            },
+            "problemMatcher": [],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
         }
     ]
 }
