@@ -1,4 +1,4 @@
-name: Build Firmware
+name: Build F0 Module Firmware
 
 on: [push, pull_request]
 
@@ -25,5 +25,5 @@ jobs:
         run: arm-none-eabi-gcc -v
 
       - name: Build Firmware
-        working-directory: ./firmware/
+        working-directory: ./firmware/boards/f0_module
         run: ./build_wideband.sh
