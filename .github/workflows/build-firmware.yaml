@@ -11,7 +11,7 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Install multilib, mingw, and ncftp
+      - name: Install crc32
         run: |
           sudo apt-get update
           sudo apt-get install perl-Archive-Zip
