@@ -6,12 +6,7 @@
 #include "lambda_conversion.h"
 #include "sampling.h"
 #include "pump_dac.h"
-
-static const CANConfig canConfig500 =
-{
-    CAN_MCR_ABOM | CAN_MCR_AWUM | CAN_MCR_TXFP | CAN_MCR_NART,
-    CAN_BTR_SJW(0) | CAN_BTR_BRP(5)  | CAN_BTR_TS1(12) | CAN_BTR_TS2(1),
-};
+#include "port.h"
 
 static THD_WORKING_AREA(waCanTxThread, 256);
 void CanTxThread(void*)

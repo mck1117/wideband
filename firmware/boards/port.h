@@ -1,5 +1,7 @@
 #pragma once
 
+#include "hal.h"
+
 struct AnalogResult
 {
     float NernstVoltage;
@@ -8,3 +10,5 @@ struct AnalogResult
 };
 
 AnalogResult AnalogSample();
+
+extern const CANConfig canConfig500;
