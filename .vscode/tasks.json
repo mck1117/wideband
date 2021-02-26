@@ -30,11 +30,11 @@
             }
         },
         {
-            "label": "Full Build & Create Image",
+            "label": "Build F0 Module Image",
             "type": "shell",
             "command": "./build_wideband.sh",
             "options": {
-                "cwd": "${workspaceRoot}/firmware"
+                "cwd": "${workspaceRoot}/firmware/boards/f0_module"
             },
             "problemMatcher": [],
             "group": {
