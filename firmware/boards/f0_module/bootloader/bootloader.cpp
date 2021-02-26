@@ -6,16 +6,17 @@
 #include <cstring>
 
 // These are defined in the linker script
-extern uint32_t __appflash_start__;
+extern uint32_t __appflash_start__[64];
 extern uint32_t __appflash_size__;
-extern uint32_t __ram_vectors_start__;
+extern uint32_t __ram_vectors_start__[64];
 extern uint32_t __ram_vectors_size__;
 
 #define SWAP_UINT32(x) ((((x) >> 24) & 0xff) | (((x) << 8) & 0xff0000) | (((x) >> 8) & 0xff00) | (((x) << 24) & 0xff000000))
 uint32_t crc32(const uint8_t *buf, uint32_t size);
 
 bool isAppValid() {
-    const uint32_t* appFlash = &__appflash_start__;
+    const uint32_t* appFlash = 
+    __appflash_start__;
 
     int appSize = 25600;
 
@@ -33,7 +34,7 @@ void boot_app() {
     // Reset peripherals we might have used
     rccDisableCAN1();
 
-    const uint32_t* appFlash = &__appflash_start__;
+    const uint32_t* appFlash = __appflash_start__;
 
     // copy vector table to sram
     // TODO: use __ram_vectors_size__
@@ -55,7 +56,7 @@ void boot_app() {
     while(1);
 }
 
-uint32_t appFlashAddr = (uint32_t)&__appflash_start__;
+uintptr_t appFlashAddr = (uintptr_t)__appflash_start__;
 
 void EraseAppPages()
 {
