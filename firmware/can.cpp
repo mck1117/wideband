@@ -13,10 +13,23 @@ void CanTxThread(void*)
 {
     while(1)
     {
-        SendEmulatedAemXseries(0);
+        auto configuration = GetConfiguration();
+        SendEmulatedAemXseries(configuration.CanIndexOffset);
 
         chThdSleepMilliseconds(10);
     }
+}
+
+static void SendAck()
+{
+    CANTxFrame frame;
+
+    frame.IDE = CAN_IDE_EXT;
+    frame.EID = 0x727573;   // ascii "rus"
+    frame.RTR = CAN_RTR_DATA;
+    frame.DLC = 0;
+
+    canTransmitTimeout(&CAND1, CAN_ANY_MAILBOX, &frame, TIME_INFINITE);
 }
 
 static THD_WORKING_AREA(waCanRxThread, 256);
@@ -42,21 +55,20 @@ void CanRxThread(void*)
         // If it's a bootloader entry request, reboot to the bootloader!
         if (frame.DLC == 0 && frame.EID == 0xEF0'0000)
         {
-            {
-                CANTxFrame frame;
-
-                frame.IDE = CAN_IDE_EXT;
-                frame.EID = 0x727573;   // ascii "rus"
-                frame.RTR = CAN_RTR_DATA;
-                frame.DLC = 0;
-
-                canTransmitTimeout(&CAND1, CAN_ANY_MAILBOX, &frame, TIME_INFINITE);
-            }
+            SendAck();
 
             // Let the message get out before we reset the chip
             chThdSleep(50);
 
             NVIC_SystemReset();
+        }
+        // Check if it's an "index set" message
+        else if (frame.DLC == 1 && frame.EID == 0xEF4'0000)
+        {
+            auto newCfg = GetConfiguration();
+            newCfg.CanIndexOffset = frame.data8[0];
+            SetConfiguration(newCfg);
+            SendAck();
         }
     }
 }

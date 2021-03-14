@@ -1,4 +1,5 @@
 #include "port.h"
+#include "shared/flash.h"
 
 #include "wideband_config.h"
 
@@ -45,6 +46,37 @@ AnalogResult AnalogSample()
         .PumpCurrentVoltage = AverageSamples(adcBuffer, 1),
         .VirtualGroundVoltageInt = AverageSamples(adcBuffer, 2),
     };
+}
+
+extern Configuration __configflash__start__;
+
+Configuration GetConfiguration()
+{
+    const auto& cfg = __configflash__start__;
+
+    // If config has been written before, return the stored configuration
+    if (cfg.IsValid())
+    {
+        return cfg;
+    }
+    else
+    {
+        // Otherwise return a default config
+        return {};
+    }
+}
+
+void SetConfiguration(const Configuration& newConfig)
+{
+    // erase config page
+    Flash::ErasePage(31);
+
+    // Copy data to flash
+    Flash::Write(
+        reinterpret_cast<flashaddr_t>(&__configflash__start__),
+        reinterpret_cast<const uint8_t*>(&newConfig),
+        sizeof(Configuration)
+    );
 }
 
 const CANConfig canConfig500 =
