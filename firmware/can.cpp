@@ -90,7 +90,7 @@ struct StandardDataFrame
 #define SWAP_UINT16(x) (((x) << 8) | ((x) >> 8))
 
 void SendEmulatedAemXseries(uint8_t idx) {
-    CanTxMessage frame(0x180 + idx);
+    CanTxMessage frame(0x180 + idx, 8, true);
 
     bool isValid = IsRunningClosedLoop();
 
