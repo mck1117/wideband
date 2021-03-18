@@ -88,8 +88,8 @@ static float GetDutyForState(HeaterState state, float heaterEsr)
         case HeaterState::WarmupRamp:
             if (rampDuty < 0.75f)
             {
-                // 0.3 volt per second, divided by battery voltage and update rate
-                rampDuty += (0.3f / (14 * 20));
+                // 0.4 volt per second, divided by battery voltage and update rate
+                rampDuty += ((0.4f / 14) / HEATER_CONTROL_PERIOD);
             }
 
             return rampDuty;
