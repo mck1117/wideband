@@ -24,7 +24,9 @@ void Pwm::Start()
         },
         0,
         0,
+#if STM32_PWM_USE_ADVANCED
         0
+#endif
     };
 
     pwmStart(m_driver, &config);
