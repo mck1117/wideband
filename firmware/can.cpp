@@ -116,7 +116,16 @@ void SendEmulatedAemXseries(uint8_t idx) {
     frame[2] = GetPumpOutputDuty() / 4;
 
     // Report sensor ESR in byte 3, 4 ohm steps
-    frame[3] = (int)GetSensorInternalResistance() / 4;
+    int esrVal = (int)GetSensorInternalResistance() / 4;
+
+    // Clamp to uint8_t limits
+    if (esrVal > 255) {
+        esrVal = 255;
+    } else if (esrVal < 0) {
+        esrVal = 0;
+    }
+
+    frame[3] = esrVal;
 
     // Report current nernst voltage in byte 4, 5mv steps
     frame[4] = (int)(GetNernstDc() * 200);
