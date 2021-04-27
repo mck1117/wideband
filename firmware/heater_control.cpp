@@ -89,7 +89,9 @@ static float GetDutyForState(HeaterState state, float heaterEsr)
             if (rampDuty < 0.75f)
             {
                 // 0.4 volt per second, divided by battery voltage and update rate
-                rampDuty += ((0.4f / 14) / HEATER_CONTROL_PERIOD);
+                constexpr float rampRateVoltPerSecond = 0.4f;
+                constexpr float heaterFrequency = 1000.0f / HEATER_CONTROL_PERIOD;
+                rampDuty += ((rampRateVoltPerSecond / 14) / heaterFrequency);
             }
 
             return rampDuty;
