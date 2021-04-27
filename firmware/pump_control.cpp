@@ -25,6 +25,11 @@ static void PumpThread(void*)
             // result is in mA
             SetPumpCurrentTarget(result * 1000);
         }
+        else
+        {
+            // Otherwise set zero pump current to avoid damaging the sensor
+            SetPumpCurrentTarget(0);
+        }
 
         // Run at 500hz
         chThdSleepMilliseconds(2);
