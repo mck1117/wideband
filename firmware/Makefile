@@ -101,6 +101,12 @@ CONFDIR  := $(BOARDDIR)
 BUILDDIR := ./build
 DEPDIR   := ./.dep
 
+ifeq ("$(wildcard $(CHIBIOS)/os/license/license.mk)","")
+# submodules probably aren't checked out, complain to the user about it!
+# make is not happy about newly checked out module for some reason but next invocation would work
+$(error Please run 'git submodule update --init --recursive' before trying to build!)
+endif
+
 # Licensing files.
 include $(CHIBIOS)/os/license/license.mk
 # HAL-OSAL files (optional).
