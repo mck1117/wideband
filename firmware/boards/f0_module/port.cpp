@@ -48,6 +48,40 @@ AnalogResult AnalogSample()
     };
 }
 
+// Returns:
+// low -> 0
+// floating -> 1
+// high -> 2
+uint8_t readSelPin(ioportid_t port, iopadid_t pad)
+{
+    // If we pull the pin down, does the input follow?
+    palSetPadMode(port, pad, PAL_MODE_INPUT_PULLDOWN);
+    chThdSleepMilliseconds(1);
+    auto pd = palReadPad(port, pad);
+
+    // If we pull the pin up, does the input follow?
+    palSetPadMode(port, pad, PAL_MODE_INPUT_PULLUP);
+    chThdSleepMilliseconds(1);
+    auto pu = palReadPad(port, pad);
+
+    // If the pin changed with pullup/down state, it's floating
+    if (pd != pu)
+    {
+        return 1;
+    }
+
+    if (pu)
+    {
+        // Pin was high
+        return 2;
+    }
+    else
+    {
+        // Pin was low
+        return 0;
+    }
+}
+
 extern Configuration __configflash__start__;
 
 Configuration GetConfiguration()
@@ -57,7 +91,27 @@ Configuration GetConfiguration()
     // If config has been written before, return the stored configuration
     if (cfg.IsValid())
     {
-        return cfg;
+        auto c = cfg;
+
+        // TODO: test me!
+        // auto sel1 = readSelPin(GPIOB, 1);
+        // auto sel2 = readSelPin(GPIOA, 8);
+
+        // See https://github.com/mck1117/wideband/issues/11
+        // switch (3 * sel1 + sel2) {
+        //     case 0: c.CanIndexOffset = 0; break;
+        //     case 1: c.CanIndexOffset = 2; break;
+        //     case 2: c.CanIndexOffset = 3; break;
+        //     case 3: c.CanIndexOffset = 4; break;
+        //     case 4: /* both floating, do nothing */ break;
+        //     case 5: c.CanIndexOffset = 1; break;
+        //     case 6: c.CanIndexOffset = 5; break;
+        //     case 7: c.CanIndexOffset = 6; break;
+        //     case 8: c.CanIndexOffset = 7; break;
+        //     default: break;
+        // }
+
+        return c;
     }
     else
     {
