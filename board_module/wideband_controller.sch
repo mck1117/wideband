@@ -1102,14 +1102,6 @@ Wire Wire Line
 	4750 3450 4850 3450
 Wire Wire Line
 	7925 2950 8400 2950
-Text Label 5775 5350 0    50   ~ 0
-UART_RX
-Text Label 5775 5250 0    50   ~ 0
-UART_TX
-Wire Wire Line
-	6150 5250 5775 5250
-Wire Wire Line
-	5775 5350 6150 5350
 Text Label 8425 3750 2    50   ~ 0
 UART_RX
 Wire Wire Line
@@ -1564,10 +1556,7 @@ F 3 "" H 6000 4250 50  0001 C CNN
 	0    1    1    0   
 $EndComp
 NoConn ~ 7925 4250
-NoConn ~ 7925 3550
 NoConn ~ 7925 3250
-NoConn ~ 6925 3550
-NoConn ~ 6925 3650
 NoConn ~ 6925 3750
 NoConn ~ 6925 3850
 $Comp
@@ -1850,4 +1839,91 @@ Wire Wire Line
 	8700 1200 8700 1275
 Connection ~ 8700 1275
 NoConn ~ 7925 3150
+$Comp
+L Jumper:Jumper_3_Open JP1
+U 1 1 60A55596
+P 7275 5250
+F 0 "JP1" V 7275 5337 50  0000 L CNN
+F 1 "Jumper_3_Open" V 7230 5337 50  0001 L CNN
+F 2 "Jumper:SolderJumper-3_P1.3mm_Open_Pad1.0x1.5mm" H 7275 5250 50  0001 C CNN
+F 3 "~" H 7275 5250 50  0001 C CNN
+	1    7275 5250
+	0    -1   -1   0   
+$EndComp
+$Comp
+L power:GND #PWR0125
+U 1 1 60A57FE8
+P 7275 5500
+F 0 "#PWR0125" H 7275 5250 50  0001 C CNN
+F 1 "GND" H 7280 5327 50  0001 C CNN
+F 2 "" H 7275 5500 50  0001 C CNN
+F 3 "" H 7275 5500 50  0001 C CNN
+	1    7275 5500
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:+3.3V #PWR0140
+U 1 1 60A5820A
+P 7275 5000
+F 0 "#PWR0140" H 7275 4850 50  0001 C CNN
+F 1 "+3.3V" H 7290 5173 50  0000 C CNN
+F 2 "" H 7275 5000 50  0001 C CNN
+F 3 "" H 7275 5000 50  0001 C CNN
+	1    7275 5000
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	7425 5250 7700 5250
+Text Label 7700 5250 2    50   ~ 0
+SEL_1
+$Comp
+L Jumper:Jumper_3_Open JP2
+U 1 1 60A736F8
+P 7550 5800
+F 0 "JP2" V 7550 5887 50  0000 L CNN
+F 1 "Jumper_3_Open" V 7505 5887 50  0001 L CNN
+F 2 "Jumper:SolderJumper-3_P1.3mm_Open_Pad1.0x1.5mm" H 7550 5800 50  0001 C CNN
+F 3 "~" H 7550 5800 50  0001 C CNN
+	1    7550 5800
+	0    -1   -1   0   
+$EndComp
+$Comp
+L power:GND #PWR0141
+U 1 1 60A736FE
+P 7550 6050
+F 0 "#PWR0141" H 7550 5800 50  0001 C CNN
+F 1 "GND" H 7555 5877 50  0001 C CNN
+F 2 "" H 7550 6050 50  0001 C CNN
+F 3 "" H 7550 6050 50  0001 C CNN
+	1    7550 6050
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:+3.3V #PWR0142
+U 1 1 60A73704
+P 7550 5550
+F 0 "#PWR0142" H 7550 5400 50  0001 C CNN
+F 1 "+3.3V" H 7565 5723 50  0000 C CNN
+F 2 "" H 7550 5550 50  0001 C CNN
+F 3 "" H 7550 5550 50  0001 C CNN
+	1    7550 5550
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	7700 5800 7975 5800
+Text Label 7975 5800 2    50   ~ 0
+SEL_2
+Wire Wire Line
+	6925 3650 6475 3650
+Text Label 6475 3650 0    50   ~ 0
+SEL_1
+Wire Wire Line
+	7925 3550 8400 3550
+Text Label 8400 3550 2    50   ~ 0
+SEL_2
+Text Notes 7825 5425 0    50   ~ 0
+SEL_1, SEL_2:\nlow, low = idx 2\nlow, float = idx 0\nlow, high = idx 3\nfloat, low = idx 4\nfloat, float = read index from flash cfg\nfloat, high = idx 1\nhigh, low = idx 5\nhigh, float = idx 6\nhigh, high = idx 7\n
+NoConn ~ 6925 3550
+NoConn ~ 6150 5250
+NoConn ~ 6150 5350
 $EndSCHEMATC
