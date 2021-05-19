@@ -8,12 +8,13 @@
 #include "pump_dac.h"
 #include "port.h"
 
+Configuration configuration;
+
 static THD_WORKING_AREA(waCanTxThread, 256);
 void CanTxThread(void*)
 {
     while(1)
     {
-        auto configuration = GetConfiguration();
         SendEmulatedAemXseries(configuration.CanIndexOffset);
 
         chThdSleepMilliseconds(10);
@@ -68,6 +69,7 @@ void CanRxThread(void*)
             auto newCfg = GetConfiguration();
             newCfg.CanIndexOffset = frame.data8[0];
             SetConfiguration(newCfg);
+            configuration = GetConfiguration();
             SendAck();
         }
     }
@@ -75,6 +77,8 @@ void CanRxThread(void*)
 
 void InitCan()
 {
+    configuration = GetConfiguration();
+
     canStart(&CAND1, &canConfig500);
     chThdCreateStatic(waCanTxThread, sizeof(waCanTxThread), NORMALPRIO, CanTxThread, nullptr);
     chThdCreateStatic(waCanRxThread, sizeof(waCanRxThread), NORMALPRIO - 4, CanRxThread, nullptr);
