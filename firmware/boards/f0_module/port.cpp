@@ -88,36 +88,33 @@ Configuration GetConfiguration()
 {
     const auto& cfg = __configflash__start__;
 
-    // If config has been written before, return the stored configuration
+    Configuration c;
+
+    // If config has been written before, use the stored configuration
     if (cfg.IsValid())
     {
-        auto c = cfg;
-
-        // TODO: test me!
-        // auto sel1 = readSelPin(GPIOB, 1);
-        // auto sel2 = readSelPin(GPIOA, 8);
-
-        // See https://github.com/mck1117/wideband/issues/11
-        // switch (3 * sel1 + sel2) {
-        //     case 0: c.CanIndexOffset = 0; break;
-        //     case 1: c.CanIndexOffset = 2; break;
-        //     case 2: c.CanIndexOffset = 3; break;
-        //     case 3: c.CanIndexOffset = 4; break;
-        //     case 4: /* both floating, do nothing */ break;
-        //     case 5: c.CanIndexOffset = 1; break;
-        //     case 6: c.CanIndexOffset = 5; break;
-        //     case 7: c.CanIndexOffset = 6; break;
-        //     case 8: c.CanIndexOffset = 7; break;
-        //     default: break;
-        // }
-
-        return c;
+        c = cfg;
     }
-    else
-    {
-        // Otherwise return a default config
-        return {};
+
+    // Now, override the index with a hardware-strapped option (if present)
+    auto sel1 = readSelPin(GPIOB, 1);
+    auto sel2 = readSelPin(GPIOA, 8);
+
+    // See https://github.com/mck1117/wideband/issues/11
+    switch (3 * sel1 + sel2) {
+        case 0: c.CanIndexOffset = 2; break;
+        case 1: c.CanIndexOffset = 0; break;
+        case 2: c.CanIndexOffset = 3; break;
+        case 3: c.CanIndexOffset = 4; break;
+        case 4: /* both floating, do nothing */ break;
+        case 5: c.CanIndexOffset = 1; break;
+        case 6: c.CanIndexOffset = 5; break;
+        case 7: c.CanIndexOffset = 6; break;
+        case 8: c.CanIndexOffset = 7; break;
+        default: break;
     }
+
+    return c;
 }
 
 void SetConfiguration(const Configuration& newConfig)
