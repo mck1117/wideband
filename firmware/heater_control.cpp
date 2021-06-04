@@ -112,6 +112,10 @@ static HeaterState state = HeaterState::Preheat;
 static THD_WORKING_AREA(waHeaterThread, 256);
 static void HeaterThread(void*)
 {
+    // Wait for temperature sensing to stabilize so we don't
+    // immediately think we overshot the target temperature
+    chThdSleepMilliseconds(1000);
+
     while (true)
     {
         // Read sensor state
