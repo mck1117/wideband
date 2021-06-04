@@ -15,6 +15,9 @@
 #define ESR_SUPPLY_R (22000)
 #define VM_RESISTOR_VALUE (10)
 
+// Heater low pass filter
+#define ESR_SENSE_ALPHA (0.002f)
+
 // *******************************
 //       Pump current sense
 // *******************************
@@ -25,8 +28,8 @@
 #define LSU_SENSE_R (61.9f)
 
 // Pump low pass filter alpha
-// sampling at 2.5khz, alpha of 0.1 gives about 42hz bandwidth
-#define PUMP_FILTER_ALPHA (0.1f)
+// sampling at 2.5khz, alpha of 0.01 gives about 50hz bandwidth
+#define PUMP_FILTER_ALPHA (0.02f)
 
 // *******************************
 //        Pump controller

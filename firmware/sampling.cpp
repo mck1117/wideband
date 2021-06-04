@@ -41,8 +41,12 @@ static void SamplingThread(void*)
         float r2_opposite_phase = (r_1 + r_3) / 2;
 
         // Compute AC (difference) and DC (average) components
-        nernstAc = f_abs(r2_opposite_phase - r_2);
+        float nernstAcLocal = f_abs(r2_opposite_phase - r_2);
         nernstDc = (r2_opposite_phase + r_2) / 2;
+
+        nernstAc =
+            (1 - ESR_SENSE_ALPHA) * nernstAc +
+            ESR_SENSE_ALPHA * nernstAcLocal;
 
         // Exponential moving average (aka first order lpf)
         pumpCurrentSenseVoltage =
