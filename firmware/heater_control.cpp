@@ -133,8 +133,9 @@ static void HeaterThread(void*)
             voltage = 13;
         }
 
-        // TODO: is this right?
-        float duty = voltage / batteryVoltage;
+        // duty = (V_eff / V_batt) ^ 2
+        float voltageRatio = voltage / batteryVoltage;
+        float duty = voltageRatio * voltageRatio;
 
         // Pipe the output to the heater driver
         heaterPwm.SetDuty(duty);
