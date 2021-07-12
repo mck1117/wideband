@@ -126,15 +126,15 @@ static void HeaterThread(void*)
 
         // Run the state machine
         state = GetNextState(state, heaterEsr);
-        float voltage = GetVoltageForState(state, heaterEsr);
+        float heaterVoltage = GetVoltageForState(state, heaterEsr);
 
         // Limit to 13 volts
-        if (voltage > 13) {
-            voltage = 13;
+        if (heaterVoltage > 13) {
+            heaterVoltage = 13;
         }
 
         // duty = (V_eff / V_batt) ^ 2
-        float voltageRatio = voltage / batteryVoltage;
+        float voltageRatio = heaterVoltage / batteryVoltage;
         float duty = voltageRatio * voltageRatio;
 
         // Pipe the output to the heater driver
