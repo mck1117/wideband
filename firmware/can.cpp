@@ -53,8 +53,19 @@ void CanRxThread(void*)
             continue;
         }
 
+        if (frame.DLC == 2 && frame.EID == 0xEF5'0000) {
+            // This is status from ECU - battery voltage and heater enable signal
+
+            // data0 contains battery voltage in tenths of a volt
+            float vbatt = frame.data8[0] * 0.1f;
+            SetBatteryVoltage(vbatt);
+
+            // data1 contains heater enable bit
+            // TODO use this
+            //bool heaterEnabled = (frame.data8[1] & 0x1) == 0x1;
+        }
         // If it's a bootloader entry request, reboot to the bootloader!
-        if (frame.DLC == 0 && frame.EID == 0xEF0'0000)
+        else if (frame.DLC == 0 && frame.EID == 0xEF0'0000)
         {
             SendAck();
 

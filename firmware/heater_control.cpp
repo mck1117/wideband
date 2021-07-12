@@ -109,6 +109,9 @@ static float GetVoltageForState(HeaterState state, float heaterEsr)
 
 static HeaterState state = HeaterState::Preheat;
 
+// Nominal battery voltage (running engine) is 14v
+static float batteryVoltage = 14;
+
 static THD_WORKING_AREA(waHeaterThread, 256);
 static void HeaterThread(void*)
 {
@@ -131,7 +134,7 @@ static void HeaterThread(void*)
         }
 
         // TODO: is this right?
-        float duty = voltage / 14;
+        float duty = voltage / batteryVoltage;
 
         // Pipe the output to the heater driver
         heaterPwm.SetDuty(duty);
@@ -152,4 +155,17 @@ void StartHeaterControl()
 bool IsRunningClosedLoop()
 {
     return state == HeaterState::ClosedLoop;
+}
+
+void SetBatteryVoltage(float vbatt)
+{
+    if (vbatt > 18 || vbatt < 5)
+    {
+        // provided vbatt is bogus, default to 14v nominal
+        batteryVoltage = 14;
+    }
+    else
+    {
+        batteryVoltage = vbatt;
+    }
 }

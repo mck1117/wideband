@@ -4,3 +4,4 @@
 
 void StartHeaterControl();
 bool IsRunningClosedLoop();
+void SetBatteryVoltage(float vbatt);
