@@ -21,7 +21,7 @@ enum class HeaterState
 };
 
 int timeCounter = HEATER_PREHEAT_TIME / HEATER_CONTROL_PERIOD;
-float rampDuty = 0.5f;
+float rampVoltage = 0;
 
 static HeaterState GetNextState(HeaterState state, float sensorEsr)
 {
@@ -34,8 +34,8 @@ static HeaterState GetNextState(HeaterState state, float sensorEsr)
             if (timeCounter <= 0 || sensorEsr < HEATER_CLOSED_LOOP_THRESHOLD_ESR)
             {
                 // If enough time has elapsed, start the ramp
-                // Start the ramp at 30% duty - ~3-4 volts
-                rampDuty = 0.3f;
+                // Start the ramp at 4 volts
+                rampVoltage = 5;
 
                 // Next phase times out at 15 seconds
                 timeCounter = HEATER_WARMUP_TIMEOUT / HEATER_CONTROL_PERIOD;
@@ -78,42 +78,28 @@ static HeaterState GetNextState(HeaterState state, float sensorEsr)
     return state;
 }
 
-// oscillates at 0.04 kP
+static Pid heaterPid(0.04f,0, 0, 0.6f, HEATER_CONTROL_PERIOD);
 
-//static Pid heaterPid(0.04f,0, 0, 0.6f, HEATER_CONTROL_PERIOD);
-
-// "no overshoot" PID
-//static Pid heaterPid(0.008f, 0.0288f, 0.0015f, 0.6f, HEATER_CONTROL_PERIOD);
-
-// PI
-//static Pid heaterPid(0.02f, 0.0576f, 0.0015f, 0.6f, HEATER_CONTROL_PERIOD);
-
-// rusefi ETB autotune
-//static Pid heaterPid(0.014f, 0.018f, 0.0018f, 0.6f, HEATER_CONTROL_PERIOD);
-
-// rusefi ETB autotune with more PD
-static Pid heaterPid(0.02f, 0.018f, 0.003f, 0.6f, HEATER_CONTROL_PERIOD);
-
-static float GetDutyForState(HeaterState state, float heaterEsr)
+static float GetVoltageForState(HeaterState state, float heaterEsr)
 {
     switch (state)
     {
         case HeaterState::Preheat: return 0.04f;
         case HeaterState::WarmupRamp:
-            if (rampDuty < 0.75f)
+            if (rampVoltage < 12)
             {
                 // 0.3 volt per second, divided by battery voltage and update rate
                 constexpr float rampRateVoltPerSecond = 0.3f;
                 constexpr float heaterFrequency = 1000.0f / HEATER_CONTROL_PERIOD;
-                rampDuty += ((rampRateVoltPerSecond / 14) / heaterFrequency);
+                rampVoltage += (rampRateVoltPerSecond / heaterFrequency);
             }
 
-            return rampDuty;
+            return rampVoltage;
         case HeaterState::ClosedLoop:
             // Negated because lower resistance -> hotter
             return -heaterPid.GetOutput(HEATER_TARGET_ESR, heaterEsr);
         case HeaterState::Stopped:
-            // Something has gone wrong, return 0.
+            // Something has gone wrong, turn off the heater.
             return 0;
     }
 
@@ -137,12 +123,15 @@ static void HeaterThread(void*)
 
         // Run the state machine
         state = GetNextState(state, heaterEsr);
-        float duty = GetDutyForState(state, heaterEsr);
+        float voltage = GetVoltageForState(state, heaterEsr);
 
-        // Limit to 80% duty
-        if (duty > 0.8) {
-            duty = 0.8;
+        // Limit to 13 volts
+        if (voltage > 13) {
+            voltage = 13;
         }
+
+        // TODO: is this right?
+        float duty = voltage / 14;
 
         // Pipe the output to the heater driver
         heaterPwm.SetDuty(duty);
