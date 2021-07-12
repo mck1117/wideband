@@ -78,7 +78,13 @@ static HeaterState GetNextState(HeaterState state, float sensorEsr)
     return state;
 }
 
-static Pid heaterPid(0.04f,0, 0, 0.6f, HEATER_CONTROL_PERIOD);
+static Pid heaterPid(
+    0.04f,      // kP
+    0,          // kI
+    0,          // kD
+    2.0f,       // Integrator clamp (volts)
+    HEATER_CONTROL_PERIOD
+);
 
 static float GetVoltageForState(HeaterState state, float heaterEsr)
 {
@@ -96,8 +102,9 @@ static float GetVoltageForState(HeaterState state, float heaterEsr)
 
             return rampVoltage;
         case HeaterState::ClosedLoop:
+            // "nominal" heater voltage is 7.5v, so apply correction around that point (instead of relying on integrator so much)
             // Negated because lower resistance -> hotter
-            return -heaterPid.GetOutput(HEATER_TARGET_ESR, heaterEsr);
+            return 7.5f - heaterPid.GetOutput(HEATER_TARGET_ESR, heaterEsr);
         case HeaterState::Stopped:
             // Something has gone wrong, turn off the heater.
             return 0;
