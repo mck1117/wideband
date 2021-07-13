@@ -79,10 +79,10 @@ static HeaterState GetNextState(HeaterState state, float sensorEsr)
 }
 
 static Pid heaterPid(
-    0.04f,      // kP
-    0,          // kI
-    0,          // kD
-    2.0f,       // Integrator clamp (volts)
+    0.3f,      // kP
+    0.3f,      // kI
+    0.02f,     // kD
+    3.0f,      // Integrator clamp (volts)
     HEATER_CONTROL_PERIOD
 );
 
@@ -128,6 +128,13 @@ static void HeaterThread(void*)
 
     while (true)
     {
+        if (batteryVoltage > 18)
+        {
+            // Overvoltage protection - sensor not rated for PWM above 24v
+            heaterPwm.SetDuty(0);
+            continue;
+        }
+
         // Read sensor state
         float heaterEsr = GetSensorInternalResistance();
 
@@ -167,7 +174,7 @@ bool IsRunningClosedLoop()
 
 void SetBatteryVoltage(float vbatt)
 {
-    if (vbatt > 18 || vbatt < 5)
+    if (vbatt < 5)
     {
         // provided vbatt is bogus, default to 14v nominal
         batteryVoltage = 14;
