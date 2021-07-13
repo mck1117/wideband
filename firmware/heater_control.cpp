@@ -128,13 +128,6 @@ static void HeaterThread(void*)
 
     while (true)
     {
-        if (batteryVoltage > 18)
-        {
-            // Overvoltage protection - sensor not rated for PWM above 24v
-            heaterPwm.SetDuty(0);
-            continue;
-        }
-
         // Read sensor state
         float heaterEsr = GetSensorInternalResistance();
 
@@ -151,8 +144,16 @@ static void HeaterThread(void*)
         float voltageRatio = heaterVoltage / batteryVoltage;
         float duty = voltageRatio * voltageRatio;
 
-        // Pipe the output to the heater driver
-        heaterPwm.SetDuty(duty);
+        if (batteryVoltage < 23)
+        {
+            // Pipe the output to the heater driver
+            heaterPwm.SetDuty(duty);
+        }
+        else
+        {
+            // Overvoltage protection - sensor not rated for PWM above 24v
+            heaterPwm.SetDuty(0);
+        }
 
         // Loop at ~20hz
         chThdSleepMilliseconds(HEATER_CONTROL_PERIOD);
