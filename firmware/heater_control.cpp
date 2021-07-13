@@ -92,7 +92,7 @@ static float GetVoltageForState(HeaterState state, float heaterEsr)
     {
         case HeaterState::Preheat: return 0.04f;
         case HeaterState::WarmupRamp:
-            if (rampVoltage < 12)
+            if (rampVoltage < 10)
             {
                 // 0.3 volt per second, divided by battery voltage and update rate
                 constexpr float rampRateVoltPerSecond = 0.3f;
@@ -135,9 +135,9 @@ static void HeaterThread(void*)
         state = GetNextState(state, heaterEsr);
         float heaterVoltage = GetVoltageForState(state, heaterEsr);
 
-        // Limit to 13 volts
-        if (heaterVoltage > 13) {
-            heaterVoltage = 13;
+        // Limit to 11 volts
+        if (heaterVoltage > 11) {
+            heaterVoltage = 11;
         }
 
         // duty = (V_eff / V_batt) ^ 2
