@@ -90,7 +90,9 @@ static float GetVoltageForState(HeaterState state, float heaterEsr)
 {
     switch (state)
     {
-        case HeaterState::Preheat: return 0.04f;
+        case HeaterState::Preheat:
+            // Max allowed during condensation phase (preheat) is 2v
+            return 1.5f;
         case HeaterState::WarmupRamp:
             if (rampVoltage < 10)
             {
