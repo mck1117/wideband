@@ -44,7 +44,7 @@ static HeaterState GetNextState(HeaterState state, float sensorEsr)
             {
                 // If enough time has elapsed, start the ramp
                 // Start the ramp at 4 volts
-                rampVoltage = 5;
+                rampVoltage = 4;
 
                 // Next phase times out at 15 seconds
                 timeCounter = HEATER_WARMUP_TIMEOUT / HEATER_CONTROL_PERIOD;
