@@ -20,11 +20,20 @@ enum class HeaterState
     Stopped,
 };
 
-int timeCounter = HEATER_PREHEAT_TIME / HEATER_CONTROL_PERIOD;
-float rampVoltage = 0;
+constexpr int preheatTimeCounter = HEATER_PREHEAT_TIME / HEATER_CONTROL_PERIOD;
+static int timeCounter = preheatTimeCounter;
+static float rampVoltage = 0;
+static bool heaterAllowed = false;
 
 static HeaterState GetNextState(HeaterState state, float sensorEsr)
 {
+    if (!heaterAllowed)
+    {
+        // ECU hasn't allowed preheat yet, reset timer, and force preheat state
+        timeCounter = preheatTimeCounter;
+        return HeaterState::Preheat;
+    }
+
     switch (state)
     {
         case HeaterState::Preheat:
@@ -186,4 +195,9 @@ void SetBatteryVoltage(float vbatt)
     {
         batteryVoltage = vbatt;
     }
+}
+
+void SetHeaterAllowed(bool allowed)
+{
+    heaterAllowed = allowed;
 }

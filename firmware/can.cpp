@@ -61,8 +61,8 @@ void CanRxThread(void*)
             SetBatteryVoltage(vbatt);
 
             // data1 contains heater enable bit
-            // TODO use this
-            //bool heaterEnabled = (frame.data8[1] & 0x1) == 0x1;
+            bool heaterAllowed = (frame.data8[1] & 0x1) == 0x1;
+            SetHeaterAllowed(heaterAllowed);
         }
         // If it's a bootloader entry request, reboot to the bootloader!
         else if (frame.DLC == 0 && frame.EID == 0xEF0'0000)
