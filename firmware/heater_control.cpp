@@ -69,6 +69,7 @@ static HeaterState GetNextState(HeaterState state, float sensorEsr)
 
             break;
         case HeaterState::ClosedLoop:
+            // Check that the sensor's ESR is acceptable for normal operation
             if (sensorEsr < HEATER_OVERHEAT_ESR)
             {
                 SetFault(Fault::SensorOverheat);
