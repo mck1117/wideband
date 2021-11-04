@@ -16,6 +16,7 @@ void CanTxThread(void*)
     while(1)
     {
         SendEmulatedAemXseries(configuration.CanIndexOffset);
+        SendRusefiFormat(configuration.CanIndexOffset);
 
         chThdSleepMilliseconds(10);
     }
@@ -144,6 +145,11 @@ void SendEmulatedAemXseries(uint8_t idx) {
 
     // Report current nernst voltage in byte 4, 5mv steps
     frame[4] = (int)(GetNernstDc() * 200);
+}
+
+void SendRusefiFormat(uint8_t idx)
+{
+
 }
 
 void SendCanData(float lambda, uint16_t measuredResistance)
