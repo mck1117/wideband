@@ -1,6 +1,7 @@
 #include "can.h"
 #include "hal.h"
 
+#include "fault.h"
 #include "can_helper.h"
 #include "heater_control.h"
 #include "lambda_conversion.h"
@@ -96,13 +97,6 @@ void InitCan()
     chThdCreateStatic(waCanRxThread, sizeof(waCanRxThread), NORMALPRIO - 4, CanRxThread, nullptr);
 }
 
-struct StandardDataFrame
-{
-    uint16_t lambda;
-    uint16_t measuredResistance;
-    uint8_t pad[4];
-};
-
 #define SWAP_UINT16(x) (((x) << 8) | ((x) >> 8))
 
 void SendEmulatedAemXseries(uint8_t idx) {
@@ -147,15 +141,46 @@ void SendEmulatedAemXseries(uint8_t idx) {
     frame[4] = (int)(GetNernstDc() * 200);
 }
 
+struct StandardData
+{
+    uint16_t Lambda;
+    uint16_t TemperatureC;
+    uint8_t Valid;
+
+    uint8_t pad1;
+    uint16_t pad2;
+};
+
+struct DiagData
+{
+    uint16_t Esr;
+    uint16_t NernstDc;
+    uint8_t PumpDuty;
+    Fault Status;
+
+    uint16_t pad;
+};
+
 void SendRusefiFormat(uint8_t idx)
 {
+    {
+        CanTxTyped<StandardData> frame(0x170 + idx);
 
-}
+        uint16_t lambda = GetLambda() * 10000;
+        frame.get().Lambda = lambda;
 
-void SendCanData(float lambda, uint16_t measuredResistance)
-{
-    CanTxTyped<StandardDataFrame> frame(0x130);
+        // TODO: decode temperatature
+        frame.get().TemperatureC = 0;
 
-    frame.get().lambda = lambda * 10000;
-    frame.get().measuredResistance = measuredResistance;
+        frame.get().Valid = IsRunningClosedLoop() ? 0x01 : 0x00;
+    }
+
+    {
+        CanTxTyped<DiagData> frame(0x190 + idx);
+
+        frame.get().Esr = GetSensorInternalResistance();
+        frame.get().NernstDc = GetNernstDc() * 1000;
+        frame.get().PumpDuty = GetPumpOutputDuty() / 4;
+        frame.get().Status = GetCurrentFault();
+    }
 }
