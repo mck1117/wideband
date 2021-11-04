@@ -61,7 +61,7 @@ static HeaterState GetNextState(HeaterState state, float sensorEsr)
             }
             else if (timeCounter == 0)
             {
-                setFault(Fault::SensorDidntHeat);
+                SetFault(Fault::SensorDidntHeat);
                 return HeaterState::Stopped;
             }
 
@@ -71,12 +71,12 @@ static HeaterState GetNextState(HeaterState state, float sensorEsr)
         case HeaterState::ClosedLoop:
             if (sensorEsr < HEATER_OVERHEAT_ESR)
             {
-                setFault(Fault::SensorOverheat);
+                SetFault(Fault::SensorOverheat);
                 return HeaterState::Stopped;
             }
             else if (sensorEsr > HEATER_UNDERHEAT_ESR)
             {
-                setFault(Fault::SensorUnderheat);
+                SetFault(Fault::SensorUnderheat);
                 return HeaterState::Stopped;
             }
 

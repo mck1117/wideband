@@ -28,7 +28,7 @@ int main() {
 
     while(true)
     {
-        auto fault = getCurrentFault();
+        auto fault = GetCurrentFault();
 
         if (fault == Fault::None)
         {

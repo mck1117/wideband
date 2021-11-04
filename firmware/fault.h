@@ -1,6 +1,8 @@
 #pragma once
 
-enum class Fault
+#include <cstdint>
+
+enum class Fault : uint8_t
 {
     None = 0,
 
@@ -10,6 +12,6 @@ enum class Fault
     SensorUnderheat = 5,
 };
 
-void setFault(Fault fault);
-bool hasFault();
-Fault getCurrentFault();
+void SetFault(Fault fault);
+bool HasFault();
+Fault GetCurrentFault();
