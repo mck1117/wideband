@@ -102,52 +102,12 @@ void InitCan()
 
 #define SWAP_UINT16(x) (((x) << 8) | ((x) >> 8))
 
-void SendEmulatedAemXseries(uint8_t idx) {
-    CanTxMessage frame(0x180 + idx, 8, true);
-
-    bool isValid = IsRunningClosedLoop();
-
-    float lambda = GetLambda();
-    uint16_t intLambda = lambda * 10000;
-
-    // swap endian
-    intLambda = SWAP_UINT16(intLambda);
-    *reinterpret_cast<uint16_t*>(&frame[0]) = intLambda;
-
-    // bit 1 = LSU 4.9 detected
-    // bit 7 = reading valid
-    frame[6] = 0x02 | (isValid ? 0x80 : 0x00);
-
-    // Hijack a reserved bit to indicate that we're NOT an AEM controller
-    frame[7] = 0x80;
-
-    // Now we embed some extra data for debug
-    // bytes 2-3 are officially oxygen percent
-    // byte 4 is officially supply voltage
-
-    // Report pump output PWM in byte 2, 0-255 for min to max target (128 = 0 current)
-    frame[2] = GetPumpOutputDuty() / 4;
-
-    // Report sensor ESR in byte 3, 4 ohm steps
-    int esrVal = (int)GetSensorInternalResistance() / 4;
-
-    // Clamp to uint8_t limits
-    if (esrVal > 255) {
-        esrVal = 255;
-    } else if (esrVal < 0) {
-        esrVal = 0;
-    }
-
-    frame[3] = esrVal;
-
-    // Report current nernst voltage in byte 4, 5mv steps
-    frame[4] = (int)(GetNernstDc() * 200);
-}
-
 void SendRusefiFormat(uint8_t idx)
 {
+    auto baseAddress = 0x180 + 2 * idx;
+
     {
-        CanTxTyped<wbo::StandardData> frame(0x170 + idx);
+        CanTxTyped<wbo::StandardData> frame(baseAddress + 0);
 
         // The same header is imported by the ECU and checked against this data in the frame
         frame.get().Version = RUSEFI_WIDEBAND_VERSION;
@@ -162,7 +122,7 @@ void SendRusefiFormat(uint8_t idx)
     }
 
     {
-        CanTxTyped<wbo::DiagData> frame(0x190 + idx);
+        CanTxTyped<wbo::DiagData> frame(baseAddress + 1);
 
         frame.get().Esr = GetSensorInternalResistance();
         frame.get().NernstDc = GetNernstDc() * 1000;
