@@ -9,6 +9,9 @@
 #include "pump_dac.h"
 #include "port.h"
 
+// this same header is imported by rusEFI to get struct layouts and firmware version
+#include "../for_rusefi/wideband_can.h"
+
 Configuration configuration;
 
 static THD_WORKING_AREA(waCanTxThread, 256);
@@ -141,30 +144,13 @@ void SendEmulatedAemXseries(uint8_t idx) {
     frame[4] = (int)(GetNernstDc() * 200);
 }
 
-struct StandardData
-{
-    uint16_t Lambda;
-    uint16_t TemperatureC;
-    uint8_t Valid;
-
-    uint8_t pad1;
-    uint16_t pad2;
-};
-
-struct DiagData
-{
-    uint16_t Esr;
-    uint16_t NernstDc;
-    uint8_t PumpDuty;
-    Fault Status;
-
-    uint16_t pad;
-};
-
 void SendRusefiFormat(uint8_t idx)
 {
     {
-        CanTxTyped<StandardData> frame(0x170 + idx);
+        CanTxTyped<wbo::StandardData> frame(0x170 + idx);
+
+        // The same header is imported by the ECU and checked against this data in the frame
+        frame.get().Version = RUSEFI_WIDEBAND_VERSION;
 
         uint16_t lambda = GetLambda() * 10000;
         frame.get().Lambda = lambda;
@@ -176,7 +162,7 @@ void SendRusefiFormat(uint8_t idx)
     }
 
     {
-        CanTxTyped<DiagData> frame(0x190 + idx);
+        CanTxTyped<wbo::DiagData> frame(0x190 + idx);
 
         frame.get().Esr = GetSensorInternalResistance();
         frame.get().NernstDc = GetNernstDc() * 1000;
