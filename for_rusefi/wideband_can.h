@@ -1,6 +1,6 @@
 #pragma once
 
-#define RUSEFI_WIDEBAND_VERSION 01
+#define RUSEFI_WIDEBAND_VERSION (0xA0)
 
 namespace wbo
 {
