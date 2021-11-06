@@ -105,6 +105,7 @@ void InitCan()
 void SendRusefiFormat(uint8_t idx)
 {
     auto baseAddress = 0x180 + 2 * idx;
+    auto esr = GetSensorInternalResistance();
 
     {
         CanTxTyped<wbo::StandardData> frame(baseAddress + 0);
@@ -115,8 +116,8 @@ void SendRusefiFormat(uint8_t idx)
         uint16_t lambda = GetLambda() * 10000;
         frame.get().Lambda = lambda;
 
-        // TODO: decode temperatature
-        frame.get().TemperatureC = 0;
+        // TODO: decode temperatature instead of putting ESR here
+        frame.get().TemperatureC = esr;
 
         frame.get().Valid = IsRunningClosedLoop() ? 0x01 : 0x00;
     }
@@ -124,7 +125,7 @@ void SendRusefiFormat(uint8_t idx)
     {
         CanTxTyped<wbo::DiagData> frame(baseAddress + 1);
 
-        frame.get().Esr = GetSensorInternalResistance();
+        frame.get().Esr = esr;
         frame.get().NernstDc = GetNernstDc() * 1000;
         frame.get().PumpDuty = GetPumpOutputDuty() / 4;
         frame.get().Status = GetCurrentFault();
