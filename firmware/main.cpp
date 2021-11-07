@@ -8,6 +8,7 @@
 #include "pump_dac.h"
 #include "sampling.h"
 #include "uart.h"
+#include "io_pins.h"
 
 
 /*
@@ -33,10 +34,10 @@ int main() {
         if (fault == Fault::None)
         {
             // blue is off
-            palClearPad(GPIOB, 5);
+            palClearPad(BLUE_LED_PORT, BLUE_LED_PIN);
 
             // Green is blinking
-            palTogglePad(GPIOB, 6);
+            palTogglePad(GREEN_LED_PORT, GREEN_LED_PIN);
 
             // Slow blink if closed loop, fast if not
             chThdSleepMilliseconds(IsRunningClosedLoop() ? 700 : 50);
@@ -50,7 +51,7 @@ int main() {
             for (int i = 0; i < 2 * static_cast<int>(fault); i++)
             {
                 // Blue is blinking
-                palTogglePad(GPIOB, 5);
+                palTogglePad(BLUE_LED_PORT, BLUE_LED_PIN);
 
                 // fast blink
                 chThdSleepMilliseconds(300);
