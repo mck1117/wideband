@@ -1,0 +1,5 @@
+#define BLUE_LED_PORT GPIOB
+#define BLUE_LED_PIN 5
+
+#define GREEN_LED_PORT GPIOB
+#define GREEN_LED_PIN 6

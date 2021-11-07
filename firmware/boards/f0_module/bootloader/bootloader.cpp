@@ -2,6 +2,7 @@
 #include "hal.h"
 
 #include "flash.h"
+#include "../../../io_pins.h"
 
 #include <cstring>
 
@@ -244,24 +245,23 @@ int main(void) {
 
     chThdCreateStatic(waBootloaderThread, sizeof(waBootloaderThread), NORMALPRIO + 1, BootloaderThread, nullptr);
 
-    // PB5 is blue LED
-    palSetPadMode(GPIOB, 5, PAL_MODE_OUTPUT_PUSHPULL);
-    // PB6 is green LED
-    palSetPadMode(GPIOB, 6, PAL_MODE_OUTPUT_PUSHPULL);
-    palTogglePad(GPIOB, 6);
+    palSetPadMode(BLUE_LED_PORT, BLUE_LED_PIN, PAL_MODE_OUTPUT_PUSHPULL);
+
+    palSetPadMode(GREEN_LED_PORT, GREEN_LED_PIN, PAL_MODE_OUTPUT_PUSHPULL);
+    palTogglePad(GREEN_LED_PORT, GREEN_LED_PIN);
 
     for (size_t i = 0; i < 20; i++)
     {
-        palTogglePad(GPIOB, 5);
-        palTogglePad(GPIOB, 6);
+        palTogglePad(BLUE_LED_PORT, BLUE_LED_PIN);
+        palTogglePad(GREEN_LED_PORT, GREEN_LED_PIN);
         chThdSleepMilliseconds(40);
     }
 
     // Block until booting the app is allowed and CRC matches
     while (bootloaderBusy || !isAppValid())
     {
-        palTogglePad(GPIOB, 5);
-        palTogglePad(GPIOB, 6);
+        palTogglePad(BLUE_LED_PORT, BLUE_LED_PIN);
+        palTogglePad(GREEN_LED_PORT, GREEN_LED_PIN);
         chThdSleepMilliseconds(200);
     }
 
