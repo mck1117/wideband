@@ -8,6 +8,7 @@
 #include "sampling.h"
 #include "pump_dac.h"
 #include "port.h"
+#include "api/wideband_api.h"
 
 // this same header is imported by rusEFI to get struct layouts and firmware version
 #include "../for_rusefi/wideband_can.h"
@@ -57,7 +58,7 @@ void CanRxThread(void*)
             continue;
         }
 
-        if (frame.DLC == 2 && frame.EID == 0xEF5'0000) {
+        if (frame.DLC == 2 && frame.EID == WB_MGS_ECU_STATUS) {
             // This is status from ECU - battery voltage and heater enable signal
 
             // data0 contains battery voltage in tenths of a volt
@@ -69,7 +70,7 @@ void CanRxThread(void*)
             SetHeaterAllowed(heaterAllowed);
         }
         // If it's a bootloader entry request, reboot to the bootloader!
-        else if (frame.DLC == 0 && frame.EID == 0xEF0'0000)
+        else if (frame.DLC == 0 && frame.EID == WB_BL_ENTER)
         {
             SendAck();
 
@@ -79,7 +80,7 @@ void CanRxThread(void*)
             NVIC_SystemReset();
         }
         // Check if it's an "index set" message
-        else if (frame.DLC == 1 && frame.EID == 0xEF4'0000)
+        else if (frame.DLC == 1 && frame.EID == WM_MSG_SET_INDEX)
         {
             auto newCfg = GetConfiguration();
             newCfg.CanIndexOffset = frame.data8[0];
