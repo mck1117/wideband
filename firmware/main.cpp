@@ -45,7 +45,7 @@ int main() {
         else
         {
             // green is off
-            palClearPad(GPIOB, 6);
+            palClearPad(GREEN_LED_PORT, GREEN_LED_PIN);
 
             // Blink out the error code
             for (int i = 0; i < 2 * static_cast<int>(fault); i++)
