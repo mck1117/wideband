@@ -6,11 +6,12 @@
 #include "wideband_config.h"
 
 #include "port.h"
+#include "io_pins.h"
 
 // Stored results
-float nernstAc = 0;
-float nernstDc = 0;
-volatile float pumpCurrentSenseVoltage = 0;
+static float nernstAc = 0;
+static float nernstDc = 0;
+static volatile float pumpCurrentSenseVoltage = 0;
 
 constexpr float f_abs(float x)
 {
@@ -29,7 +30,7 @@ static void SamplingThread(void*)
         auto result = AnalogSample();
 
         // Toggle the pin after sampling so that any switching noise occurs while we're doing our math instead of when sampling
-        palTogglePad(GPIOB, 7);
+        palTogglePad(NERNST_ESR_DRIVER_PORT, NERNST_ESR_DRIVER_PIN);
 
         float r_1 = result.NernstVoltage;
 
