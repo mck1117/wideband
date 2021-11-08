@@ -30,7 +30,7 @@ static void SendAck()
     CANTxFrame frame;
 
     frame.IDE = CAN_IDE_EXT;
-    frame.EID = WB_RUS;
+    frame.EID = WB_ACK;
     frame.RTR = CAN_RTR_DATA;
     frame.DLC = 0;
 
