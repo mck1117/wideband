@@ -1,3 +1,5 @@
+#pragma once
+
 #define BLUE_LED_PORT GPIOB
 #define BLUE_LED_PIN 5
 
