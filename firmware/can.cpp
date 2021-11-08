@@ -8,7 +8,6 @@
 #include "sampling.h"
 #include "pump_dac.h"
 #include "port.h"
-#include "api/wideband_api.h"
 
 // this same header is imported by rusEFI to get struct layouts and firmware version
 #include "../for_rusefi/wideband_can.h"
@@ -31,7 +30,7 @@ static void SendAck()
     CANTxFrame frame;
 
     frame.IDE = CAN_IDE_EXT;
-    frame.EID = 0x727573;   // ascii "rus"
+    frame.EID = WB_RUS;
     frame.RTR = CAN_RTR_DATA;
     frame.DLC = 0;
 
