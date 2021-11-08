@@ -19,7 +19,6 @@ void CanTxThread(void*)
 {
     while(1)
     {
-        SendEmulatedAemXseries(configuration.CanIndexOffset);
         SendRusefiFormat(configuration.CanIndexOffset);
 
         chThdSleepMilliseconds(10);
