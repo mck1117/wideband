@@ -1,6 +1,5 @@
-#include "ch.h"
-#include "hal.h"
 
+#include "port_shared.h"
 #include "flash.h"
 #include "io_pins.h"
 
@@ -213,12 +212,6 @@ void RunBootloaderLoop()
         }
     }
 }
-
-static const CANConfig canConfig500 =
-{
-    CAN_MCR_ABOM | CAN_MCR_AWUM | CAN_MCR_TXFP,
-    CAN_BTR_SJW(0) | CAN_BTR_BRP(5)  | CAN_BTR_TS1(12) | CAN_BTR_TS2(1),
-};
 
 THD_WORKING_AREA(waBootloaderThread, 512);
 THD_FUNCTION(BootloaderThread, arg)
