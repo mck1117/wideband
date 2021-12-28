@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 # first build the bootloader
 cd bootloader
 ./build_bootloader.sh

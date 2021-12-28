@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 # back out to the root
 cd ../..
 
