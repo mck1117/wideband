@@ -2,7 +2,7 @@
 #include "hal.h"
 
 #include "flash.h"
-#include "../io_pins.h"
+#include "io_pins.h"
 
 #include <cstring>
 
