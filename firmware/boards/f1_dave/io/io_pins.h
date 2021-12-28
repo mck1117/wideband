@@ -6,6 +6,7 @@
 #define LED_GREEN_PORT GPIOB
 #define LED_GREEN_PIN 8
 
+// TODO: is this correct?
 #define NERNST_ESR_DRIVER_PORT GPIOB
 #define NERNST_ESR_DRIVER_PIN 12
 
