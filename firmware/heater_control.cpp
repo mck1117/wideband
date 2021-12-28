@@ -10,7 +10,7 @@
 #include "pid.h"
 
 // 400khz / 1024 = 390hz PWM
-Pwm heaterPwm(PWMD1, 0, 400'000, 1024);
+Pwm heaterPwm(HEATER_PWM_DEVICE, HEATER_PWM_CHANNEL, 400'000, 1024);
 
 enum class HeaterState
 {
