@@ -10,8 +10,8 @@ cd bootloader
 cd ../../..
 
 # delete the elf to force a re-link (it might not pick up the bootloader otherwise)
-rm -r build/
-rm ../for_rusefi/wideband_image.h
+rm -rf build/
+rm -f ../for_rusefi/wideband_image.h
 
 # build app firmware!
 make -j12 BOARD=f0_module
