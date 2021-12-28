@@ -12,7 +12,7 @@ rm -r build/
 rm ../for_rusefi/wideband_image.h
 
 # build app firmware!
-make -j12
+make -j12 BOARD=f0_module
 
 # Copy the bin without the bootloader (the image consumed by rusEfi has no bootloader on it)
 dd if=build/wideband.bin of=build/wideband_noboot_no_pad.bin skip=6144 bs=1
