@@ -36,15 +36,18 @@ void boot_app() {
 
     const uint32_t* appFlash = __appflash_start__;
 
+    // The reset vector is at offset 4 (second uint32)
+    uint32_t reset_vector = appFlash[1];
+
+#ifdef STM32F0XX
     // copy vector table to sram
     // TODO: use __ram_vectors_size__
     memcpy(reinterpret_cast<char*>(&__ram_vectors_start__), appFlash, 256);
 
-    // The reset vector is at offset 4 (second uint32)
-    uint32_t reset_vector = appFlash[1];
-
+    // M0 core version, newer cores do same thing a bit nicer
     // switch to use vectors in ram
     SYSCFG->CFGR1 |= 3;
+#endif
 
     // TODO: is this necessary?
     //uint32_t app_msp = appLocation[0];
