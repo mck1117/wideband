@@ -241,23 +241,23 @@ int main(void) {
 
     chThdCreateStatic(waBootloaderThread, sizeof(waBootloaderThread), NORMALPRIO + 1, BootloaderThread, nullptr);
 
-    palSetPadMode(BLUE_LED_PORT, BLUE_LED_PIN, PAL_MODE_OUTPUT_PUSHPULL);
+    palSetPadMode(LED_BLUE_PORT, LED_BLUE_PIN, PAL_MODE_OUTPUT_PUSHPULL);
 
-    palSetPadMode(GREEN_LED_PORT, GREEN_LED_PIN, PAL_MODE_OUTPUT_PUSHPULL);
-    palTogglePad(GREEN_LED_PORT, GREEN_LED_PIN);
+    palSetPadMode(LED_GREEN_PORT, LED_GREEN_PIN, PAL_MODE_OUTPUT_PUSHPULL);
+    palTogglePad(LED_GREEN_PORT, LED_GREEN_PIN);
 
     for (size_t i = 0; i < 20; i++)
     {
-        palTogglePad(BLUE_LED_PORT, BLUE_LED_PIN);
-        palTogglePad(GREEN_LED_PORT, GREEN_LED_PIN);
+        palTogglePad(LED_BLUE_PORT, LED_BLUE_PIN);
+        palTogglePad(LED_GREEN_PORT, LED_GREEN_PIN);
         chThdSleepMilliseconds(40);
     }
 
     // Block until booting the app is allowed and CRC matches
     while (bootloaderBusy || !isAppValid())
     {
-        palTogglePad(BLUE_LED_PORT, BLUE_LED_PIN);
-        palTogglePad(GREEN_LED_PORT, GREEN_LED_PIN);
+        palTogglePad(LED_BLUE_PORT, LED_BLUE_PIN);
+        palTogglePad(LED_GREEN_PORT, LED_GREEN_PIN);
         chThdSleepMilliseconds(200);
     }
 

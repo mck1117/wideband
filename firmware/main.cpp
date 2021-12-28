@@ -34,10 +34,10 @@ int main() {
         if (fault == Fault::None)
         {
             // blue is off
-            palClearPad(BLUE_LED_PORT, BLUE_LED_PIN);
+            palClearPad(LED_BLUE_PORT, LED_BLUE_PIN);
 
             // Green is blinking
-            palTogglePad(GREEN_LED_PORT, GREEN_LED_PIN);
+            palTogglePad(LED_GREEN_PORT, LED_GREEN_PIN);
 
             // Slow blink if closed loop, fast if not
             chThdSleepMilliseconds(IsRunningClosedLoop() ? 700 : 50);
@@ -45,13 +45,13 @@ int main() {
         else
         {
             // green is off
-            palClearPad(GREEN_LED_PORT, GREEN_LED_PIN);
+            palClearPad(LED_GREEN_PORT, LED_GREEN_PIN);
 
             // Blink out the error code
             for (int i = 0; i < 2 * static_cast<int>(fault); i++)
             {
                 // Blue is blinking
-                palTogglePad(BLUE_LED_PORT, BLUE_LED_PIN);
+                palTogglePad(LED_BLUE_PORT, LED_BLUE_PIN);
 
                 // fast blink
                 chThdSleepMilliseconds(300);

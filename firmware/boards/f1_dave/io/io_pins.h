@@ -2,11 +2,11 @@
 
 // TODO: is this correct?
 
-#define BLUE_LED_PORT GPIOB
-#define BLUE_LED_PIN 5
+#define LED_BLUE_PORT GPIOB
+#define LED_BLUE_PIN 5
 
-#define GREEN_LED_PORT GPIOB
-#define GREEN_LED_PIN 6
+#define LED_GREEN_PORT GPIOB
+#define LED_GREEN_PIN 6
 
 #define NERNST_ESR_DRIVER_PORT GPIOB
 #define NERNST_ESR_DRIVER_PIN 7
