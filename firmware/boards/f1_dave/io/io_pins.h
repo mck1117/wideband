@@ -1,18 +1,18 @@
 #pragma once
 
-// TODO: is this correct?
-
 #define LED_BLUE_PORT GPIOB
-#define LED_BLUE_PIN 5
+#define LED_BLUE_PIN 13
 
 #define LED_GREEN_PORT GPIOB
-#define LED_GREEN_PIN 6
+#define LED_GREEN_PIN 8
 
 #define NERNST_ESR_DRIVER_PORT GPIOB
-#define NERNST_ESR_DRIVER_PIN 7
+#define NERNST_ESR_DRIVER_PIN 12
 
+// PC13
 #define HEATER_PWM_DEVICE PWMD1
 #define HEATER_PWM_CHANNEL 0
 
+// PA1 TIM2_CH2
 #define PUMP_DAC_PWM_DEVICE PWMD3
 #define PUMP_DAC_PWM_CHANNEL 0
