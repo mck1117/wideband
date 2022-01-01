@@ -129,3 +129,7 @@ void SetConfiguration(const Configuration& newConfig)
         sizeof(Configuration)
     );
 }
+
+void StartIo() {
+    // pins are initialized via board.h
+}

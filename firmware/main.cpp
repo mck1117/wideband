@@ -8,6 +8,7 @@
 #include "pump_dac.h"
 #include "sampling.h"
 #include "uart.h"
+#include "port.h"
 #include "io_pins.h"
 
 
@@ -19,13 +20,16 @@ int main() {
     chSysInit();
 
     // Fire up all of our threads
+    StartIo();
     StartSampling();
     InitPumpDac();
     StartHeaterControl();
     StartPumpControl();
 
     InitCan();
-    //InitUart();
+#ifdef ECHO_UART
+    InitUart();
+#endif
 
     while(true)
     {

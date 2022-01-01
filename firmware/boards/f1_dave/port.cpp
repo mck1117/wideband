@@ -64,3 +64,10 @@ void SetConfiguration(const Configuration& newConfig)
 {
     // TODO: implement me!
 }
+
+void StartIo() {
+    // stm32 TX - dongle RX often White
+    palSetPadMode(GPIOA, 9, PAL_MODE_STM32_ALTERNATE_PUSHPULL );
+    // stm32 RX - dongle TX often Green
+    palSetPadMode(GPIOA,10, PAL_MODE_INPUT_PULLUP );
+}

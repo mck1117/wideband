@@ -33,4 +33,5 @@ public:
 
 Configuration GetConfiguration();
 void SetConfiguration(const Configuration& newConfig);
+void StartIo();
 
