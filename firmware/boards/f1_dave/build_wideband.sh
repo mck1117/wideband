@@ -6,4 +6,4 @@ set -e
 cd ../..
 
 # build app firmware!
-make -j12 BOARD=f1_dave
+make -j12 BOARD=f1_dave ECHO_UART=TRUE

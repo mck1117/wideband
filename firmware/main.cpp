@@ -26,7 +26,9 @@ int main() {
     StartPumpControl();
 
     InitCan();
-    //InitUart();
+#ifdef ECHO_UART
+    InitUart();
+#endif
 
     while(true)
     {
