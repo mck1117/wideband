@@ -10,6 +10,7 @@
 #include "uart.h"
 #include "io_pins.h"
 
+using namespace wbo;
 
 /*
  * Application entry point.

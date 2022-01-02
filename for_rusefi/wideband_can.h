@@ -10,6 +10,16 @@
 
 namespace wbo
 {
+enum class Fault : uint8_t
+{
+    None = 0,
+
+    // First fault code at 3 so it's easier to see
+    SensorDidntHeat = 3,
+    SensorOverheat = 4,
+    SensorUnderheat = 5,
+};
+
 struct StandardData
 {
     uint8_t Version;
@@ -30,4 +40,6 @@ struct DiagData
 
     uint16_t pad;
 };
+
+
 } // namespace wbo

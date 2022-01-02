@@ -2,16 +2,8 @@
 
 #include <cstdint>
 
-enum class Fault : uint8_t
-{
-    None = 0,
+#include "../for_rusefi/wideband_can.h"
 
-    // First fault code at 3 so it's easier to see
-    SensorDidntHeat = 3,
-    SensorOverheat = 4,
-    SensorUnderheat = 5,
-};
-
-void SetFault(Fault fault);
+void SetFault(wbo::Fault fault);
 bool HasFault();
-Fault GetCurrentFault();
+wbo::Fault GetCurrentFault();

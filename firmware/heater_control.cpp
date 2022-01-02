@@ -9,6 +9,8 @@
 #include "sampling.h"
 #include "pid.h"
 
+using namespace wbo;
+
 // 400khz / 1024 = 390hz PWM
 Pwm heaterPwm(HEATER_PWM_DEVICE, HEATER_PWM_CHANNEL, 400'000, 1024);
 
