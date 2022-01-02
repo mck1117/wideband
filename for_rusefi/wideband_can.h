@@ -41,5 +41,19 @@ struct DiagData
     uint16_t pad;
 };
 
+static const char* describeFault(Fault fault) {
+    switch (fault) {
+        case Fault::None:
+            return "OK";
+        case Fault::SensorDidntHeat:
+            return "Sensor failed to heat";
+        case Fault::SensorOverheat:
+            return "Sensor overheat";
+        case Fault::SensorUnderheat:
+            return "Sensor underheat";
+    }
+
+    return "Unknown";
+}
 
 } // namespace wbo
