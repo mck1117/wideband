@@ -18,29 +18,25 @@
 #define _BOARD_H_
 
 /*
- * Setup for the ST INEMO-M1 Discovery board.
- */
-
-/*
  * Board identifier.
  */
 #define BOARD_ST_NUCLEO64_F103RB
-#define BOARD_NAME              "STMicroelectronics NUCLEO-F103RB"
+/*
+ * Board identifier.
+ */
+#define BOARD_NAME                  "rusEfi Wideband Controller"
 
 /*
- * Board frequencies.
+ * Board oscillators-related settings.
+ * NOTE: LSE not fitted.
+ * NOTE: HSE not fitted.
  */
-#define STM32_LSECLK            0
+#if !defined(STM32_LSECLK)
+#define STM32_LSECLK                0U
+#endif
 
-#if defined(NUCLEO_EXTERNAL_OSCILLATOR)
-#define STM32_HSECLK            8000000
-#define STM32_HSE_BYPASS
-
-#elif defined(NUCLEO_HSE_CRYSTAL)
-#define STM32_HSECLK            8000000
-
-#else
-#define STM32_HSECLK            0
+#if !defined(STM32_HSECLK)
+#define STM32_HSECLK                0U
 #endif
 
 /*
