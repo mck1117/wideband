@@ -188,15 +188,15 @@
  * Port A setup.
  * Everything input with pull-up except:
  * PA0  - Ip_sense                  (analog in).
- * PA1  - Ip_dac (PWM)              (output pushpull, alternate 1).
+ * PA1  - Ip_dac (PWM)              (output pushpull, alternate).
  * PA2  - Vm_sense                  (analog in).
  * PA3  - Un_sense                  (analog in).
  * PA4  - Vm                        (analog in, unused).
  * PA8  - Green LED                 (output pushpull).
- * PA9  - UART TX                   (alternate 1).
- * PA10 - UART RX                   (alternate 1).
- * PA11 - CAN RX                    (alternate 4).
- * PA12 - CAN TX                    (alternate 4).
+ * PA9  - UART TX                   (output pushpull, alternate).
+ * PA10 - UART RX                   (digital input, alternate).
+ * PA11 - CAN RX                    (digital input, alternate).
+ * PA12 - CAN TX                    (output pushpull, alternate).
  * PA13 - Pull-up input             (GPIOA_SWDIO).
  * PA14 - Pull-down input           (GPIOA_SWCLK).
  */
