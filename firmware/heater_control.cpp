@@ -204,3 +204,8 @@ void SetHeaterAllowed(bool allowed)
 {
     heaterAllowed = allowed;
 }
+
+uint16_t GetHeaterDuty()
+{
+    return heaterPwm.GetLastDuty();
+}

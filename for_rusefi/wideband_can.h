@@ -38,7 +38,8 @@ struct DiagData
     uint8_t PumpDuty;
     Fault Status;
 
-    uint16_t pad;
+    uint8_t HeaterDuty;
+    uint8_t pad;
 };
 
 static const char* describeFault(Fault fault) {
