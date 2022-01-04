@@ -18,13 +18,13 @@ ADCConversionGroup convGroup =
     nullptr,
     0, ADC_CR2_CONT,       // CR1, CR2
     // SMPR1
-    0, 
+    0,
     // SMPR2
-    ADC_SMPR2_SMP_AN0(ADC_SAMPLE) | ADC_SMPR2_SMP_AN2(ADC_SAMPLE) | ADC_SMPR2_SMP_AN3(ADC_SAMPLE),
+    ADC_SMPR2_SMP_AN3(ADC_SAMPLE) | ADC_SMPR2_SMP_AN0(ADC_SAMPLE) | ADC_SMPR2_SMP_AN2(ADC_SAMPLE),
     // SQR
     ADC_SQR1_NUM_CH(ADC_CHANNEL_COUNT),
     0,
-    ADC_SQR3_SQ1_N(0) | ADC_SQR3_SQ2_N(2) | ADC_SQR3_SQ3_N(3)
+    ADC_SQR3_SQ1_N(3) | ADC_SQR3_SQ2_N(0) | ADC_SQR3_SQ3_N(2)
 };
 
 static float AverageSamples(adcsample_t* buffer, size_t idx)
