@@ -7,7 +7,7 @@
 #include "hal.h"
 
 // 48MHz / 1024 = 46.8khz PWM
-static Pwm pumpDac(PWMD3, 0, 48'000'000, 1024);
+static Pwm pumpDac(PUMP_DAC_PWM_DEVICE, PUMP_DAC_PWM_CHANNEL, 48'000'000, 1024);
 
 void InitPumpDac()
 {

@@ -30,7 +30,7 @@ static void SendAck()
     CANTxFrame frame;
 
     frame.IDE = CAN_IDE_EXT;
-    frame.EID = 0x727573;   // ascii "rus"
+    frame.EID = WB_ACK;
     frame.RTR = CAN_RTR_DATA;
     frame.DLC = 0;
 
@@ -57,7 +57,7 @@ void CanRxThread(void*)
             continue;
         }
 
-        if (frame.DLC == 2 && frame.EID == 0xEF5'0000) {
+        if (frame.DLC == 2 && frame.EID == WB_MGS_ECU_STATUS) {
             // This is status from ECU - battery voltage and heater enable signal
 
             // data0 contains battery voltage in tenths of a volt
@@ -69,7 +69,7 @@ void CanRxThread(void*)
             SetHeaterAllowed(heaterAllowed);
         }
         // If it's a bootloader entry request, reboot to the bootloader!
-        else if (frame.DLC == 0 && frame.EID == 0xEF0'0000)
+        else if (frame.DLC == 0 && frame.EID == WB_BL_ENTER)
         {
             SendAck();
 
@@ -79,7 +79,7 @@ void CanRxThread(void*)
             NVIC_SystemReset();
         }
         // Check if it's an "index set" message
-        else if (frame.DLC == 1 && frame.EID == 0xEF4'0000)
+        else if (frame.DLC == 1 && frame.EID == WB_MSG_SET_INDEX)
         {
             auto newCfg = GetConfiguration();
             newCfg.CanIndexOffset = frame.data8[0];
@@ -103,7 +103,7 @@ void InitCan()
 
 void SendRusefiFormat(uint8_t idx)
 {
-    auto baseAddress = 0x180 + 2 * idx;
+    auto baseAddress = 0x190 + 2 * idx;
     auto esr = GetSensorInternalResistance();
 
     {
@@ -115,7 +115,7 @@ void SendRusefiFormat(uint8_t idx)
         uint16_t lambda = GetLambda() * 10000;
         frame.get().Lambda = lambda;
 
-        // TODO: decode temperatature instead of putting ESR here
+        // TODO: decode temperature instead of putting ESR here
         frame.get().TemperatureC = esr;
 
         frame.get().Valid = IsRunningClosedLoop() ? 0x01 : 0x00;
@@ -128,5 +128,6 @@ void SendRusefiFormat(uint8_t idx)
         frame.get().NernstDc = GetNernstDc() * 1000;
         frame.get().PumpDuty = GetPumpOutputDuty() / 4;
         frame.get().Status = GetCurrentFault();
+        frame.get().HeaterDuty = GetHeaterDuty() / 4;
     }
 }

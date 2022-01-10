@@ -18,29 +18,25 @@
 #define _BOARD_H_
 
 /*
- * Setup for the ST INEMO-M1 Discovery board.
- */
-
-/*
  * Board identifier.
  */
 #define BOARD_ST_NUCLEO64_F103RB
-#define BOARD_NAME              "STMicroelectronics NUCLEO-F103RB"
+/*
+ * Board identifier.
+ */
+#define BOARD_NAME                  "rusEfi Wideband Controller"
 
 /*
- * Board frequencies.
+ * Board oscillators-related settings.
+ * NOTE: LSE not fitted.
+ * NOTE: HSE not fitted.
  */
-#define STM32_LSECLK            0
+#if !defined(STM32_LSECLK)
+#define STM32_LSECLK                0U
+#endif
 
-#if defined(NUCLEO_EXTERNAL_OSCILLATOR)
-#define STM32_HSECLK            8000000
-#define STM32_HSE_BYPASS
-
-#elif defined(NUCLEO_HSE_CRYSTAL)
-#define STM32_HSECLK            8000000
-
-#else
-#define STM32_HSECLK            0
+#if !defined(STM32_HSECLK)
+#define STM32_HSECLK                0U
 #endif
 
 /*
@@ -191,20 +187,28 @@
 /*
  * Port A setup.
  * Everything input with pull-up except:
- * PA2  - Alternate output          (GPIOA_ARD_D1, GPIOA_USART2_TX).
- * PA3  - Normal input              (GPIOA_ARD_D0, GPIOA_USART2_RX).
- * PA5  - Push Pull output          (GPIOA_LED_GREEN).
+ * PA0  - Ip_sense                  (analog in).
+ * PA1  - Ip_dac (PWM)              (output pushpull, alternate).
+ * PA2  - Vm_sense                  (analog in).
+ * PA3  - Un_sense                  (analog in).
+ * PA4  - Vm                        (analog in, unused).
+ * PA8  - Green LED                 (output pushpull).
+ * PA9  - UART TX                   (output pushpull, alternate).
+ * PA10 - UART RX                   (digital input, alternate).
+ * PA11 - CAN RX                    (digital input, alternate).
+ * PA12 - CAN TX                    (output pushpull, alternate).
  * PA13 - Pull-up input             (GPIOA_SWDIO).
  * PA14 - Pull-down input           (GPIOA_SWCLK).
  */
-#define VAL_GPIOACRL            0x88384B88      /*  PA7...PA0 */
-#define VAL_GPIOACRH            0x88888888      /* PA15...PA8 */
-#define VAL_GPIOAODR            0xFFFFBFDF
+#define VAL_GPIOACRL            0x88800020      /*  PA7...PA0 */
+#define VAL_GPIOACRH            0x888B88B2      /* PA15...PA8 */
+#define VAL_GPIOAODR            0xFFFFFFFF
 
 /*
  * Port B setup.
  * Everything input with pull-up except:
- * PB3  - Pull-up input             (GPIOA_SWO).
+ * PB12 - Nernst ESR driver (GPIO)  (output pushpull)
+ * PB13 - Blue LED                  (output pushpull)
  */
 #define VAL_GPIOBCRL            0x88888888      /*  PB7...PB0 */
 #define VAL_GPIOBCRH            0x88888888      /* PB15...PB8 */
@@ -213,19 +217,16 @@
 /*
  * Port C setup.
  * Everything input with pull-up except:
- * PC13 - Normal input              (GPIOC_BUTTON).
  */
 #define VAL_GPIOCCRL            0x88888888      /*  PC7...PC0 */
-#define VAL_GPIOCCRH            0x88488888      /* PC15...PC8 */
+#define VAL_GPIOCCRH            0x88888888      /* PC15...PC8 */
 #define VAL_GPIOCODR            0xFFFFFFFF
 
 /*
  * Port D setup.
  * Everything input with pull-up except:
- * PD0  - Normal input              (GPIOD_OSC_IN).
- * PD1  - Normal input              (GPIOD_OSC_OUT).
  */
-#define VAL_GPIODCRL            0x88888844      /*  PD7...PD0 */
+#define VAL_GPIODCRL            0x88888888      /*  PD7...PD0 */
 #define VAL_GPIODCRH            0x88888888      /* PD15...PD8 */
 #define VAL_GPIODODR            0xFFFFFFFF
 

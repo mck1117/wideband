@@ -1,5 +1,7 @@
 #pragma once
 
+#include "io_pins.h"
+
 // Fundamental board constants
 #define VCC_VOLTS (3.3f)
 #define HALF_VCC (VCC_VOLTS / 2)

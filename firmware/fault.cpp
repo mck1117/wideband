@@ -1,5 +1,7 @@
 #include "fault.h"
 
+using namespace wbo;
+
 static Fault currentFault = Fault::None;
 
 void SetFault(Fault fault)

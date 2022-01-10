@@ -1,8 +1,7 @@
-#include "ch.h"
-#include "hal.h"
 
+#include "port_shared.h"
 #include "flash.h"
-#include "../io_pins.h"
+#include "io_pins.h"
 
 #include <cstring>
 
@@ -37,15 +36,18 @@ void boot_app() {
 
     const uint32_t* appFlash = __appflash_start__;
 
+    // The reset vector is at offset 4 (second uint32)
+    uint32_t reset_vector = appFlash[1];
+
+#ifdef STM32F0XX
     // copy vector table to sram
     // TODO: use __ram_vectors_size__
     memcpy(reinterpret_cast<char*>(&__ram_vectors_start__), appFlash, 256);
 
-    // The reset vector is at offset 4 (second uint32)
-    uint32_t reset_vector = appFlash[1];
-
+    // M0 core version, newer cores do same thing a bit nicer
     // switch to use vectors in ram
     SYSCFG->CFGR1 |= 3;
+#endif
 
     // TODO: is this necessary?
     //uint32_t app_msp = appLocation[0];
@@ -214,12 +216,6 @@ void RunBootloaderLoop()
     }
 }
 
-static const CANConfig canConfig500 =
-{
-    CAN_MCR_ABOM | CAN_MCR_AWUM | CAN_MCR_TXFP,
-    CAN_BTR_SJW(0) | CAN_BTR_BRP(5)  | CAN_BTR_TS1(12) | CAN_BTR_TS2(1),
-};
-
 THD_WORKING_AREA(waBootloaderThread, 512);
 THD_FUNCTION(BootloaderThread, arg)
 {
@@ -245,23 +241,23 @@ int main(void) {
 
     chThdCreateStatic(waBootloaderThread, sizeof(waBootloaderThread), NORMALPRIO + 1, BootloaderThread, nullptr);
 
-    palSetPadMode(BLUE_LED_PORT, BLUE_LED_PIN, PAL_MODE_OUTPUT_PUSHPULL);
+    palSetPadMode(LED_BLUE_PORT, LED_BLUE_PIN, PAL_MODE_OUTPUT_PUSHPULL);
 
-    palSetPadMode(GREEN_LED_PORT, GREEN_LED_PIN, PAL_MODE_OUTPUT_PUSHPULL);
-    palTogglePad(GREEN_LED_PORT, GREEN_LED_PIN);
+    palSetPadMode(LED_GREEN_PORT, LED_GREEN_PIN, PAL_MODE_OUTPUT_PUSHPULL);
+    palTogglePad(LED_GREEN_PORT, LED_GREEN_PIN);
 
     for (size_t i = 0; i < 20; i++)
     {
-        palTogglePad(BLUE_LED_PORT, BLUE_LED_PIN);
-        palTogglePad(GREEN_LED_PORT, GREEN_LED_PIN);
+        palTogglePad(LED_BLUE_PORT, LED_BLUE_PIN);
+        palTogglePad(LED_GREEN_PORT, LED_GREEN_PIN);
         chThdSleepMilliseconds(40);
     }
 
     // Block until booting the app is allowed and CRC matches
     while (bootloaderBusy || !isAppValid())
     {
-        palTogglePad(BLUE_LED_PORT, BLUE_LED_PIN);
-        palTogglePad(GREEN_LED_PORT, GREEN_LED_PIN);
+        palTogglePad(LED_BLUE_PORT, LED_BLUE_PIN);
+        palTogglePad(LED_GREEN_PORT, LED_GREEN_PIN);
         chThdSleepMilliseconds(200);
     }
 

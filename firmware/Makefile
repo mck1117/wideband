@@ -131,6 +131,7 @@ CSRC = $(ALLCSRC) $(BOARDDIR)/board.c
 # setting.
 CPPSRC = $(ALLCPPSRC) \
           $(BOARDDIR)/port.cpp \
+          $(BOARDDIR)/port_shared.cpp \
           shared/flash.cpp \
           can.cpp \
           can_helper.cpp \
@@ -152,7 +153,7 @@ ASMSRC = $(ALLASMSRC)
 ASMXSRC = $(ALLXASMSRC)
 
 # Inclusion directories.
-INCDIR = $(CONFDIR) $(ALLINC) $(TESTINC) boards/
+INCDIR = $(CONFDIR) $(ALLINC) boards/ $(BOARDDIR)/io/
 
 # Define C warning options here.
 CWARN = -Wall -Wextra -Wundef -Wstrict-prototypes
