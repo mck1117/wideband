@@ -16,3 +16,9 @@
 // PA6
 #define PUMP_DAC_PWM_DEVICE PWMD3
 #define PUMP_DAC_PWM_CHANNEL 0
+
+#define ID_SEL1_PORT GPIOB
+#define ID_SEL1_PIN 1
+
+#define ID_SEL2_PORT GPIOA
+#define ID_SEL2_PIN 8
