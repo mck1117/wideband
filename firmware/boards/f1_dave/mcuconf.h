@@ -35,6 +35,8 @@
 
 /*
  * HAL driver system settings.
+ * TL,DR: we run at 48MHz.
+ * It's not possible to run at 72 on HSI because of the PLL's limited configuration options, so 48MHz right now.
  */
 #define STM32_NO_INIT                       FALSE
 #define STM32_HSI_ENABLED                   TRUE
