@@ -35,3 +35,9 @@ jobs:
       - name: Build Firmware
         working-directory: ./firmware/boards/${{matrix.build-target}}
         run: ./build_wideband.sh
+
+      - name: Attach binaries
+        uses: actions/upload-artifact@v2
+        with:
+          name: Wideband ${{matrix.build-target}}
+          path: ./firmware/build/wideband.*
