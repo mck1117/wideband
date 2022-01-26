@@ -1,3 +1,5 @@
+[![Build Firmware](https://github.com/rusefi/wideband/actions/workflows/build-firmware.yaml/badge.svg)](https://github.com/rusefi/wideband/actions/workflows/build-firmware.yaml)
+
 # rusEFI Wideband Controller
 
 [User Documentation](https://rusefi.com/s/wb)
