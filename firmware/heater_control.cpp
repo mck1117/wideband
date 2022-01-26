@@ -205,7 +205,7 @@ void SetHeaterAllowed(bool allowed)
     heaterAllowed = allowed;
 }
 
-uint16_t GetHeaterDuty()
+float GetHeaterDuty()
 {
     return heaterPwm.GetLastDuty();
 }

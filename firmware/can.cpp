@@ -126,8 +126,8 @@ void SendRusefiFormat(uint8_t idx)
 
         frame.get().Esr = esr;
         frame.get().NernstDc = GetNernstDc() * 1000;
-        frame.get().PumpDuty = GetPumpOutputDuty() / 4;
+        frame.get().PumpDuty = GetPumpOutputDuty() * 255;
         frame.get().Status = GetCurrentFault();
-        frame.get().HeaterDuty = GetHeaterDuty() / 4;
+        frame.get().HeaterDuty = GetHeaterDuty() * 255;
     }
 }
