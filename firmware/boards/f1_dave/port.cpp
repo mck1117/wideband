@@ -8,6 +8,9 @@
 #define ADC_CHANNEL_COUNT 4
 #define ADC_SAMPLE ADC_SAMPLE_7P5
 
+/* 39K + 10K divider */
+#define BATTERY_INPUT_DIVIDER       (10.0 / (10.0 + 39.0))
+
 static adcsample_t adcBuffer[ADC_CHANNEL_COUNT * ADC_OVERSAMPLE];
 
 ADCConversionGroup convGroup =
