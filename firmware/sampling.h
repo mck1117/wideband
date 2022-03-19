@@ -7,3 +7,5 @@ float GetSensorInternalResistance();
 float GetNernstDc();
 
 float GetPumpNominalCurrent();
+
+float GetBatteryVoltage();

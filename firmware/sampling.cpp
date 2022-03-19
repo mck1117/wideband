@@ -12,6 +12,7 @@
 static float nernstAc = 0;
 static float nernstDc = 0;
 static volatile float pumpCurrentSenseVoltage = 0;
+static float battv = 0;
 
 constexpr float f_abs(float x)
 {
@@ -54,6 +55,8 @@ static void SamplingThread(void*)
             (1 - PUMP_FILTER_ALPHA) * pumpCurrentSenseVoltage +
             PUMP_FILTER_ALPHA * (result.PumpCurrentVoltage - result.VirtualGroundVoltageInt);
 
+        battv = result.BatteryVoltage;
+
         // Shift history over by one
         r_3 = r_2;
         r_2 = r_1;
@@ -93,4 +96,9 @@ float GetPumpNominalCurrent()
     // 1000 is to convert to milliamperes
     constexpr float ratio = -1000 / (PUMP_CURRENT_SENSE_GAIN * LSU_SENSE_R);
     return pumpCurrentSenseVoltage * ratio;
+}
+
+float GetBatteryVoltage()
+{
+    return battv;
 }

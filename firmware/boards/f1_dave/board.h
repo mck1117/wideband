@@ -192,6 +192,7 @@
  * PA2  - Vm_sense                  (analog in).
  * PA3  - Un_sense                  (analog in).
  * PA4  - Vm                        (analog in, unused).
+ * PA5  - Battery_sense             (analog in).
  * PA8  - Green LED                 (output pushpull).
  * PA9  - UART TX                   (output pushpull, alternate).
  * PA10 - UART RX                   (digital input, alternate).
@@ -200,7 +201,7 @@
  * PA13 - Pull-up input             (GPIOA_SWDIO).
  * PA14 - Pull-down input           (GPIOA_SWCLK).
  */
-#define VAL_GPIOACRL            0x88800020      /*  PA7...PA0 */
+#define VAL_GPIOACRL            0x88000020      /*  PA7...PA0 */
 #define VAL_GPIOACRH            0x888B88B2      /* PA15...PA8 */
 #define VAL_GPIOAODR            0xFFFFFFFF
 

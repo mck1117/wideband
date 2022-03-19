@@ -35,8 +35,12 @@ static void UartThread(void*)
         float lambda = GetLambda();
         int lambdaIntPart = lambda;
         int lambdaThousandths = (lambda - lambdaIntPart) * 1000;
+        int batteryVoltageMv = GetBatteryVoltage() * 1000;
 
-        size_t writeCount = chsnprintf(printBuffer, 200, "%d.%03d\t%d\t%d\r\n", lambdaIntPart, lambdaThousandths, (int)GetSensorInternalResistance(), (int)(GetPumpNominalCurrent() * 1000));
+        size_t writeCount = chsnprintf(printBuffer, 200,
+            "%d.%03d\t%d\t%d\t%d\r\n",
+            lambdaIntPart, lambdaThousandths,
+            (int)GetSensorInternalResistance(), (int)(GetPumpNominalCurrent() * 1000), batteryVoltageMv);
         uartStartSend(&UARTD1, writeCount, printBuffer);
 
         chThdSleepMilliseconds(20);

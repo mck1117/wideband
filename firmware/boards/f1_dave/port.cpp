@@ -5,8 +5,11 @@
 
 #include "hal.h"
 
-#define ADC_CHANNEL_COUNT 3
+#define ADC_CHANNEL_COUNT 4
 #define ADC_SAMPLE ADC_SAMPLE_7P5
+
+/* 39K + 10K divider */
+#define BATTERY_INPUT_DIVIDER       (10.0 / (10.0 + 39.0))
 
 static adcsample_t adcBuffer[ADC_CHANNEL_COUNT * ADC_OVERSAMPLE];
 
@@ -20,11 +23,11 @@ ADCConversionGroup convGroup =
     // SMPR1
     0,
     // SMPR2
-    ADC_SMPR2_SMP_AN3(ADC_SAMPLE) | ADC_SMPR2_SMP_AN0(ADC_SAMPLE) | ADC_SMPR2_SMP_AN2(ADC_SAMPLE),
+    ADC_SMPR2_SMP_AN3(ADC_SAMPLE) | ADC_SMPR2_SMP_AN0(ADC_SAMPLE) | ADC_SMPR2_SMP_AN2(ADC_SAMPLE) | ADC_SMPR2_SMP_AN5(ADC_SAMPLE),
     // SQR
     ADC_SQR1_NUM_CH(ADC_CHANNEL_COUNT),
     0,
-    ADC_SQR3_SQ1_N(3) | ADC_SQR3_SQ2_N(0) | ADC_SQR3_SQ3_N(2)
+    ADC_SQR3_SQ1_N(3) | ADC_SQR3_SQ2_N(0) | ADC_SQR3_SQ3_N(2) | ADC_SQR3_SQ4_N(5)
 };
 
 static float AverageSamples(adcsample_t* buffer, size_t idx)
@@ -51,6 +54,7 @@ AnalogResult AnalogSample()
         .NernstVoltage = AverageSamples(adcBuffer, 0) * NERNST_INPUT_GAIN,
         .PumpCurrentVoltage = AverageSamples(adcBuffer, 1),
         .VirtualGroundVoltageInt = AverageSamples(adcBuffer, 2),
+        .BatteryVoltage = AverageSamples(adcBuffer, 3) / BATTERY_INPUT_DIVIDER,
     };
 }
 
