@@ -15,19 +15,19 @@ static adcsample_t adcBuffer[ADC_CHANNEL_COUNT * ADC_OVERSAMPLE];
 
 ADCConversionGroup convGroup =
 {
-    false,
-    ADC_CHANNEL_COUNT,
-    nullptr,
-    nullptr,
-    0, ADC_CR2_CONT,       // CR1, CR2
-    // SMPR1
-    0,
-    // SMPR2
-    ADC_SMPR2_SMP_AN3(ADC_SAMPLE) | ADC_SMPR2_SMP_AN0(ADC_SAMPLE) | ADC_SMPR2_SMP_AN2(ADC_SAMPLE) | ADC_SMPR2_SMP_AN5(ADC_SAMPLE),
-    // SQR
-    ADC_SQR1_NUM_CH(ADC_CHANNEL_COUNT),
-    0,
-    ADC_SQR3_SQ1_N(3) | ADC_SQR3_SQ2_N(0) | ADC_SQR3_SQ3_N(2) | ADC_SQR3_SQ4_N(5)
+    .circular = false,
+    .num_channels = ADC_CHANNEL_COUNT,
+    .end_cb = nullptr,
+    .error_cb = nullptr,
+    .cr1 = 0,
+    .cr2 = ADC_CR2_CONT,
+    .smpr1 = 0,
+    .smpr2 = ADC_SMPR2_SMP_AN3(ADC_SAMPLE) | ADC_SMPR2_SMP_AN0(ADC_SAMPLE) |
+             ADC_SMPR2_SMP_AN2(ADC_SAMPLE) | ADC_SMPR2_SMP_AN5(ADC_SAMPLE),
+    .sqr1 = ADC_SQR1_NUM_CH(ADC_CHANNEL_COUNT),
+    .sqr2 = 0,
+    .sqr3 = ADC_SQR3_SQ1_N(3) | ADC_SQR3_SQ2_N(0) |
+            ADC_SQR3_SQ3_N(2) | ADC_SQR3_SQ4_N(5)
 };
 
 static float AverageSamples(adcsample_t* buffer, size_t idx)
