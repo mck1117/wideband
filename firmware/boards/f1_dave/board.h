@@ -97,11 +97,11 @@
  * Port B setup.
  * Everything input with pull-up except:
  * PB6  - Heater PWM                (output pushpull, 2 MHz, alternate).
- * PB12 - Nernst ESR driver (GPIO)  (output pushpull)
+ * PB12 - Nernst ESR driver (GPIO)  (output pushpull, 50 Mhz)
  * PB13 - Blue LED                  (output pushpull)
  */
 #define VAL_GPIOBCRL            0x8A888888      /*  PB7...PB0 */
-#define VAL_GPIOBCRH            0x88888888      /* PB15...PB8 */
+#define VAL_GPIOBCRH            0x88838888      /* PB15...PB8 */
 #define VAL_GPIOBODR            0xFFFFFFFF
 
 /*
