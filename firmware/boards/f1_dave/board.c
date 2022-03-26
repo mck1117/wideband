@@ -47,5 +47,4 @@ void __early_init(void) {
  * Board-specific initialization code.
  */
 void boardInit(void) {
-    palSetPadMode(HEATER_PORT, HEATER_PIN, PAL_MODE_OUTPUT_PUSHPULL );
 }
