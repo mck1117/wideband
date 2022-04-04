@@ -1,15 +1,11 @@
 #pragma once
 
-// Fundamental board constants
-#define VCC_VOLTS (3.3f)
-#define HALF_VCC (VCC_VOLTS / 2)
-#define ADC_MAX_COUNT (4095)
-#define ADC_OVERSAMPLE 24
+#include "io_pins.h"
+#include "wideband_board_config.h"
 
 // *******************************
 //    Nernst voltage & ESR sense
 // *******************************
-#define NERNST_INPUT_GAIN (1 / 2.7f)
 
 // Nernst AC injection resistor value
 #define ESR_SUPPLY_R (22000)
@@ -42,9 +38,9 @@
 #define HEATER_CONTROL_PERIOD 50
 
 #define HEATER_PREHEAT_TIME 5000
-#define HEATER_WARMUP_TIMEOUT 45000
+#define HEATER_WARMUP_TIMEOUT 60000
 
-#define HEATER_CLOSED_LOOP_THRESHOLD_ESR 400
+#define HEATER_CLOSED_LOOP_THRESHOLD_ESR 500
 #define HEATER_TARGET_ESR 300
 #define HEATER_OVERHEAT_ESR 150
-#define HEATER_UNDERHEAT_ESR 600
+#define HEATER_UNDERHEAT_ESR 700

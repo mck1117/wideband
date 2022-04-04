@@ -1,6 +1,7 @@
 #pragma once
 
 #include "hal.h"
+#include "port_shared.h"
 
 struct AnalogResult
 {
@@ -33,4 +34,3 @@ public:
 Configuration GetConfiguration();
 void SetConfiguration(const Configuration& newConfig);
 
-extern const CANConfig canConfig500;

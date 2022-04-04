@@ -1,18 +1,20 @@
 #include "fault.h"
 
+using namespace wbo;
+
 static Fault currentFault = Fault::None;
 
-void setFault(Fault fault)
+void SetFault(Fault fault)
 {
     currentFault = fault;
 }
 
-bool hasFault()
+bool HasFault()
 {
     return currentFault != Fault::None;
 }
 
-Fault getCurrentFault()
+Fault GetCurrentFault()
 {
     return currentFault;
 }

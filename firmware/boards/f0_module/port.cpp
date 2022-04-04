@@ -97,8 +97,8 @@ Configuration GetConfiguration()
     }
 
     // Now, override the index with a hardware-strapped option (if present)
-    auto sel1 = readSelPin(GPIOB, 1);
-    auto sel2 = readSelPin(GPIOA, 8);
+    auto sel1 = readSelPin(ID_SEL1_PORT, ID_SEL1_PIN);
+    auto sel2 = readSelPin(ID_SEL2_PORT, ID_SEL2_PIN);
 
     // See https://github.com/mck1117/wideband/issues/11
     switch (3 * sel1 + sel2) {
@@ -129,9 +129,3 @@ void SetConfiguration(const Configuration& newConfig)
         sizeof(Configuration)
     );
 }
-
-const CANConfig canConfig500 =
-{
-    CAN_MCR_ABOM | CAN_MCR_AWUM | CAN_MCR_TXFP,
-    CAN_BTR_SJW(0) | CAN_BTR_BRP(5)  | CAN_BTR_TS1(12) | CAN_BTR_TS2(1),
-};

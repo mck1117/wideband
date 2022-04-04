@@ -1,15 +1,9 @@
 #pragma once
 
-enum class Fault
-{
-    None = 0,
+#include <cstdint>
 
-    // First fault code at 3 so it's easier to see
-    SensorDidntHeat = 3,
-    SensorOverheat = 4,
-    SensorUnderheat = 5,
-};
+#include "../for_rusefi/wideband_can.h"
 
-void setFault(Fault fault);
-bool hasFault();
-Fault getCurrentFault();
+void SetFault(wbo::Fault fault);
+bool HasFault();
+wbo::Fault GetCurrentFault();

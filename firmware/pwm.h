@@ -11,11 +11,12 @@ public:
 
     void Start();
     void SetDuty(float duty);
-    uint16_t GetLastDuty() const;
+    float GetLastDuty() const;
+
 private:
     PWMDriver* const m_driver;
     const uint8_t m_channel;
     const uint32_t m_counterFrequency;
     const uint16_t m_counterPeriod;
-    uint16_t m_lastDuty;
+    float m_dutyFloat;
 };

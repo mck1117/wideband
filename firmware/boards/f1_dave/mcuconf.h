@@ -35,6 +35,8 @@
 
 /*
  * HAL driver system settings.
+ * TL,DR: we run at 48MHz.
+ * It's not possible to run at 72 on HSI because of the PLL's limited configuration options, so 48MHz right now.
  */
 #define STM32_NO_INIT                       FALSE
 #define STM32_HSI_ENABLED                   TRUE
@@ -47,7 +49,7 @@
 #define STM32_PLLMUL_VALUE                  12
 #define STM32_HPRE                          STM32_HPRE_DIV1
 #define STM32_PPRE1                         STM32_PPRE1_DIV2
-#define STM32_PPRE2                         STM32_PPRE2_DIV2
+#define STM32_PPRE2                         STM32_PPRE2_DIV1
 #define STM32_ADCPRE                        STM32_ADCPRE_DIV4
 #define STM32_USB_CLOCK_REQUIRED            TRUE
 #define STM32_USBPRE                        STM32_USBPRE_DIV1
@@ -133,8 +135,8 @@
  */
 #define STM32_PWM_USE_ADVANCED              FALSE
 #define STM32_PWM_USE_TIM1                  TRUE
-#define STM32_PWM_USE_TIM2                  FALSE
-#define STM32_PWM_USE_TIM3                  TRUE
+#define STM32_PWM_USE_TIM2                  TRUE
+#define STM32_PWM_USE_TIM3                  FALSE
 #define STM32_PWM_USE_TIM4                  FALSE
 #define STM32_PWM_USE_TIM5                  FALSE
 #define STM32_PWM_USE_TIM8                  FALSE
@@ -182,7 +184,7 @@
  * ST driver system settings.
  */
 #define STM32_ST_IRQ_PRIORITY               8
-#define STM32_ST_USE_TIMER                  2
+#define STM32_ST_USE_TIMER                  3
 
 /*
  * UART driver system settings.

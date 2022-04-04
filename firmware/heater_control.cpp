@@ -9,8 +9,10 @@
 #include "sampling.h"
 #include "pid.h"
 
+using namespace wbo;
+
 // 400khz / 1024 = 390hz PWM
-Pwm heaterPwm(PWMD1, 0, 400'000, 1024);
+static Pwm heaterPwm(HEATER_PWM_DEVICE, HEATER_PWM_CHANNEL, 400'000, 1024);
 
 enum class HeaterState
 {
@@ -61,7 +63,7 @@ static HeaterState GetNextState(HeaterState state, float sensorEsr)
             }
             else if (timeCounter == 0)
             {
-                setFault(Fault::SensorDidntHeat);
+                SetFault(Fault::SensorDidntHeat);
                 return HeaterState::Stopped;
             }
 
@@ -69,14 +71,15 @@ static HeaterState GetNextState(HeaterState state, float sensorEsr)
 
             break;
         case HeaterState::ClosedLoop:
+            // Check that the sensor's ESR is acceptable for normal operation
             if (sensorEsr < HEATER_OVERHEAT_ESR)
             {
-                setFault(Fault::SensorOverheat);
+                SetFault(Fault::SensorOverheat);
                 return HeaterState::Stopped;
             }
             else if (sensorEsr > HEATER_UNDERHEAT_ESR)
             {
-                setFault(Fault::SensorUnderheat);
+                SetFault(Fault::SensorUnderheat);
                 return HeaterState::Stopped;
             }
 
@@ -200,4 +203,9 @@ void SetBatteryVoltage(float vbatt)
 void SetHeaterAllowed(bool allowed)
 {
     heaterAllowed = allowed;
+}
+
+float GetHeaterDuty()
+{
+    return heaterPwm.GetLastDuty();
 }

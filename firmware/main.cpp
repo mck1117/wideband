@@ -8,7 +8,9 @@
 #include "pump_dac.h"
 #include "sampling.h"
 #include "uart.h"
+#include "io_pins.h"
 
+using namespace wbo;
 
 /*
  * Application entry point.
@@ -24,19 +26,21 @@ int main() {
     StartPumpControl();
 
     InitCan();
-    //InitUart();
+#ifdef ECHO_UART
+    InitUart();
+#endif
 
     while(true)
     {
-        auto fault = getCurrentFault();
+        auto fault = GetCurrentFault();
 
         if (fault == Fault::None)
         {
             // blue is off
-            palClearPad(GPIOB, 5);
+            palClearPad(LED_BLUE_PORT, LED_BLUE_PIN);
 
             // Green is blinking
-            palTogglePad(GPIOB, 6);
+            palTogglePad(LED_GREEN_PORT, LED_GREEN_PIN);
 
             // Slow blink if closed loop, fast if not
             chThdSleepMilliseconds(IsRunningClosedLoop() ? 700 : 50);
@@ -44,13 +48,13 @@ int main() {
         else
         {
             // green is off
-            palClearPad(GPIOB, 6);
+            palClearPad(LED_GREEN_PORT, LED_GREEN_PIN);
 
             // Blink out the error code
             for (int i = 0; i < 2 * static_cast<int>(fault); i++)
             {
                 // Blue is blinking
-                palTogglePad(GPIOB, 5);
+                palTogglePad(LED_BLUE_PORT, LED_BLUE_PIN);
 
                 // fast blink
                 chThdSleepMilliseconds(300);

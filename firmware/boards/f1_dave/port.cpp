@@ -1,16 +1,58 @@
 #include "port.h"
 
-AnalogResult AnalogSample()
+
+#include "wideband_config.h"
+
+#include "hal.h"
+
+#define ADC_CHANNEL_COUNT 3
+#define ADC_SAMPLE ADC_SAMPLE_7P5
+
+static adcsample_t adcBuffer[ADC_CHANNEL_COUNT * ADC_OVERSAMPLE];
+
+ADCConversionGroup convGroup =
 {
-    // TODO: implement me!
-    return {};
+    false,
+    ADC_CHANNEL_COUNT,
+    nullptr,
+    nullptr,
+    0, ADC_CR2_CONT,       // CR1, CR2
+    // SMPR1
+    0,
+    // SMPR2
+    ADC_SMPR2_SMP_AN3(ADC_SAMPLE) | ADC_SMPR2_SMP_AN0(ADC_SAMPLE) | ADC_SMPR2_SMP_AN2(ADC_SAMPLE),
+    // SQR
+    ADC_SQR1_NUM_CH(ADC_CHANNEL_COUNT),
+    0,
+    ADC_SQR3_SQ1_N(3) | ADC_SQR3_SQ2_N(0) | ADC_SQR3_SQ3_N(2)
+};
+
+static float AverageSamples(adcsample_t* buffer, size_t idx)
+{
+    uint32_t sum = 0;
+
+    for (size_t i = 0; i < ADC_OVERSAMPLE; i++)
+    {
+        sum += buffer[idx];
+        idx += ADC_CHANNEL_COUNT;
+    }
+
+    constexpr float scale = VCC_VOLTS / (ADC_MAX_COUNT * ADC_OVERSAMPLE);
+
+    return (float)sum * scale;
 }
 
-const CANConfig canConfig500 =
+AnalogResult AnalogSample()
 {
-    CAN_MCR_ABOM | CAN_MCR_AWUM | CAN_MCR_TXFP,
-    0 // TODO: set bit timing! correctly!
-};
+    adcConvert(&ADCD1, &convGroup, adcBuffer, ADC_OVERSAMPLE);
+
+    return
+    {
+        .NernstVoltage = AverageSamples(adcBuffer, 0) * NERNST_INPUT_GAIN,
+        .PumpCurrentVoltage = AverageSamples(adcBuffer, 1),
+        .VirtualGroundVoltageInt = AverageSamples(adcBuffer, 2),
+    };
+}
 
 Configuration GetConfiguration()
 {

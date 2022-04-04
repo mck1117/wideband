@@ -1,12 +1,16 @@
 #include "can.h"
 #include "hal.h"
 
+#include "fault.h"
 #include "can_helper.h"
 #include "heater_control.h"
 #include "lambda_conversion.h"
 #include "sampling.h"
 #include "pump_dac.h"
 #include "port.h"
+
+// this same header is imported by rusEFI to get struct layouts and firmware version
+#include "../for_rusefi/wideband_can.h"
 
 Configuration configuration;
 
@@ -15,7 +19,7 @@ void CanTxThread(void*)
 {
     while(1)
     {
-        SendEmulatedAemXseries(configuration.CanIndexOffset);
+        SendRusefiFormat(configuration.CanIndexOffset);
 
         chThdSleepMilliseconds(10);
     }
@@ -26,7 +30,7 @@ static void SendAck()
     CANTxFrame frame;
 
     frame.IDE = CAN_IDE_EXT;
-    frame.EID = 0x727573;   // ascii "rus"
+    frame.EID = WB_ACK;
     frame.RTR = CAN_RTR_DATA;
     frame.DLC = 0;
 
@@ -53,7 +57,7 @@ void CanRxThread(void*)
             continue;
         }
 
-        if (frame.DLC == 2 && frame.EID == 0xEF5'0000) {
+        if (frame.DLC == 2 && frame.EID == WB_MGS_ECU_STATUS) {
             // This is status from ECU - battery voltage and heater enable signal
 
             // data0 contains battery voltage in tenths of a volt
@@ -65,7 +69,7 @@ void CanRxThread(void*)
             SetHeaterAllowed(heaterAllowed);
         }
         // If it's a bootloader entry request, reboot to the bootloader!
-        else if (frame.DLC == 0 && frame.EID == 0xEF0'0000)
+        else if (frame.DLC == 0 && frame.EID == WB_BL_ENTER)
         {
             SendAck();
 
@@ -75,7 +79,7 @@ void CanRxThread(void*)
             NVIC_SystemReset();
         }
         // Check if it's an "index set" message
-        else if (frame.DLC == 1 && frame.EID == 0xEF4'0000)
+        else if (frame.DLC == 1 && frame.EID == WB_MSG_SET_INDEX)
         {
             auto newCfg = GetConfiguration();
             newCfg.CanIndexOffset = frame.data8[0];
@@ -95,61 +99,35 @@ void InitCan()
     chThdCreateStatic(waCanRxThread, sizeof(waCanRxThread), NORMALPRIO - 4, CanRxThread, nullptr);
 }
 
-struct StandardDataFrame
-{
-    uint16_t lambda;
-    uint16_t measuredResistance;
-    uint8_t pad[4];
-};
-
 #define SWAP_UINT16(x) (((x) << 8) | ((x) >> 8))
 
-void SendEmulatedAemXseries(uint8_t idx) {
-    CanTxMessage frame(0x180 + idx, 8, true);
+void SendRusefiFormat(uint8_t idx)
+{
+    auto baseAddress = 0x190 + 2 * idx;
+    auto esr = GetSensorInternalResistance();
 
-    bool isValid = IsRunningClosedLoop();
+    {
+        CanTxTyped<wbo::StandardData> frame(baseAddress + 0);
 
-    float lambda = GetLambda();
-    uint16_t intLambda = lambda * 10000;
+        // The same header is imported by the ECU and checked against this data in the frame
+        frame.get().Version = RUSEFI_WIDEBAND_VERSION;
 
-    // swap endian
-    intLambda = SWAP_UINT16(intLambda);
-    *reinterpret_cast<uint16_t*>(&frame[0]) = intLambda;
+        uint16_t lambda = GetLambda() * 10000;
+        frame.get().Lambda = lambda;
 
-    // bit 1 = LSU 4.9 detected
-    // bit 7 = reading valid
-    frame[6] = 0x02 | (isValid ? 0x80 : 0x00);
+        // TODO: decode temperature instead of putting ESR here
+        frame.get().TemperatureC = esr;
 
-    // Hijack a reserved bit to indicate that we're NOT an AEM controller
-    frame[7] = 0x80;
-
-    // Now we embed some extra data for debug
-    // bytes 2-3 are officially oxygen percent
-    // byte 4 is officially supply voltage
-
-    // Report pump output PWM in byte 2, 0-255 for min to max target (128 = 0 current)
-    frame[2] = GetPumpOutputDuty() / 4;
-
-    // Report sensor ESR in byte 3, 4 ohm steps
-    int esrVal = (int)GetSensorInternalResistance() / 4;
-
-    // Clamp to uint8_t limits
-    if (esrVal > 255) {
-        esrVal = 255;
-    } else if (esrVal < 0) {
-        esrVal = 0;
+        frame.get().Valid = IsRunningClosedLoop() ? 0x01 : 0x00;
     }
 
-    frame[3] = esrVal;
+    {
+        CanTxTyped<wbo::DiagData> frame(baseAddress + 1);
 
-    // Report current nernst voltage in byte 4, 5mv steps
-    frame[4] = (int)(GetNernstDc() * 200);
-}
-
-void SendCanData(float lambda, uint16_t measuredResistance)
-{
-    CanTxTyped<StandardDataFrame> frame(0x130);
-
-    frame.get().lambda = lambda * 10000;
-    frame.get().measuredResistance = measuredResistance;
+        frame.get().Esr = esr;
+        frame.get().NernstDc = GetNernstDc() * 1000;
+        frame.get().PumpDuty = GetPumpOutputDuty() * 255;
+        frame.get().Status = GetCurrentFault();
+        frame.get().HeaterDuty = GetHeaterDuty() * 255;
+    }
 }

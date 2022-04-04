@@ -45,14 +45,14 @@ float clampF(float min, float clamp, float max) {
 }
 
 void Pwm::SetDuty(float duty) {
-    pwmcnt_t highTime = m_counterPeriod * clampF(0, duty, 1);
-
-    m_lastDuty = highTime;
+    auto dutyFloat = clampF(0, duty, 1);
+    m_dutyFloat = dutyFloat;
+    pwmcnt_t highTime = m_counterPeriod * dutyFloat;
 
     pwm_lld_enable_channel(m_driver, m_channel, highTime);
 }
 
-uint16_t Pwm::GetLastDuty() const
+float Pwm::GetLastDuty() const
 {
-    return m_lastDuty;
+    return m_dutyFloat;
 }
