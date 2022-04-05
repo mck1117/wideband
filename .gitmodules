@@ -1,6 +1,7 @@
 [submodule "firmware/ChibiOS"]
 	path = firmware/ChibiOS
-	url = https://github.com/ChibiOS/ChibiOS
+	url = https://github.com/rusefi/ChibiOS
+	branch = master.wideband
 [submodule "firmware/cmsis-svd"]
 	path = firmware/cmsis-svd
 	url = https://github.com/posborne/cmsis-svd
