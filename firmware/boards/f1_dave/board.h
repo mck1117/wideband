@@ -74,43 +74,52 @@
 
 /*
  * Port A setup.
- * Everything input with pull-up except:
  * PA0  - Ip_sense                  (analog in).
- * PA1  - Ip_dac (PWM)              (output pushpull, alternate).
+ * PA1  - Ip_dac (PWM)              (output pushpull, alternate, 2 MHz).
  * PA2  - Vm_sense                  (analog in).
  * PA3  - Un_sense                  (analog in).
  * PA4  - Vm                        (analog in, unused).
  * PA5  - Battery sense             (analog in).
- * PA8  - Green LED                 (output pushpull).
- * PA9  - UART TX                   (output pushpull, alternate).
- * PA10 - UART RX                   (digital input, alternate).
- * PA11 - CAN RX                    (digital input, alternate).
- * PA12 - CAN TX                    (output pushpull, alternate).
- * PA13 - Pull-up input             (GPIOA_SWDIO).
- * PA14 - Pull-down input           (GPIOA_SWCLK).
+ * PA6  - unused
+ * PA7  - unused
+ * PA8  - LED_GREEN                 (output pushpull, 2 MHz).
+ * PA9  - UART_TX                   (output pushpull, alternate, 50 Mhz).
+ * PA10 - UART_RX                   (digital input, alternate).
+ * PA11 - CAN_RX                    (digital input, alternate).
+ * PA12 - CAN_TX                    (output pushpull, alternate, 50 Mhz).
+ * PA13 - SWDIO                     (digital input)
+ * PA14 - SWCLK                     (digital input)
+ * PA15 - DISP0 - unused
  */
 #define VAL_GPIOACRL            0x88000020      /*  PA7...PA0 */
 #define VAL_GPIOACRH            0x888B88B2      /* PA15...PA8 */
-#define VAL_GPIOAODR            0xFFFFFFFF
+#define VAL_GPIOAODR            0x0000FFFF
 
 /*
  * Port B setup.
- * Everything input with pull-up except:
- * PB6  - Heater PWM                (output pushpull, 2 MHz, alternate).
+ * PB0..PB2 - config0..config2 - unused
+ * PB3  - SWO                       (digital input)
+ * PB4..PB5 - DISP1..DISP2 - unused
+ * PB6  - heater_pwm                (output pushpull, alternate, 2 MHz).
+ * PB7..PB9 - DISP4..DISP6 - unused
+ * PB10 - config3 - unused
  * PB12 - Nernst ESR driver (GPIO)  (output pushpull, 50 Mhz)
- * PB13 - Blue LED                  (output pushpull)
+ * PB13 - Blue LED                  (output pushpull, 2 MHz)
+ * PB14 - PWMout2                   (output pushpull, alternate, 50 Mhz).
+ * PB15 - PWMout1                   (output pushpull, alternate, 50 Mhz).
  */
 #define VAL_GPIOBCRL            0x8A888888      /*  PB7...PB0 */
-#define VAL_GPIOBCRH            0x88238888      /* PB15...PB8 */
-#define VAL_GPIOBODR            0xFFFFFFFF
+#define VAL_GPIOBCRH            0xBB238888      /* PB15...PB8 */
+#define VAL_GPIOBODR            0x0000FFFF
 
 /*
  * Port C setup.
- * Everything input with pull-up except:
+ * Everything input with pull-up
+ * PC13 - heater_pwm on old rev, should not conflict in input mode
  */
 #define VAL_GPIOCCRL            0x88888888      /*  PC7...PC0 */
 #define VAL_GPIOCCRH            0x88888888      /* PC15...PC8 */
-#define VAL_GPIOCODR            0xFFFFFFFF
+#define VAL_GPIOCODR            0x0000FFFF
 
 /*
  * Port D setup.
@@ -118,7 +127,7 @@
  */
 #define VAL_GPIODCRL            0x88888888      /*  PD7...PD0 */
 #define VAL_GPIODCRH            0x88888888      /* PD15...PD8 */
-#define VAL_GPIODODR            0xFFFFFFFF
+#define VAL_GPIODODR            0x0000FFFF
 
 /*
  * Port E setup.
@@ -126,7 +135,7 @@
  */
 #define VAL_GPIOECRL            0x88888888      /*  PE7...PE0 */
 #define VAL_GPIOECRH            0x88888888      /* PE15...PE8 */
-#define VAL_GPIOEODR            0xFFFFFFFF
+#define VAL_GPIOEODR            0x0000FFFF
 
 /*
  * USB bus activation macro, required by the USB driver.
