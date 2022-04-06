@@ -101,7 +101,7 @@
  * PB13 - Blue LED                  (output pushpull)
  */
 #define VAL_GPIOBCRL            0x8A888888      /*  PB7...PB0 */
-#define VAL_GPIOBCRH            0x88838888      /* PB15...PB8 */
+#define VAL_GPIOBCRH            0x88238888      /* PB15...PB8 */
 #define VAL_GPIOBODR            0xFFFFFFFF
 
 /*
