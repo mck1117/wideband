@@ -24,13 +24,30 @@ enum class HeaterState
 };
 
 constexpr int preheatTimeCounter = HEATER_PREHEAT_TIME / HEATER_CONTROL_PERIOD;
+constexpr int batteryStabTimeCounter = HEATER_BATTERY_STAB_TIME / HEATER_CONTROL_PERIOD;
 static int timeCounter = preheatTimeCounter;
+static int batteryStabTime = batteryStabTimeCounter;
 static float rampVoltage = 0;
 
 static HeaterState GetNextState(HeaterState state, HeaterAllow heaterAllowState, float batteryVoltage, float sensorEsr)
 {
-    // TODO: smarter state machine to use internal vbatt when CAN not connected
     bool heaterAllowed = heaterAllowState == HeaterAllow::Allowed;
+
+    // Check battery voltage for thresholds only if there is still no command over CAN
+    if (heaterAllowState == HeaterAllow::Unknown)
+    {
+        // measured voltage too low to auto-start heating
+        if (batteryVoltage < HEATER_BATTETY_OFF_VOLTAGE)
+        {
+            batteryStabTime = batteryStabTimeCounter;
+        }
+        // measured voltage is high enougth to auto-start heating, wait some time to stabilize
+        if ((batteryVoltage > HEATER_BATTERY_ON_VOLTAGE) && (batteryStabTime > 0))
+        {
+            batteryStabTime--;
+        }
+        heaterAllowed = batteryStabTime == 0;
+    }
 
     if (!heaterAllowed)
     {
