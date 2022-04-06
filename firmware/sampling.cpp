@@ -30,7 +30,8 @@ static const struct inter_point lsu49_r_to_temp[] =
     {  800,  665},
     { 1000,  640},
     { 1200,  630},
-    { 2500,  565}
+    { 2500,  565},
+    { 6000,   25}   /* measured while cold */
 };
 
 #define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
