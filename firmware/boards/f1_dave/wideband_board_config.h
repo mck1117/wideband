@@ -10,3 +10,9 @@
 //    Nernst voltage & ESR sense
 // *******************************
 #define NERNST_INPUT_GAIN (1 / 3.0f)
+
+// *******************************
+//        Battery Sensing
+// *******************************
+// 39k/10k divider
+#define BATTERY_INPUT_DIVIDER (10.0 / (10.0 + 39.0))
