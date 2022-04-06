@@ -1,37 +1,37 @@
 #include "interpolation.h"
 
-int interpolateInt(int x1, int y1, int x2, int y2, int x)
+float interpolateFloat(float x1, float y1, float x2, float y2, float x)
 {
-    if (x1 == x2)
-        return y1;
+	if (x1 == x2)
+		return y1;
 
-    return (y1 + (y2 - y1) * (x - x1) / (x2 - x1));
+	return (y1 + (y2 - y1) * (x - x1) / (x2 - x1));
 }
 
-int interpolateIntClamped(int x1, int y1, int x2, int y2, int x)
+float interpolateFloatClamped(float x1, float y1, float x2, float y2, float x)
 {
-    if (x <= x1)
-        return y1;
-    if (x >= x2)
-        return y2;
+	if (x <= x1)
+		return y1;
+	if (x >= x2)
+		return y2;
 
-    return interpolateInt(x1, y1, x2, y2, x);
+	return interpolateFloat(x1, y1, x2, y2, x);
 }
 
-int interpolate_1d_int(const struct inter_point *p, int size, int x)
+float interpolate_1d_float(const struct inter_point *p, int size, float x)
 {
-    int i;
+	int i;
 
-    /* no exterpolation */
-    if (x < p[0].x)
-        return p[0].y;
+	/* no exterpolation */
+	if (x < p[0].x)
+		return p[0].y;
 
-    for (i = 0; i < size - 1; i++) {
-        if ((x >= p[i].x) && (x < p[i + 1].x)) {
-            return interpolateInt(p[i].x, p[i].y, p[i + 1].x, p[i + 1].y, x);
-        }
-    }
+	for (i = 0; i < size - 1; i++) {
+		if ((x >= p[i].x) && (x < p[i + 1].x)) {
+			return interpolateFloat(p[i].x, p[i].y, p[i + 1].x, p[i + 1].y, x);
+		}
+	}
 
-    /* no exterpolation */
-    return p[size - 1].y;
+	/* no exterpolation */
+	return p[size - 1].y;
 }

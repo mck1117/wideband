@@ -110,7 +110,7 @@ float GetSensorInternalResistance()
 
 float GetSensorTemperature()
 {
-    return interpolate_1d_int(lsu49_r_to_temp, ARRAY_SIZE(lsu49_r_to_temp), GetSensorInternalResistance());
+    return interpolate_1d_float(lsu49_r_to_temp, ARRAY_SIZE(lsu49_r_to_temp), GetSensorInternalResistance());
 }
 
 float GetNernstDc()
