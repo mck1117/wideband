@@ -41,9 +41,9 @@
 #define HEATER_WARMUP_TIMEOUT 60000
 
 #define HEATER_BATTERY_STAB_TIME	3000
-/* minimal battery voltage to start heating without CAN command */
+// minimal battery voltage to start heating without CAN command
 #define HEATER_BATTERY_ON_VOLTAGE	9.5
-/* mininal battery voltage to continue heating */
+// mininal battery voltage to continue heating
 #define HEATER_BATTETY_OFF_VOLTAGE  8.5
 
 #define HEATER_CLOSED_LOOP_THRESHOLD_ESR 500

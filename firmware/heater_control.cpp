@@ -33,14 +33,17 @@ static HeaterState GetNextState(HeaterState state, HeaterAllow heaterAllowState,
 {
     bool heaterAllowed = heaterAllowState == HeaterAllow::Allowed;
 
-    /* Check battery voltage for thresholds only if there is still no command over CAN */
-    if (heaterAllowState == HeaterAllow::Unknown) {
-        /* measured voltage too low to auto-start heating */
-        if (batteryVoltage < HEATER_BATTETY_OFF_VOLTAGE) {
+    // Check battery voltage for thresholds only if there is still no command over CAN
+    if (heaterAllowState == HeaterAllow::Unknown)
+    {
+        // measured voltage too low to auto-start heating
+        if (batteryVoltage < HEATER_BATTETY_OFF_VOLTAGE)
+        {
             batteryStabTime = batteryStabTimeCounter;
         }
-        /* measured voltage is high enougth to auto-start heating, wait some time to stabilize */
-        if ((batteryVoltage > HEATER_BATTERY_ON_VOLTAGE) && (batteryStabTime > 0)) {
+        // measured voltage is high enougth to auto-start heating, wait some time to stabilize
+        if ((batteryVoltage > HEATER_BATTERY_ON_VOLTAGE) && (batteryStabTime > 0))
+        {
             batteryStabTime--;
         }
         heaterAllowed = batteryStabTime == 0;
