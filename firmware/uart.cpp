@@ -27,7 +27,7 @@ static const UARTConfig uartCfg =
 
 static char printBuffer[200];
 
-static THD_WORKING_AREA(waUartThread, 256);
+static THD_WORKING_AREA(waUartThread, 512);
 static void UartThread(void*)
 {
     while(true)
