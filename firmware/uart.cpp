@@ -38,10 +38,19 @@ static void UartThread(void*)
         int batteryVoltageMv = GetInternalBatteryVoltage() * 1000;
         int duty = GetHeaterDuty() * 100;
 
-        size_t writeCount = chsnprintf(printBuffer, 200, "%d.%03d\t%d\t%d\r\n", lambdaIntPart, lambdaThousandths, (int)GetSensorInternalResistance(), (int)(GetPumpNominalCurrent() * 1000));
+        size_t writeCount = chsnprintf(printBuffer, 200,
+            "%d.%03d\tAC %d mV\tR: %d %d\tIpump: %d\tVbat: %d\theater: %s (%d)\tfault: %s\r\n",
+            lambdaIntPart, lambdaThousandths,
+            (int)(GetNernstAc() * 1000.0),
+            (int)GetSensorInternalResistance(),
+            (int)GetSensorInternalResistanceAlt(),
+            (int)(GetPumpNominalCurrent() * 1000),
+            batteryVoltageMv,
+            describeHeaterState(GetHeaterState()), duty,
+            describeFault(GetCurrentFault()));
         uartStartSend(&UARTD1, writeCount, printBuffer);
 
-        chThdSleepMilliseconds(20);
+        chThdSleepMilliseconds(50);
     }
 }
 
