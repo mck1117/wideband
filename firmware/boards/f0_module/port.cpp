@@ -45,6 +45,7 @@ AnalogResult AnalogSample()
         .NernstVoltage = AverageSamples(adcBuffer, 0) * NERNST_INPUT_GAIN,
         .PumpCurrentVoltage = AverageSamples(adcBuffer, 1),
         .VirtualGroundVoltageInt = AverageSamples(adcBuffer, 2),
+        .BatteryVoltage = 0,
     };
 }
 
