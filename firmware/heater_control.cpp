@@ -8,6 +8,7 @@
 #include "pwm.h"
 #include "sampling.h"
 #include "pid.h"
+#include "can.h"
 
 using namespace wbo;
 
@@ -25,10 +26,12 @@ enum class HeaterState
 constexpr int preheatTimeCounter = HEATER_PREHEAT_TIME / HEATER_CONTROL_PERIOD;
 static int timeCounter = preheatTimeCounter;
 static float rampVoltage = 0;
-static bool heaterAllowed = false;
 
-static HeaterState GetNextState(HeaterState state, float sensorEsr)
+static HeaterState GetNextState(HeaterState state, HeaterAllow heaterAllowState, float batteryVoltage, float sensorEsr)
 {
+    // TODO: smarter state machine to use internal vbatt when CAN not connected
+    bool heaterAllowed = heaterAllowState == HeaterAllow::Allowed;
+
     if (!heaterAllowed)
     {
         // ECU hasn't allowed preheat yet, reset timer, and force preheat state
@@ -130,8 +133,6 @@ static float GetVoltageForState(HeaterState state, float heaterEsr)
 
 static HeaterState state = HeaterState::Preheat;
 
-// Nominal battery voltage (running engine) is 14v
-static float batteryVoltage = 14;
 
 static THD_WORKING_AREA(waHeaterThread, 256);
 static void HeaterThread(void*)
@@ -145,8 +146,16 @@ static void HeaterThread(void*)
         // Read sensor state
         float heaterEsr = GetSensorInternalResistance();
 
+        auto heaterAllowState = GetHeaterAllowed();
+
+        // If we haven't heard from rusEFI, use the internally sensed 
+        // battery voltage instead of voltage over CAN.
+        float batteryVoltage = heaterAllowState == HeaterAllow::Unknown
+                                    ? GetInternalBatteryVoltage()
+                                    : GetRemoteBatteryVoltage();
+
         // Run the state machine
-        state = GetNextState(state, heaterEsr);
+        state = GetNextState(state, heaterAllowState, batteryVoltage, heaterEsr);
         float heaterVoltage = GetVoltageForState(state, heaterEsr);
 
         // Limit to 11 volts
@@ -185,24 +194,6 @@ void StartHeaterControl()
 bool IsRunningClosedLoop()
 {
     return state == HeaterState::ClosedLoop;
-}
-
-void SetBatteryVoltage(float vbatt)
-{
-    if (vbatt < 5)
-    {
-        // provided vbatt is bogus, default to 14v nominal
-        batteryVoltage = 14;
-    }
-    else
-    {
-        batteryVoltage = vbatt;
-    }
-}
-
-void SetHeaterAllowed(bool allowed)
-{
-    heaterAllowed = allowed;
 }
 
 float GetHeaterDuty()

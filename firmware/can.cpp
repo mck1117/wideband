@@ -37,6 +37,11 @@ static void SendAck()
     canTransmitTimeout(&CAND1, CAN_ANY_MAILBOX, &frame, TIME_INFINITE);
 }
 
+// Start in Unknown state. If no CAN message is ever received, we operate
+// on internal battery sense etc.
+static HeaterAllow heaterAllow = HeaterAllow::Unknown;
+static float remoteBatteryVoltage = 0;
+
 static THD_WORKING_AREA(waCanRxThread, 256);
 void CanRxThread(void*)
 {
@@ -60,13 +65,27 @@ void CanRxThread(void*)
         if (frame.DLC == 2 && frame.EID == WB_MGS_ECU_STATUS) {
             // This is status from ECU - battery voltage and heater enable signal
 
+            // data1 contains heater enable bit
+            if ((frame.data8[1] & 0x1) == 0x1)
+            {
+                heaterAllow = HeaterAllow::Allowed;
+            }
+            else
+            {
+                heaterAllow = HeaterAllow::NotAllowed;
+            }
+
             // data0 contains battery voltage in tenths of a volt
             float vbatt = frame.data8[0] * 0.1f;
-            SetBatteryVoltage(vbatt);
-
-            // data1 contains heater enable bit
-            bool heaterAllowed = (frame.data8[1] & 0x1) == 0x1;
-            SetHeaterAllowed(heaterAllowed);
+            if (vbatt < 5)
+            {
+                // provided vbatt is bogus, default to 14v nominal
+                remoteBatteryVoltage = 14;
+            }
+            else
+            {
+                remoteBatteryVoltage = vbatt;
+            }
         }
         // If it's a bootloader entry request, reboot to the bootloader!
         else if (frame.DLC == 0 && frame.EID == WB_BL_ENTER)
@@ -88,6 +107,16 @@ void CanRxThread(void*)
             SendAck();
         }
     }
+}
+
+HeaterAllow GetHeaterAllowed()
+{
+    return heaterAllow;
+}
+
+float GetRemoteBatteryVoltage()
+{
+    return remoteBatteryVoltage;
 }
 
 void InitCan()
