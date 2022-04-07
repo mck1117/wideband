@@ -23,8 +23,8 @@ enum class HeaterState
     Stopped,
 };
 
-constexpr int preheatTimeCounter = HEATER_PREHEAT_TIME / HEATER_CONTROL_PERIOD;
-constexpr int batteryStabTimeCounter = HEATER_BATTERY_STAB_TIME / HEATER_CONTROL_PERIOD;
+static constexpr int preheatTimeCounter = HEATER_PREHEAT_TIME / HEATER_CONTROL_PERIOD;
+static constexpr int batteryStabTimeCounter = HEATER_BATTERY_STAB_TIME / HEATER_CONTROL_PERIOD;
 static int timeCounter = preheatTimeCounter;
 static int batteryStabTime = batteryStabTimeCounter;
 static float rampVoltage = 0;
