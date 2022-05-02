@@ -17,7 +17,9 @@ ADCConversionGroup convGroup =
     .end_cb = nullptr,
     .error_cb = nullptr,
     .cr1 = 0,
-    .cr2 = ADC_CR2_CONT,
+    .cr2 =
+        ADC_CR2_CONT |
+        ADC_CR2_ADON,   /* keep ADC enabled between convertions - for GD32 */
     .smpr1 = 0,
     .smpr2 =
         ADC_SMPR2_SMP_AN0(ADC_SAMPLE) |
