@@ -6,8 +6,9 @@
 #define LED_GREEN_PORT GPIOA
 #define LED_GREEN_PIN 8
 
+/* LSU 4.9 - 22K */
 #define NERNST_ESR_DRIVER_PORT GPIOB
-#define NERNST_ESR_DRIVER_PIN 12
+#define NERNST_ESR_DRIVER_PIN 11
 
 // PC13 on rev 0.1
 // exploring jumper wire from PB6 DISP3 to HEATER
