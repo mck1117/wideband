@@ -18,3 +18,8 @@
 #define BATTERY_INPUT_DIVIDER (10.0 / (10.0 + 39.0))
 
 #define AFR_CHANNELS 1
+
+// *******************************
+//    Nernst voltage & ESR sense
+// *******************************
+#define VM_RESISTOR_VALUE (10)
