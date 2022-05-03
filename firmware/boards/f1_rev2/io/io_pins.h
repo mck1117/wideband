@@ -20,8 +20,8 @@
 #define PUMP_DAC_PWM_DEVICE PWMD2
 #define PUMP_DAC_PWM_CHANNEL 1
 
-#define ID_SEL1_PORT GPIOB
-#define ID_SEL1_PIN 0
+#define ID_SEL1_PORT                GPIOC
+#define ID_SEL1_PIN                 13
 
-#define ID_SEL2_PORT GPIOB
-#define ID_SEL2_PIN 1
+#define ID_SEL2_PORT                GPIOC
+#define ID_SEL2_PIN                 14
