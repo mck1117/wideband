@@ -108,11 +108,11 @@
  * PB11 - Nernsr_4.9_esr_drive      (output pushpull, 50 Mhz)
  * PB12 - Nernsr_4.2_esr_drive      (digital input, no pull) - keep high-Z after power on
  * PB13 - Blue LED                  (output pushpull, 2 MHz)
- * PB14 - PWMout2                   (output pushpull, alternate, 50 Mhz).
- * PB15 - PWMout1                   (output pushpull, alternate, 50 Mhz).
+ * PB14 - PWMout2                   (output pushpull, alternate, 2 Mhz).
+ * PB15 - PWMout1                   (output pushpull, alternate, 2 Mhz).
  */
 #define VAL_GPIOBCRL            0x8A888200      /*  PB7...PB0 */
-#define VAL_GPIOBCRH            0xBB243488      /* PB15...PB8 */
+#define VAL_GPIOBCRH            0xAA243488      /* PB15...PB8 */
 #define VAL_GPIOBODR            0x0000FFFF
 
 /*
