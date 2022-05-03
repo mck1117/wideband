@@ -11,6 +11,7 @@ public:
 
     void Start();
     void SetDuty(float duty);
+    void SetDuty(int channel, float duty);
     float GetLastDuty() const;
 
 private:
