@@ -4,6 +4,8 @@
 
 #include "lambda_conversion.h"
 #include "sampling.h"
+#include "heater_control.h"
+#include "fault.h"
 #include "uart.h"
 
 static const UARTConfig uartCfg =
@@ -35,11 +37,22 @@ static void UartThread(void*)
         float lambda = GetLambda();
         int lambdaIntPart = lambda;
         int lambdaThousandths = (lambda - lambdaIntPart) * 1000;
+        int batteryVoltageMv = GetInternalBatteryVoltage() * 1000;
+        int duty = GetHeaterDuty() * 100;
 
-        size_t writeCount = chsnprintf(printBuffer, 200, "%d.%03d\t%d\t%d\r\n", lambdaIntPart, lambdaThousandths, (int)GetSensorInternalResistance(), (int)(GetPumpNominalCurrent() * 1000));
+        size_t writeCount = chsnprintf(printBuffer, 200,
+            "%d.%03d\tAC %d mV\tR: %d\tT: %d\tIpump: %d\tVbat: %d\theater: %s (%d)\tfault: %s\r\n",
+            lambdaIntPart, lambdaThousandths,
+            (int)(GetNernstAc() * 1000.0),
+            (int)GetSensorInternalResistance(),
+            (int)GetSensorTemperature(),
+            (int)(GetPumpNominalCurrent() * 1000),
+            batteryVoltageMv,
+            describeHeaterState(GetHeaterState()), duty,
+            describeFault(GetCurrentFault()));
         uartStartSend(&UARTD1, writeCount, printBuffer);
 
-        chThdSleepMilliseconds(20);
+        chThdSleepMilliseconds(50);
     }
 }
 
