@@ -28,3 +28,8 @@
 // *******************************
 // 100K + 10K divider
 #define VM_INPUT_DIVIDER (10.0 / (10.0 + 100.0))
+
+// *******************************
+//    Nernst voltage & ESR sense
+// *******************************
+#define VM_RESISTOR_VALUE (0)
