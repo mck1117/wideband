@@ -1,12 +1,18 @@
 #include "pwm.h"
 
-#include "hal.h"
-
 Pwm::Pwm(PWMDriver& driver, uint8_t channel, uint32_t counterFrequency, uint32_t counterPeriod)
     : m_driver(&driver)
     , m_channel(channel)
     , m_counterFrequency(counterFrequency)
     , m_counterPeriod(counterPeriod)
+{
+}
+
+Pwm::Pwm(PWMDriver& driver)
+    : m_driver(&driver)
+    , m_channel(0)
+    , m_counterFrequency(0)
+    , m_counterPeriod(0)
 {
 }
 
@@ -30,6 +36,14 @@ void Pwm::Start()
     };
 
     pwmStart(m_driver, &config);
+}
+
+void Pwm::Start(PWMConfig *config)
+{
+    m_counterFrequency = config->frequency;
+    m_counterPeriod = config->period;
+
+    pwmStart(m_driver, config);
 }
 
 float maxF(float i1, float i2) {
