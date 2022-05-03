@@ -18,7 +18,7 @@ CanTxMessage::~CanTxMessage() {
 
 	/* rotate mailboxes */
 	can1_mailbox++;
-	if (can1_mailbox == 4) {
+	if (can1_mailbox > CAN_TX_MAILBOXES) {
 		can1_mailbox = 1;
 	}
 }
