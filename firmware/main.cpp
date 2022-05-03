@@ -9,6 +9,7 @@
 #include "sampling.h"
 #include "uart.h"
 #include "io_pins.h"
+#include "auxout.h"
 
 using namespace wbo;
 
@@ -24,6 +25,10 @@ int main() {
     InitPumpDac();
     StartHeaterControl();
     StartPumpControl();
+
+#ifdef AUXOUT_DAC_PWM_DEVICE
+    InitAuxDac();
+#endif
 
     InitCan();
 #ifdef ECHO_UART
