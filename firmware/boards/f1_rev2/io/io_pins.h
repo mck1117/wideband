@@ -44,6 +44,12 @@
 // PB15 - TIM1_CH3N
 #define AUXOUT_DAC_PWM_CHANNEL_1    2
 
+// PB14 - TIM1_CH2N
+// PB15 - TIM1_CH3N
+#define AUXOUT_DAC_PWM_DEVICE       PWMD1
+#define AUXOUT_DSC_PWM_CHANNEL_0    2
+#define AUXOUT_DSC_PWM_CHANNEL_1    3
+
 #define ID_SEL1_PORT                GPIOC
 #define ID_SEL1_PIN                 13
 
