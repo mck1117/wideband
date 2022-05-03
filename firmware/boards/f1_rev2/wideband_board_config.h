@@ -33,3 +33,9 @@
 //    Nernst voltage & ESR sense
 // *******************************
 #define VM_RESISTOR_VALUE (0)
+
+// *******************************
+//          AUX outputs
+// *******************************
+// OpAmp with 82K + 160K
+#define AUXOUT_GAIN         ((82.0 + 160.0) / 160.0)
