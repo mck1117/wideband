@@ -33,15 +33,15 @@ void Pwm::Start()
 }
 
 float maxF(float i1, float i2) {
-	return i1 > i2 ? i1 : i2;
+    return i1 > i2 ? i1 : i2;
 }
 
 float minF(float i1, float i2) {
-	return i1 < i2 ? i1 : i2;
+    return i1 < i2 ? i1 : i2;
 }
 
 float clampF(float min, float clamp, float max) {
-	return maxF(min, minF(clamp, max));
+    return maxF(min, minF(clamp, max));
 }
 
 void Pwm::SetDuty(float duty) {

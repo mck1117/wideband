@@ -1,8 +1,9 @@
 #pragma once
 
-struct inter_point {
-	int		x;
-	int		y;
+struct inter_point
+{
+    int x;
+    int y;
 };
 
 int interpolateInt(int x1, int y1, int x2, int y2, int x);

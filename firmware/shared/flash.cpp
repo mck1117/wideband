@@ -53,17 +53,17 @@ void Flash::ErasePage(uint8_t pageIdx) {
 }
 
 static void flashWriteData(flashaddr_t address, const flashdata_t data) {
-	/* Enter flash programming mode */
-	FLASH->CR |= FLASH_CR_PG;
+    /* Enter flash programming mode */
+    FLASH->CR |= FLASH_CR_PG;
 
-	/* Write the data */
-	*(flashdata_t*) address = data;
+    /* Write the data */
+    *(flashdata_t*) address = data;
 
-	/* Wait for completion */
-	flashWaitWhileBusy();
+    /* Wait for completion */
+    flashWaitWhileBusy();
 
-	/* Exit flash programming mode */
-	FLASH->CR &= ~FLASH_CR_PG;
+    /* Exit flash programming mode */
+    FLASH->CR &= ~FLASH_CR_PG;
 }
 
 void Flash::Write(flashaddr_t address, const uint8_t* buffer, size_t size) {
