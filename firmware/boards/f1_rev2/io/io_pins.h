@@ -2,6 +2,7 @@
 
 #define LED_BLUE_PORT GPIOB
 #define LED_BLUE_PIN 13
+#define LL_LED_BLUE_PIN LL_GPIO_PIN_13
 
 #define LED_GREEN_PORT GPIOA
 #define LED_GREEN_PIN 8

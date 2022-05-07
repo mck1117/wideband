@@ -10,6 +10,7 @@
 #include "stm32f1xx_ll_usart.h"                  /* STM32 LL USART header              */
 #include "stm32f1xx_ll_gpio.h"                   /* STM32 LL GPIO header               */
 
+#include "../io/io_pins.h"
 
 /****************************************************************************************
 * Function prototypes
@@ -126,7 +127,7 @@ void HAL_MspInit(void)
 
   /* GPIO ports clock enable. */
   LL_APB2_GRP1_EnableClock(LL_APB2_GRP1_PERIPH_GPIOA);
-  LL_APB2_GRP1_EnableClock(LL_APB2_GRP1_PERIPH_GPIOC);
+  LL_APB2_GRP1_EnableClock(LL_APB2_GRP1_PERIPH_GPIOB);
 
 #if (BOOT_COM_RS232_ENABLE > 0)
   /* UART clock enable. */
@@ -158,18 +159,12 @@ void HAL_MspInit(void)
   LL_GPIO_Init(CAN_GPIO_PORT, &GPIO_InitStruct);
 #endif
 
-  /* Configure GPIO pin for the LED. */
-  GPIO_InitStruct.Pin = LL_GPIO_PIN_5;
-  GPIO_InitStruct.Mode = LL_GPIO_MODE_OUTPUT;
-  GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_LOW;
-  GPIO_InitStruct.OutputType = LL_GPIO_OUTPUT_PUSHPULL;
-  LL_GPIO_Init(GPIOA, &GPIO_InitStruct);
-  LL_GPIO_ResetOutputPin(GPIOA, LL_GPIO_PIN_5);
-
+#if 0
   /* Configure GPIO pin for (optional) backdoor entry input. */
   GPIO_InitStruct.Pin = LL_GPIO_PIN_13;
   GPIO_InitStruct.Mode = LL_GPIO_MODE_FLOATING;
   LL_GPIO_Init(GPIOC, &GPIO_InitStruct);
+#endif
 
 #if (BOOT_COM_RS232_ENABLE > 0)
   /* UART TX and RX GPIO pin configuration. */
@@ -198,7 +193,7 @@ void HAL_MspDeInit(void)
   LL_RCC_DeInit();
   
   /* Deinit used GPIOs. */
-  LL_GPIO_DeInit(GPIOC);
+  LL_GPIO_DeInit(GPIOB);
   LL_GPIO_DeInit(GPIOA);
 
 #if (BOOT_COM_RS232_ENABLE > 0)
@@ -207,7 +202,7 @@ void HAL_MspDeInit(void)
 #endif
 
   /* GPIO ports clock disable. */
-  LL_APB2_GRP1_DisableClock(LL_APB2_GRP1_PERIPH_GPIOC);
+  LL_APB2_GRP1_DisableClock(LL_APB2_GRP1_PERIPH_GPIOB);
   LL_APB2_GRP1_DisableClock(LL_APB2_GRP1_PERIPH_GPIOA);
 
   /* AFIO and PWR clock disable. */
