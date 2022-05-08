@@ -146,7 +146,7 @@ void HAL_MspInit(void)
 
 #if (BOOT_COM_CAN_ENABLE > 0)
   /* CAN clock enable. */
-  __HAL_RCC_CAN1_CLK_ENABLE();
+  LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_CAN1);
   /* CAN TX and RX GPIO pin configuration. */
   GPIO_InitStruct.Pin = LL_CAN_TX_PIN;
   GPIO_InitStruct.Mode = LL_GPIO_MODE_ALTERNATE;
@@ -183,6 +183,11 @@ void HAL_MspDeInit(void)
   /* Deinit used GPIOs. */
   LL_GPIO_DeInit(GPIOB);
   LL_GPIO_DeInit(GPIOA);
+
+#if (BOOT_COM_CAN_ENABLE > 0)
+  /* CAN clock disable. */
+  LL_APB1_GRP1_DisableClock(LL_APB1_GRP1_PERIPH_CAN1);
+#endif
 
 #if (BOOT_COM_RS232_ENABLE > 0)
   /* UART clock disable. */
