@@ -159,7 +159,7 @@ void HAL_MspInit(void)
   LL_GPIO_Init(CAN_GPIO_PORT, &GPIO_InitStruct);
 #endif
 
-#if 0
+#if (BOOT_CPU_USER_PROGRAM_START_HOOK > 0)
   /* Configure GPIO pin for (optional) backdoor entry input. */
   GPIO_InitStruct.Pin = LL_GPIO_PIN_13;
   GPIO_InitStruct.Mode = LL_GPIO_MODE_FLOATING;
