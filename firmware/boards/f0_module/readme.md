@@ -1,0 +1,1 @@
+Firmware for reference https://github.com/mck1117/wideband/tree/master/board_module F0 hardware
