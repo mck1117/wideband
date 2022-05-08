@@ -134,7 +134,7 @@ COBJS = $(patsubst %.c,%.o,$(PROJ_CSRCS))
 #| Make ALL                                                                             |
 #|--------------------------------------------------------------------------------------|
 .PHONY: all
-all: $(BIN_PATH)/$(PROJ_NAME).srec
+all: $(BIN_PATH)/$(PROJ_NAME).srec $(BIN_PATH)/$(PROJ_NAME).hex $(BIN_PATH)/$(PROJ_NAME).bin
 
 
 $(BIN_PATH)/$(PROJ_NAME).srec : $(BIN_PATH)/$(PROJ_NAME).elf
@@ -143,6 +143,14 @@ $(BIN_PATH)/$(PROJ_NAME).srec : $(BIN_PATH)/$(PROJ_NAME).elf
 	@echo +++ Summary of memory consumption:
 	@$(SZ) $(SZFLAGS) $<
 	@echo +++ Build complete [$(notdir $@)]
+
+$(BIN_PATH)/$(PROJ_NAME).hex : $(BIN_PATH)/$(PROJ_NAME).elf
+	@mkdir -p $(@D)
+	@$(OC) -O ihex $< $@
+
+$(BIN_PATH)/$(PROJ_NAME).bin : $(BIN_PATH)/$(PROJ_NAME).elf
+	@mkdir -p $(@D)
+	@$(OC) -O binary $< $@
 
 $(BIN_PATH)/$(PROJ_NAME).elf : $(AOBJS) $(COBJS) 
 	@echo +++ Linking [$(notdir $@)]
