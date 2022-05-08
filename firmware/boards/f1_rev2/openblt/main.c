@@ -131,6 +131,31 @@ void HAL_MspInit(void)
 #if (BOOT_COM_RS232_ENABLE > 0)
   /* UART clock enable. */
   LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_USART2);
+  /* UART TX and RX GPIO pin configuration. */
+  GPIO_InitStruct.Pin = LL_UART_TX_PIN;
+  GPIO_InitStruct.Mode = LL_GPIO_MODE_ALTERNATE;
+  GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_HIGH;
+  GPIO_InitStruct.OutputType = LL_GPIO_OUTPUT_PUSHPULL;
+  LL_GPIO_Init(UART_GPIO_PORT, &GPIO_InitStruct);
+  GPIO_InitStruct.Pin = LL_UART_RX_PIN;
+  GPIO_InitStruct.Mode = LL_GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = LL_GPIO_PULL_UP;
+  LL_GPIO_Init(UART_GPIO_PORT, &GPIO_InitStruct);
+#endif
+
+#if (BOOT_COM_CAN_ENABLE > 0)
+  /* CAN clock enable. */
+  __HAL_RCC_CAN1_CLK_ENABLE();
+  /* CAN TX and RX GPIO pin configuration. */
+  GPIO_InitStruct.Pin = LL_CAN_TX_PIN;
+  GPIO_InitStruct.Mode = LL_GPIO_MODE_ALTERNATE;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_HIGH;
+  LL_GPIO_Init(CAN_GPIO_PORT, &GPIO_InitStruct);
+  GPIO_InitStruct.Pin = LL_CAN_RX_PIN;
+  GPIO_InitStruct.Mode = LL_GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = LL_GPIO_PULL_UP;
+  LL_GPIO_Init(CAN_GPIO_PORT, &GPIO_InitStruct);
 #endif
 
   /* Configure GPIO pin for the LED. */
