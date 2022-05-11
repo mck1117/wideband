@@ -9,6 +9,8 @@
 // 48MHz / 1024 = 46.8khz PWM
 static Pwm pumpDac(PUMP_DAC_PWM_DEVICE, PUMP_DAC_PWM_CHANNEL, 48'000'000, 1024);
 
+static int32_t curIpump;
+
 void InitPumpDac()
 {
     pumpDac.Start();
@@ -26,6 +28,8 @@ void SetPumpCurrentTarget(int32_t microampere)
         microampere = 0;
     }
 
+    curIpump = microampere;
+
     // 47 ohm resistor
     // 0.147 gain
     // effective resistance of 317 ohms
@@ -40,4 +44,9 @@ void SetPumpCurrentTarget(int32_t microampere)
 float GetPumpOutputDuty()
 {
     return pumpDac.GetLastDuty();
+}
+
+int32_t GetPumpCurrent()
+{
+    return curIpump;
 }
