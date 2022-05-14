@@ -46,8 +46,9 @@ static THD_WORKING_AREA(waSamplingThread, 256);
 
 static void SamplingThread(void*)
 {
-    float r_2 = 0;
-    float r_3 = 0;
+    int idx = 0;
+    bool ready = false;
+    float r[3] = {0, 0, 0};
 
     while(true)
     {
@@ -59,35 +60,42 @@ static void SamplingThread(void*)
         // Toggle the pin after sampling so that any switching noise occurs while we're doing our math instead of when sampling
         palTogglePad(NERNST_ESR_DRIVER_PORT, NERNST_ESR_DRIVER_PIN);
 
-        float r_1 = result.ch[ch].NernstVoltage;
-
-        // r2_opposite_phase estimates where the previous sample would be had we not been toggling
-        // AKA the absolute value of the difference between r2_opposite_phase and r2 is the amplitude
-        // of the AC component on the nernst voltage.  We have to pull this trick so as to use the past 3
-        // samples to cancel out any slope in the DC (aka actual nernst cell output) from the AC measurement
-        // See firmware/sampling.png for a drawing of what's going on here
-        float r2_opposite_phase = (r_1 + r_3) / 2;
-
-        // Compute AC (difference) and DC (average) components
-        float nernstAcLocal = f_abs(r2_opposite_phase - r_2);
-        nernstDc = (r2_opposite_phase + r_2) / 2;
-
-        nernstAc =
-            (1 - ESR_SENSE_ALPHA) * nernstAc +
-            ESR_SENSE_ALPHA * nernstAcLocal;
-
-        // Exponential moving average (aka first order lpf)
-        pumpCurrentSenseVoltage =
-            (1 - PUMP_FILTER_ALPHA) * pumpCurrentSenseVoltage +
-            PUMP_FILTER_ALPHA * (result.ch[ch].PumpCurrentVoltage - result.VirtualGroundVoltageInt);
-
         #ifdef BATTERY_INPUT_DIVIDER
             internalBatteryVoltage = result.ch[ch].BatteryVoltage;
         #endif
 
-        // Shift history over by one
-        r_3 = r_2;
-        r_2 = r_1;
+        r[idx] = result.ch[ch].NernstVoltage;
+
+        if (ready)
+        {
+            // opposite_phase estimates where the previous sample would be had we not been toggling
+            // AKA the absolute value of the difference between opposite_phase and r[idx] is the amplitude
+            // of the AC component on the nernst voltage.  We have to pull this trick so as to use the past 3
+            // samples to cancel out any slope in the DC (aka actual nernst cell output) from the AC measurement
+            // See firmware/sampling.png for a drawing of what's going on here
+            float opposite_phase = (r[idx] + r[(idx + 1) % 3]) / 2;
+
+            // Compute AC (difference) and DC (average) components
+            float nernstAcLocal = f_abs(opposite_phase - r[(idx + 2) % 3]);
+            nernstDc = (opposite_phase + r[(idx + 1) % 3]) / 2;
+
+            nernstAc =
+                (1 - ESR_SENSE_ALPHA) * nernstAc +
+                ESR_SENSE_ALPHA * nernstAcLocal;
+
+            // Exponential moving average (aka first order lpf)
+            pumpCurrentSenseVoltage =
+                (1 - PUMP_FILTER_ALPHA) * pumpCurrentSenseVoltage +
+                PUMP_FILTER_ALPHA * (result.ch[ch].PumpCurrentVoltage - result.VirtualGroundVoltageInt);
+        }
+
+        idx++;
+        if (idx == 3)
+        {
+            ready = true;
+            idx = 0;
+        }
+
     }
 }
 
