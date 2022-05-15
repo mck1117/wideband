@@ -145,6 +145,7 @@ CPPSRC = $(ALLCPPSRC) \
           pump_control.cpp \
           uart.cpp \
           interpolation.cpp \
+          console/binary/tunerstudio_io.cpp \
           main.cpp
 
 # List ASM source files here.
