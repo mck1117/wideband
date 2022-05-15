@@ -156,7 +156,11 @@ ASMSRC = $(ALLASMSRC)
 ASMXSRC = $(ALLXASMSRC)
 
 # Inclusion directories.
-INCDIR = $(CONFDIR) $(ALLINC) boards/ $(BOARDDIR)/io/
+INCDIR = $(CONFDIR) \
+         $(ALLINC) \
+         console/binary/ \
+         boards/ \
+         $(BOARDDIR)/io/
 
 # Define C warning options here.
 CWARN = -Wall -Wextra -Wundef -Wstrict-prototypes
