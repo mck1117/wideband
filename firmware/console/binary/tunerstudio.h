@@ -6,11 +6,12 @@
  */
 
 #pragma once
-#include "global.h"
 #include "tunerstudio_io.h"
-#include "electronic_throttle_generated.h"
-#include "knock_controller_generated.h"
-#include "FragmentEntry.h"
+//#include "electronic_throttle_generated.h"
+//#include "knock_controller_generated.h"
+//#include "FragmentEntry.h"
+
+#include "thread_controller.h"
 
 typedef struct {
 	int queryCommandCounter;
@@ -33,13 +34,6 @@ void tunerStudioDebug(TsChannelBase* tsChannel, const char *msg);
 void tunerStudioError(TsChannelBase* tsChannel, const char *msg);
 
 uint8_t* getWorkingPageAddr();
-const void * getStructAddr(live_data_e structId);
-
-#if EFI_TUNER_STUDIO
-#include "thread_controller.h"
-#include "thread_priority.h"
-
-FragmentList getFragments();
 
 void updateTunerStudioState();
 
@@ -63,13 +57,13 @@ post_packed {
 	short int count;
 } TunerStudioWriteChunkRequest;
 
-#if EFI_PROD_CODE || EFI_SIMULATOR
-#define CONNECTIVITY_THREAD_STACK (2 * UTILITY_THREAD_STACK_SIZE)
+#define CONNECTIVITY_THREAD_STACK 	(512)
+#define CONNECTIVITY_THREAD_PRIO	(NORMALPRIO + 1)
 
 class TunerstudioThread : public ThreadController<CONNECTIVITY_THREAD_STACK> {
 public:
 	TunerstudioThread(const char* name)
-		: ThreadController(name, PRIO_CONSOLE)
+		: ThreadController(name, CONNECTIVITY_THREAD_PRIO)
 	{
 	}
 
@@ -79,6 +73,3 @@ public:
 	void ThreadTask() override;
 
 };
-#endif
-
-#endif /* EFI_TUNER_STUDIO */

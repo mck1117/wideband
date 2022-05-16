@@ -5,19 +5,16 @@
  * @author Andrey Belomutskiy, (c) 2012-2020
  */
 
-#include "pch.h"
-#include "os_access.h"
+/* memcpy */
+#include <cstring>
+
 #include "tunerstudio_io.h"
+#include "crc.h"
+#include "byteswap.h"
 
-#if EFI_SIMULATOR
-#include "rusEfiFunctionalTest.h"
-#endif // EFI_SIMULATOR
-
-#if EFI_PROD_CODE || EFI_SIMULATOR
 size_t TsChannelBase::read(uint8_t* buffer, size_t size) {
 	return readTimeout(buffer, size, SR5_READ_TIMEOUT);
 }
-#endif
 
 #define isBigPacket(size) ((size) > BLOCKING_FACTOR + 7)
 
@@ -25,7 +22,7 @@ void TsChannelBase::copyAndWriteSmallCrcPacket(uint8_t responseCode, const uint8
 	auto scratchBuffer = this->scratchBuffer;
 
 	// don't transmit too large a buffer
-	efiAssertVoid(OBD_PCM_Processor_Fault, !isBigPacket(size), "copyAndWriteSmallCrcPacket tried to transmit too large a packet")
+	chDbgAssert(!isBigPacket(size), "copyAndWriteSmallCrcPacket tried to transmit too large a packet");
 
 	// If transmitting data, copy it in to place in the scratch buffer
 	// We want to prevent the data changing itself (higher priority threads could write
@@ -39,7 +36,7 @@ void TsChannelBase::copyAndWriteSmallCrcPacket(uint8_t responseCode, const uint8
 }
 
 void TsChannelBase::crcAndWriteBuffer(uint8_t responseCode, size_t size) {
-	efiAssertVoid(OBD_PCM_Processor_Fault, !isBigPacket(size), "crcAndWriteBuffer tried to transmit too large a packet")
+	chDbgAssert(!isBigPacket(size), "crcAndWriteBuffer tried to transmit too large a packet");
 
 	auto scratchBuffer = this->scratchBuffer;
 	// Index 0/1 = packet size (big endian)
@@ -89,9 +86,7 @@ TsChannelBase::TsChannelBase(const char *name) {
 }
 
 void TsChannelBase::assertPacketSize(size_t size, bool allowLongPackets) {
-	if (isBigPacket(size) && !allowLongPackets) {
-		firmwareError(OBD_PCM_Processor_Fault, "tried to send disallowed long packet of size %d", size);
-	}
+	chDbgAssert(!(isBigPacket(size) && !allowLongPackets), "tried to send disallowed long packet");
 }
 
 /**
