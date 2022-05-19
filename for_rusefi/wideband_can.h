@@ -22,6 +22,8 @@ enum class Fault : uint8_t
 
 struct StandardData
 {
+    // DO NOT move the version field - its position and format must be
+    // fixed so that incompatible versions can be idenfitied.
     uint8_t Version;
     uint8_t Valid;
 
