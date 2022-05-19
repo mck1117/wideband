@@ -143,10 +143,7 @@ void SendRusefiFormat(uint8_t idx)
 
         uint16_t lambda = GetLambda() * 10000;
         frame.get().Lambda = lambda;
-
-        // TODO: decode temperature instead of putting ESR here
-        frame.get().TemperatureC = esr;
-
+        frame.get().TemperatureC = GetSensorTemperature();
         frame.get().Valid = IsRunningClosedLoop() ? 0x01 : 0x00;
     }
 
