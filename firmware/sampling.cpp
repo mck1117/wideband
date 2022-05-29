@@ -7,6 +7,7 @@
 
 #include "port.h"
 #include "io_pins.h"
+#include "livedata.h"
 
 #include <rusefi/interpolation.h>
 
@@ -74,6 +75,11 @@ static void SamplingThread(void*)
         // Shift history over by one
         r_3 = r_2;
         r_2 = r_1;
+
+#if defined(TS_ENABLED)
+        /* tunerstudio */
+        SamplingUpdateLiveData();
+#endif
     }
 }
 
