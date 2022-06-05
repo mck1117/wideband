@@ -46,7 +46,7 @@ float GetPumpOutputDuty()
     return pumpDac.GetLastDuty();
 }
 
-int32_t GetPumpCurrent()
+float GetPumpCurrent()
 {
-    return curIpump;
+    return (float)curIpump / 1000.0;
 }
