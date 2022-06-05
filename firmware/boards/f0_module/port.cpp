@@ -104,7 +104,11 @@ Configuration GetConfiguration()
 
     // Now, override the index with a hardware-strapped option (if present)
     auto sel1 = readSelPin(ID_SEL1_PORT, ID_SEL1_PIN);
+    #ifdef ID_SEL2_PORT
     auto sel2 = readSelPin(ID_SEL2_PORT, ID_SEL2_PIN);
+    #else
+    auto sel2 = 1;  //floating
+    #endif
 
     // See https://github.com/mck1117/wideband/issues/11
     switch (3 * sel1 + sel2) {
