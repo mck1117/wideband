@@ -48,10 +48,15 @@ AnalogResult AnalogSample()
 
     return
     {
-        .NernstVoltage = AverageSamples(adcBuffer, 0) * NERNST_INPUT_GAIN,
-        .PumpCurrentVoltage = AverageSamples(adcBuffer, 1),
+        .ch =
+        {
+            {
+                .NernstVoltage = AverageSamples(adcBuffer, 0) * NERNST_INPUT_GAIN,
+                .PumpCurrentVoltage = AverageSamples(adcBuffer, 1),
+                .BatteryVoltage = AverageSamples(adcBuffer, 3) / BATTERY_INPUT_DIVIDER,
+            }
+        },
         .VirtualGroundVoltageInt = AverageSamples(adcBuffer, 2),
-        .BatteryVoltage = AverageSamples(adcBuffer, 3) / BATTERY_INPUT_DIVIDER,
     };
 }
 

@@ -51,12 +51,15 @@ static void SamplingThread(void*)
 
     while(true)
     {
+        /* TODO: run for all channels */
+        int ch = 0;
+
         auto result = AnalogSample();
 
         // Toggle the pin after sampling so that any switching noise occurs while we're doing our math instead of when sampling
         palTogglePad(NERNST_ESR_DRIVER_PORT, NERNST_ESR_DRIVER_PIN);
 
-        float r_1 = result.NernstVoltage;
+        float r_1 = result.ch[ch].NernstVoltage;
 
         // r2_opposite_phase estimates where the previous sample would be had we not been toggling
         // AKA the absolute value of the difference between r2_opposite_phase and r2 is the amplitude
@@ -76,10 +79,10 @@ static void SamplingThread(void*)
         // Exponential moving average (aka first order lpf)
         pumpCurrentSenseVoltage =
             (1 - PUMP_FILTER_ALPHA) * pumpCurrentSenseVoltage +
-            PUMP_FILTER_ALPHA * (result.PumpCurrentVoltage - result.VirtualGroundVoltageInt);
+            PUMP_FILTER_ALPHA * (result.ch[ch].PumpCurrentVoltage - result.VirtualGroundVoltageInt);
 
         #ifdef BATTERY_INPUT_DIVIDER
-            internalBatteryVoltage = result.BatteryVoltage;
+            internalBatteryVoltage = result.ch[ch].BatteryVoltage;
         #endif
 
         // Shift history over by one
