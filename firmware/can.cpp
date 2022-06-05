@@ -8,7 +8,6 @@
 #include "sampling.h"
 #include "pump_dac.h"
 #include "port.h"
-#include "byteswap.h"
 
 // this same header is imported by rusEFI to get struct layouts and firmware version
 #include "../for_rusefi/wideband_can.h"
