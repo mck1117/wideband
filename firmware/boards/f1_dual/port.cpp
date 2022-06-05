@@ -60,9 +60,19 @@ static float AverageSamples(adcsample_t* buffer, size_t idx)
     return (float)sum * scale;
 }
 
+static float l_vbatt = 0.0, r_vbatt = 0.0;
+
 AnalogResult AnalogSample()
 {
+    bool l_heater = !palReadPad(L_HEATER_PORT, L_HEATER_PIN);
+    bool r_heater = !palReadPad(R_HEATER_PORT, R_HEATER_PIN);
+
     adcConvert(&ADCD1, &convGroup, adcBuffer, ADC_OVERSAMPLE);
+
+    if ((l_heater) && (!palReadPad(L_HEATER_PORT, L_HEATER_PIN)))
+        l_vbatt = AverageSamples(adcBuffer, 6) / BATTERY_INPUT_DIVIDER;
+    if ((r_heater) && (!palReadPad(R_HEATER_PORT, R_HEATER_PIN)))
+        r_vbatt = AverageSamples(adcBuffer, 7) / BATTERY_INPUT_DIVIDER;
 
     return
     {
@@ -71,13 +81,13 @@ AnalogResult AnalogSample()
                 /* left */
                 .NernstVoltage = AverageSamples(adcBuffer, 3) * NERNST_INPUT_GAIN,
                 .PumpCurrentVoltage = AverageSamples(adcBuffer, 2),
-                .BatteryVoltage = AverageSamples(adcBuffer, 6) / BATTERY_INPUT_DIVIDER,
+                .BatteryVoltage = l_vbatt,
             },
             {
                 /* right */
                 .NernstVoltage = AverageSamples(adcBuffer, 1) * NERNST_INPUT_GAIN,
                 .PumpCurrentVoltage = AverageSamples(adcBuffer, 0),
-                .BatteryVoltage = AverageSamples(adcBuffer, 7) / BATTERY_INPUT_DIVIDER,
+                .BatteryVoltage = r_vbatt,
             },
         },
         /* Dual board has separate internal virtual ground = 3.3V / 2
