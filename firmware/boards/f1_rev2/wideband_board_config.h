@@ -41,3 +41,9 @@
 // *******************************
 // OpAmp with 82K + 160K
 #define AUXOUT_GAIN         ((82.0 + 160.0) / 160.0)
+
+// *******************************
+//   TunerStudio Primary Port
+// *******************************
+#define TS_PRIMARY_SERIAL_PORT	SD1
+#define TS_PRIMARY_BAUDRATE		115200

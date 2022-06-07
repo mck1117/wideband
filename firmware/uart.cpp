@@ -8,23 +8,17 @@
 #include "fault.h"
 #include "uart.h"
 
-static const UARTConfig uartCfg =
-{
-    .txend1_cb = nullptr,
-    .txend2_cb = nullptr,
-    .rxend_cb = nullptr,
-    .rxchar_cb = nullptr,
-    .rxerr_cb = nullptr,
-    .timeout_cb = nullptr,
+#include "tunerstudio.h"
+#include "tunerstudio_io.h"
+#include "wideband_board_config.h"
 
-#ifdef STM32F0XX
-    .timeout = 0,
-#endif
+#ifdef UART_DEBUG
 
+SerialConfig cfg = {
     .speed = 115200,
     .cr1 = 0,
-    .cr2 = 0,
-    .cr3 = 0,
+    .cr2 = USART_CR2_STOP1_BITS | USART_CR2_LINEN,
+    .cr3 = 0
 };
 
 static char printBuffer[200];
@@ -32,33 +26,68 @@ static char printBuffer[200];
 static THD_WORKING_AREA(waUartThread, 512);
 static void UartThread(void*)
 {
+    sdStart(&SD1, &cfg);
+
     while(true)
     {
-        float lambda = GetLambda();
-        int lambdaIntPart = lambda;
-        int lambdaThousandths = (lambda - lambdaIntPart) * 1000;
-        int batteryVoltageMv = GetInternalBatteryVoltage() * 1000;
-        int duty = GetHeaterDuty() * 100;
+        int ch;
 
-        size_t writeCount = chsnprintf(printBuffer, 200,
-            "%d.%03d\tAC %d mV\tR: %d\tT: %d\tIpump: %d\tVbat: %d\theater: %s (%d)\tfault: %s\r\n",
-            lambdaIntPart, lambdaThousandths,
-            (int)(GetNernstAc() * 1000.0),
-            (int)GetSensorInternalResistance(),
-            (int)GetSensorTemperature(),
-            (int)(GetPumpNominalCurrent() * 1000),
-            batteryVoltageMv,
-            describeHeaterState(GetHeaterState()), duty,
-            describeFault(GetCurrentFault()));
-        uartStartSend(&UARTD1, writeCount, printBuffer);
+        for (ch = 0; ch < AFR_CHANNELS; ch++) {
+            float lambda = GetLambda(ch);
+            int lambdaIntPart = lambda;
+            int lambdaThousandths = (lambda - lambdaIntPart) * 1000;
+            int batteryVoltageMv = GetInternalBatteryVoltage(ch) * 1000;
+            int duty = GetHeaterDuty(ch) * 100;
 
-        chThdSleepMilliseconds(50);
+            size_t writeCount = chsnprintf(printBuffer, 200,
+                "[AFR%d]: %d.%03d DC %4d mV AC %4d mV Rint: %5d T: %4d C Ipump: %6d uA Vheater: %5d heater: %s (%d)\tfault: %s\r\n",
+                ch,
+                lambdaIntPart, lambdaThousandths,
+                (int)(GetNernstDc(ch) * 1000.0),
+                (int)(GetNernstAc(ch) * 1000.0),
+                (int)GetSensorInternalResistance(ch),
+                (int)GetSensorTemperature(ch),
+                (int)(GetPumpNominalCurrent(ch) * 1000),
+                batteryVoltageMv,
+                describeHeaterState(GetHeaterState(ch)), duty,
+                describeFault(GetCurrentFault(ch)));
+            chnWrite(&SD1, (const uint8_t *)printBuffer, writeCount);
+        }
+
+
+        chThdSleepMilliseconds(100);
     }
 }
 
+#elif defined(TS_PRIMARY_UART_PORT) || defined(TS_PRIMARY_SERIAL_PORT)
+
+#ifdef TS_PRIMARY_UART_PORT
+static UartTsChannel primaryChannel(TS_PRIMARY_UART_PORT);
+#endif
+
+#ifdef TS_PRIMARY_SERIAL_PORT
+static SerialTsChannel primaryChannel(TS_PRIMARY_SERIAL_PORT);
+#endif
+
+struct PrimaryChannelThread : public TunerstudioThread {
+    PrimaryChannelThread() : TunerstudioThread("Primary TS Channel") { }
+
+    TsChannelBase* setupChannel() {
+        primaryChannel.start(TS_PRIMARY_BAUDRATE);
+
+        return &primaryChannel;
+    }
+};
+
+static PrimaryChannelThread primaryChannelThread;
+
+#endif
+
 void InitUart()
 {
-    uartStart(&UARTD1, &uartCfg);
-
+#ifdef UART_DEBUG
     chThdCreateStatic(waUartThread, sizeof(waUartThread), NORMALPRIO, UartThread, nullptr);
+#elif defined(TS_PRIMARY_UART_PORT) || defined(TS_PRIMARY_SERIAL_PORT)
+    primaryChannelThread.Start();
+#endif
 }
