@@ -5,6 +5,7 @@
 #include "lambda_conversion.h"
 #include "sampling.h"
 #include "heater_control.h"
+#include "max31855.h"
 #include "fault.h"
 #include "uart.h"
 
@@ -49,7 +50,12 @@ static void UartThread(void*)
             describeHeaterState(GetHeaterState()), duty,
             describeFault(GetCurrentFault()));
         chnWrite(&SD1, (const uint8_t *)printBuffer, writeCount);
+        chThdSleepMilliseconds(50);
 
+        writeCount = chsnprintf(printBuffer, 200,
+            "EGT: %d C (int %d C)\r\n",
+            (int)EgtThread.temp[0], (int)EgtThread.int_temp[0]);
+        chnWrite(&SD1, (const uint8_t *)printBuffer, writeCount);
         chThdSleepMilliseconds(50);
     }
 }
