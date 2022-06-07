@@ -2,6 +2,7 @@
 
 // This board implements two channels
 #define AFR_CHANNELS 2
+#define EGT_CHANNELS 2
 
 // UART used for debug
 #define UART_DEBUG
@@ -54,3 +55,8 @@
 //#define TS_PRIMARY_BAUDRATE		38400
 #define TS_PRIMARY_SERIAL_PORT	SD1
 #define TS_PRIMARY_BAUDRATE		115200
+
+// *******************************
+//   MAX31855 spi port
+// *******************************
+#define EGT_SPI_PORT			SPID1

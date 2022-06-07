@@ -62,3 +62,10 @@
 
 #define ID_SEL1_PORT				GPIOC
 #define ID_SEL1_PIN					13
+
+// PC15 - SPI1_CS1 - L_EGT
+#define EGT_CS0_PORT				GPIOC
+#define EGT_CS0_PIN					15
+// PC14 - SPI1_CS0 - R_EGT
+#define EGT_CS1_PORT				GPIOC
+#define EGT_CS1_PIN					14
