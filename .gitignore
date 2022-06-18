@@ -24,7 +24,8 @@ fp-info-cache
 # Exported BOM files
 *.xml
 
-
+# firmware artifacts
+deliver
 
 # Mac stuff
 # General
