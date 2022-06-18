@@ -11,7 +11,7 @@ enum class HeaterState
 };
 
 void StartHeaterControl();
-bool IsRunningClosedLoop();
-float GetHeaterDuty();
-HeaterState GetHeaterState();
+bool IsRunningClosedLoop(int ch);
+float GetHeaterDuty(int ch);
+HeaterState GetHeaterState(int ch);
 const char* describeHeaterState(HeaterState state);

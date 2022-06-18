@@ -1,3 +1,4 @@
+#include "wideband_config.h"
 #include "livedata.h"
 
 #include "lambda_conversion.h"
@@ -9,18 +10,23 @@
 #include <rusefi/fragments.h>
 
 static livedata_common_s livedata_common;
-static livedata_afr_s livedata_afr;
+static livedata_afr_s livedata_afr[AFR_CHANNELS];
 
 void SamplingUpdateLiveData()
 {
-    livedata_afr.afr = GetLambda();
-    livedata_afr.temperature = GetSensorTemperature();
-    livedata_afr.nernstVoltage = GetNernstDc();
-    livedata_afr.pumpCurrentTarget = GetPumpCurrent();
-    livedata_afr.pumpCurrentMeasured = GetPumpNominalCurrent();
-    livedata_afr.heaterDuty = GetHeaterDuty();
+    for (int ch = 0; ch < AFR_CHANNELS; ch++)
+    {
+        volatile struct livedata_afr_s *data = &livedata_afr[ch];
 
-    livedata_common.vbatt = GetInternalBatteryVoltage();
+        data->afr = GetLambda(ch);
+        data->temperature = GetSensorTemperature(ch);
+        data->nernstVoltage = GetNernstDc(ch);
+        data->pumpCurrentTarget = GetPumpCurrent(ch);
+        data->pumpCurrentMeasured = GetPumpNominalCurrent(ch);
+        data->heaterDuty = GetHeaterDuty(ch);
+    }
+
+    livedata_common.vbatt = GetInternalBatteryVoltage(0);
 }
 
 const livedata_common_s * getCommonLiveDataStructAddr()
@@ -28,14 +34,16 @@ const livedata_common_s * getCommonLiveDataStructAddr()
     return &livedata_common;
 }
 
-const livedata_afr_s * getAfrLiveDataStructAddr()
+const struct livedata_afr_s * getAfrLiveDataStructAddr(const int ch)
 {
-    return &livedata_afr;
+    if (ch < AFR_CHANNELS)
+        return &livedata_afr[ch];
+    return NULL;
 }
 
 static const FragmentEntry fragments[] = {
 	getCommonLiveDataStructAddr(),
-	getAfrLiveDataStructAddr(),
+	getAfrLiveDataStructAddr(0),
 };
 
 FragmentList getFragments() {

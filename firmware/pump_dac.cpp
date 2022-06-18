@@ -9,26 +9,33 @@
 // 48MHz / 1024 = 46.8khz PWM
 static Pwm pumpDac(PUMP_DAC_PWM_DEVICE, PUMP_DAC_PWM_CHANNEL, 48'000'000, 1024);
 
-static int32_t curIpump;
+struct pump_dac_state {
+    int32_t curIpump;
+};
+
+static struct pump_dac_state state[AFR_CHANNELS];
 
 void InitPumpDac()
 {
     pumpDac.Start();
 
-    // Set zero current to start - sensor can be damaged if current flowing
-    // while warming up
-    SetPumpCurrentTarget(0);
+    for (int ch = 0; ch < AFR_CHANNELS; ch++)
+    {
+        // Set zero current to start - sensor can be damaged if current flowing
+        // while warming up
+        SetPumpCurrentTarget(ch, 0);
+    }
 }
 
-void SetPumpCurrentTarget(int32_t microampere)
+void SetPumpCurrentTarget(int ch, int32_t microampere)
 {
     // Don't allow pump current when the sensor isn't hot
-    if (!IsRunningClosedLoop())
+    if (!IsRunningClosedLoop(ch))
     {
         microampere = 0;
     }
 
-    curIpump = microampere;
+    state[ch].curIpump = microampere;
 
     // 47 ohm resistor
     // 0.147 gain
@@ -41,12 +48,12 @@ void SetPumpCurrentTarget(int32_t microampere)
     pumpDac.SetDuty(volts / VCC_VOLTS);
 }
 
-float GetPumpOutputDuty()
+float GetPumpOutputDuty(int ch)
 {
     return pumpDac.GetLastDuty();
 }
 
-float GetPumpCurrent()
+float GetPumpCurrent(int ch)
 {
-    return (float)curIpump / 1000.0;
+    return (float)state[ch].curIpump / 1000.0;
 }

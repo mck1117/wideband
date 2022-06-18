@@ -42,7 +42,9 @@ int main() {
 
     while(true)
     {
-        auto fault = GetCurrentFault();
+        /* TODO: show error for all AFR channels */
+        /* TODO: show EGT errors */
+        auto fault = GetCurrentFault(0);
 
         if (fault == Fault::None)
         {
@@ -53,7 +55,7 @@ int main() {
             palTogglePad(LED_GREEN_PORT, LED_GREEN_PIN);
 
             // Slow blink if closed loop, fast if not
-            chThdSleepMilliseconds(IsRunningClosedLoop() ? 700 : 50);
+            chThdSleepMilliseconds(IsRunningClosedLoop(0) ? 700 : 50);
         }
         else
         {
