@@ -1,3 +1,3 @@
 #pragma once
 
-float GetLambda();
+float GetLambda(int ch);
