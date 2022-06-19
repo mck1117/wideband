@@ -13,20 +13,72 @@
 using namespace wbo;
 
 // 400khz / 1024 = 390hz PWM
-static Pwm heaterPwm(HEATER_PWM_DEVICE, HEATER_PWM_CHANNEL, 400'000, 1024);
+static Pwm heaterPwm(HEATER_PWM_DEVICE);
+PWMConfig heaterPwmConfig = {
+    400'000,
+    1024,
+    nullptr,
+    {
+        {PWM_OUTPUT_ACTIVE_HIGH, nullptr},
+        {PWM_OUTPUT_ACTIVE_HIGH, nullptr},
+        {PWM_OUTPUT_ACTIVE_HIGH, nullptr},
+        {PWM_OUTPUT_ACTIVE_HIGH, nullptr}
+    },
+    0,
+    0,
+#if STM32_PWM_USE_ADVANCED
+    0
+#endif
+};
 
 static constexpr int preheatTimeCounter = HEATER_PREHEAT_TIME / HEATER_CONTROL_PERIOD;
 static constexpr int batteryStabTimeCounter = HEATER_BATTERY_STAB_TIME / HEATER_CONTROL_PERIOD;
 
 struct heater_state {
+    Pid heaterPid;
     int timeCounter;
     int batteryStabTime;
     float rampVoltage;
     HeaterState heaterState;
-    int ch;
+    uint8_t ch;
+    uint8_t pwm_ch;
 };
 
-static struct heater_state state[AFR_CHANNELS];
+static struct heater_state state[AFR_CHANNELS] =
+{
+    {
+        .heaterPid = Pid(
+            0.3f,      // kP
+            0.3f,      // kI
+            0.01f,     // kD
+            3.0f,      // Integrator clamp (volts)
+            HEATER_CONTROL_PERIOD
+        ),
+        .timeCounter = preheatTimeCounter,
+        .batteryStabTime = batteryStabTimeCounter,
+        .rampVoltage = 0,
+        .heaterState = HeaterState::Preheat,
+        .ch = 0,
+        .pwm_ch = HEATER_PWM_CHANNEL_0,
+    },
+#if (AFR_CHANNELS > 1)
+    {
+        .heaterPid = Pid(
+            0.3f,      // kP
+            0.3f,      // kI
+            0.01f,     // kD
+            3.0f,      // Integrator clamp (volts)
+            HEATER_CONTROL_PERIOD
+        ),
+        .timeCounter = preheatTimeCounter,
+        .batteryStabTime = batteryStabTimeCounter,
+        .rampVoltage = 0,
+        .heaterState = HeaterState::Preheat,
+        .ch = 1,
+        .pwm_ch = HEATER_PWM_CHANNEL_1,
+    },
+#endif
+};
 
 static HeaterState GetNextState(struct heater_state *s, HeaterAllow heaterAllowState, float batteryVoltage, float sensorEsr)
 {
@@ -109,14 +161,6 @@ static HeaterState GetNextState(struct heater_state *s, HeaterAllow heaterAllowS
     return s->heaterState;
 }
 
-static Pid heaterPid(
-    0.3f,      // kP
-    0.3f,      // kI
-    0.01f,     // kD
-    3.0f,      // Integrator clamp (volts)
-    HEATER_CONTROL_PERIOD
-);
-
 static float GetVoltageForState(struct heater_state *s, float heaterEsr)
 {
     switch (s->heaterState)
@@ -137,7 +181,7 @@ static float GetVoltageForState(struct heater_state *s, float heaterEsr)
         case HeaterState::ClosedLoop:
             // "nominal" heater voltage is 7.5v, so apply correction around that point (instead of relying on integrator so much)
             // Negated because lower resistance -> hotter
-            return 7.5f - heaterPid.GetOutput(HEATER_TARGET_ESR, heaterEsr);
+            return 7.5f - s->heaterPid.GetOutput(HEATER_TARGET_ESR, heaterEsr);
         case HeaterState::Stopped:
             // Something has gone wrong, turn off the heater.
             return 0;
@@ -152,16 +196,6 @@ static void HeaterThread(void*)
 {
     int ch;
 
-    /* reset */
-    for (ch = 0; ch < AFR_CHANNELS; ch++) {
-        struct heater_state *s = &state[ch];
-
-        s->timeCounter = preheatTimeCounter;
-        s->batteryStabTime = batteryStabTimeCounter;
-        s->rampVoltage = 0;
-        s->heaterState = HeaterState::Preheat;
-        s->ch = ch;
-    }
     // Wait for temperature sensing to stabilize so we don't
     // immediately think we overshot the target temperature
     chThdSleepMilliseconds(1000);
@@ -204,12 +238,12 @@ static void HeaterThread(void*)
             if (batteryVoltage < 23)
             {
                 // Pipe the output to the heater driver
-                heaterPwm.SetDuty(duty);
+                heaterPwm.SetDuty(s->pwm_ch, duty);
             }
             else
             {
                 // Overvoltage protection - sensor not rated for PWM above 24v
-                heaterPwm.SetDuty(0);
+                heaterPwm.SetDuty(s->pwm_ch, 0);
             }
         }
 
@@ -220,8 +254,11 @@ static void HeaterThread(void*)
 
 void StartHeaterControl()
 {
-    heaterPwm.Start();
-    heaterPwm.SetDuty(0);
+    heaterPwm.Start(heaterPwmConfig);
+    heaterPwm.SetDuty(state[0].pwm_ch, 0);
+#if (AFR_CHANNELS > 1)
+    heaterPwm.SetDuty(state[1].pwm_ch, 0);
+#endif
 
     chThdCreateStatic(waHeaterThread, sizeof(waHeaterThread), NORMALPRIO + 1, HeaterThread, nullptr);
 }
@@ -233,7 +270,7 @@ bool IsRunningClosedLoop(int ch)
 
 float GetHeaterDuty(int ch)
 {
-    return heaterPwm.GetLastDuty();
+    return heaterPwm.GetLastDuty(state[ch].pwm_ch);
 }
 
 HeaterState GetHeaterState(int ch)
