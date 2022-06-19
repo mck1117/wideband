@@ -49,6 +49,13 @@
 #define AUXOUT_GAIN         ((82.0 + 160.0) / 160.0)
 
 // *******************************
+// With heater constantly on we
+// are not able to measure Vbatt
+// through Heater-
+// *******************************
+#define HEATER_MAX_DUTY		(0.85)
+
+// *******************************
 //   TunerStudio Primary Port
 // *******************************
 //#define TS_PRIMARY_UART_PORT	UARTD1
