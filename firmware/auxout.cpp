@@ -28,6 +28,13 @@ PWMConfig auxPwmConfig = {
 
 static Pwm auxDac(AUXOUT_DAC_PWM_DEVICE);
 
+static const uint8_t auxOutPwmCh[] = {
+    AUXOUT_DAC_PWM_CHANNEL_0,
+#if (AFR_CHANNELS > 1)
+    AUXOUT_DAC_PWM_CHANNEL_1,
+#endif
+};
+
 extern float clampF(float min, float clamp, float max);
 
 void SetAuxDac(int channel, float voltage)
@@ -37,7 +44,7 @@ void SetAuxDac(int channel, float voltage)
     duty = 1.0 - duty;
     duty = clampF(0, duty, 1);
 
-    auxDac.SetDuty(channel ? AUXOUT_DAC_PWM_CHANNEL_1 : AUXOUT_DAC_PWM_CHANNEL_0, duty);
+    auxDac.SetDuty(auxOutPwmCh[channel], duty);
 }
 
 /* TODO: merge with some other communication thread? */
