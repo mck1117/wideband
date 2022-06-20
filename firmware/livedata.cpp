@@ -5,6 +5,7 @@
 #include "sampling.h"
 #include "pump_dac.h"
 #include "heater_control.h"
+#include "max31855.h"
 
 #include <rusefi/arrays.h>
 #include <rusefi/fragments.h>
@@ -42,8 +43,11 @@ const struct livedata_afr_s * getAfrLiveDataStructAddr(const int ch)
 }
 
 static const FragmentEntry fragments[] = {
-	getCommonLiveDataStructAddr(),
-	getAfrLiveDataStructAddr(0),
+    getCommonLiveDataStructAddr(),
+    getAfrLiveDataStructAddr(0),
+    getAfrLiveDataStructAddr(1),
+    getEgtLiveDataStructAddr(0),
+    getEgtLiveDataStructAddr(1)
 };
 
 FragmentList getFragments() {

@@ -1,9 +1,9 @@
 #include <math.h>
 
-#include "hal.h"
 #include "io_pins.h"
 #include "wideband_config.h"
 #include "bit.h"
+#include "livedata.h"
 
 #include "max31855.h"
 
@@ -74,48 +74,54 @@ int Max31855::spi_rx(uint32_t *data)
 int Max31855::readPacket()
 {
 	uint32_t data;
-	state = MAX31855_NO_REPLY;
 
 	int ret = spi_rx(&data);
-	if (ret)
-		return ret;
 
-	if (data == 0xffffffff) {
-		state = MAX31855_NO_REPLY;
-		return -1;
-	}
+	/* TODO: also check for 0x00000000? */
+	if ((ret) || (data == 0xffffffff)) {
+		livedata.state = MAX31855_NO_REPLY;
 
-	if (data & BIT(16)) {
+		ret = -1;
+	} else if (data & BIT(16)) {
 		if (data & BIT(0)) {
-			state = MAX31855_OPEN_CIRCUIT;
+			livedata.state = MAX31855_OPEN_CIRCUIT;
 		} else if (data & BIT(1)) {
-			state = MAX31855_SHORT_TO_GND;
+			livedata.state = MAX31855_SHORT_TO_GND;
 		} else if (data & BIT(2)) {
-			state = MAX31855_SHORT_TO_VCC;
+			livedata.state = MAX31855_SHORT_TO_VCC;
 		}
 
-		cold_joint_temperature = NAN;
-		temperature = NAN;
+		ret = -1;
+	} else {
+		livedata.state = MAX31855_OK;
 
-		return -1;
+		/* D[15:4] */
+		int16_t tmp = (data >> 4) & 0xfff;
+		/* extend sign */
+		tmp = tmp << 4;
+		tmp = tmp >> 4;	/* shifting right signed is not a good idea */
+		coldJunctionTemperature = (float)tmp * 0.0625;
+
+		/* D[31:18] */
+		tmp = (data >> 18) & 0x3fff;
+		/* extend sign */
+		tmp = tmp << 2;
+		tmp = tmp >> 2;	/* shifting right signed is not a good idea */
+		temperature = (float) tmp * 0.25;
 	}
-	state = MAX31855_OK;
 
-	/* D[15:4] */
-	int16_t tmp = (data >> 4) & 0xfff;
-	/* extend sign */
-	tmp = tmp << 4;
-	tmp = tmp >> 4;	/* shifting right signed is not a good idea */
-	cold_joint_temperature = (float)tmp * 0.0625;
+	if (ret) {
+		coldJunctionTemperature = NAN;
+		livedata.coldJunctionTemperature = 0;
+		temperature = NAN;
+		livedata.temperature = 0;
+	} else {
+		/* update livedata: float to int */
+		livedata.coldJunctionTemperature = coldJunctionTemperature;
+		livedata.temperature = temperature;
+	}
 
-	/* D[31:18] */
-	tmp = (data >> 18) & 0x3fff;
-	/* extend sign */
-	tmp = tmp << 2;
-	tmp = tmp >> 2;	/* shifting right signed is not a good idea */
-	temperature = (float) tmp * 0.25;
-
-	return 0;
+	return ret;
 }
 
 void Max31855Thread::ThreadTask() {
@@ -136,6 +142,13 @@ void StartEgt() {
 
 Max31855* getEgtDrivers() {
     return instances;
+}
+
+const struct livedata_egt_s * getEgtLiveDataStructAddr(const int ch)
+{
+    if (ch < EGT_CHANNELS)
+        return &getEgtDrivers()[ch].livedata;
+    return NULL;
 }
 
 #endif /* HAL_USE_SPI */

@@ -1,5 +1,7 @@
 #pragma once
 
+#include "hal.h"
+
 #include "wideband_config.h"
 #include "thread_controller.h"
 
@@ -16,13 +18,26 @@ typedef enum {
 	MAX31855_NO_REPLY = 4,
 } Max31855State;
 
+/* livedata: +96/112 offset, size = 16 */
+struct livedata_egt_s {
+	union {
+		struct {
+			float temperature;
+			float coldJunctionTemperature;
+			uint8_t state;
+		} __attribute__((packed));
+		uint8_t pad[16];
+	};
+};
+
 class Max31855 {
 public:
     Max31855(SPIConfig *spi) {
         this->spi = spi;
     }
-	Max31855State state;
-	float cold_joint_temperature;
+	livedata_egt_s livedata;
+	/* do we need float temperatures? */
+	float coldJunctionTemperature;
 	float temperature;
 	int readPacket();
 private:
@@ -45,5 +60,6 @@ private:
 
 void StartEgt();
 Max31855* getEgtDrivers();
+const struct livedata_egt_s * getEgtLiveDataStructAddr(const int ch);
 
 #endif // HAL_USE_SPI
