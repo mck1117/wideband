@@ -4,13 +4,6 @@
 #include "wideband_board_config.h"
 
 // *******************************
-//    Defaults
-// *******************************
-#ifndef AFR_CHANNELS
-    #define AFR_CHANNELS 1
-#endif
-
-// *******************************
 //    Nernst voltage & ESR sense
 // *******************************
 
