@@ -11,4 +11,6 @@
 // *******************************
 #define NERNST_INPUT_GAIN (1 / 2.7f)
 
+#define VM_RESISTOR_VALUE (10)
+
 #define AFR_CHANNELS 1

@@ -17,4 +17,6 @@
 // 39k/10k divider
 #define BATTERY_INPUT_DIVIDER (10.0 / (10.0 + 39.0))
 
+#define VM_RESISTOR_VALUE (10)
+
 #define AFR_CHANNELS 1

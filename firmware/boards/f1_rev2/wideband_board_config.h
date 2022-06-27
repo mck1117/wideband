@@ -34,6 +34,7 @@
 // *******************************
 //    Nernst voltage & ESR sense
 // *******************************
+// yes, on this board we go with zero value due to provisions on the schematics
 #define VM_RESISTOR_VALUE (0)
 
 // *******************************
