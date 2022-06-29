@@ -49,6 +49,9 @@ static void SamplingThread(void*)
     float r_2 = 0;
     float r_3 = 0;
 
+    /* GD32: Insert 20us delay after ADC enable */
+    chThdSleepMilliseconds(1);
+
     while(true)
     {
         /* TODO: run for all channels */
