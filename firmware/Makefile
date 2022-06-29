@@ -146,6 +146,7 @@ CPPSRC = $(ALLCPPSRC) \
           pump_control.cpp \
           uart.cpp \
           interpolation.cpp \
+          console/binary/tunerstudio_io_serial.cpp \
           console/binary/tunerstudio_io.cpp \
           main.cpp
 
