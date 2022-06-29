@@ -17,7 +17,7 @@ static void PumpThread(void*)
     while(true)
     {
         // Only actuate pump when running closed loop!
-        if (IsRunningClosedLoop())
+        if (GetController().IsRunningClosedLoop())
         {
             float nernstVoltage = GetController().GetNernstDc();
 

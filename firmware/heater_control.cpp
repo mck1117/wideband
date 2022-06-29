@@ -8,7 +8,6 @@
 #include "fault.h"
 #include "pwm.h"
 #include "sampling.h"
-#include "pid.h"
 #include "can.h"
 
 using namespace wbo;
@@ -22,7 +21,7 @@ static int timeCounter = preheatTimeCounter;
 static int batteryStabTime = batteryStabTimeCounter;
 static float rampVoltage = 0;
 
-static HeaterState GetNextState(HeaterState state, HeaterAllow heaterAllowState, float batteryVoltage, float sensorEsr)
+HeaterState WidebandController::GetNextHeaterState(HeaterState state, HeaterAllow heaterAllowState, float batteryVoltage, float sensorEsr) const
 {
     bool heaterAllowed = heaterAllowState == HeaterAllow::Allowed;
 
@@ -103,15 +102,7 @@ static HeaterState GetNextState(HeaterState state, HeaterAllow heaterAllowState,
     return state;
 }
 
-static Pid heaterPid(
-    0.3f,      // kP
-    0.3f,      // kI
-    0.01f,     // kD
-    3.0f,      // Integrator clamp (volts)
-    HEATER_CONTROL_PERIOD
-);
-
-static float GetVoltageForState(HeaterState state, float heaterEsr)
+float WidebandController::GetVoltageForState(HeaterState state, float heaterEsr)
 {
     switch (state)
     {
@@ -141,8 +132,15 @@ static float GetVoltageForState(HeaterState state, float heaterEsr)
     return 0;
 }
 
-static HeaterState state = HeaterState::Preheat;
+float WidebandController::GetHeaterVoltage(HeaterAllow heaterAllowState, float batteryVoltage)
+{
+    float heaterEsr = GetSensorInternalResistance();
 
+    // Run the state machine
+    heatState = GetNextHeaterState(heatState, heaterAllowState, batteryVoltage, heaterEsr);
+
+    return GetVoltageForState(heatState, heaterEsr);
+}
 
 static THD_WORKING_AREA(waHeaterThread, 256);
 static void HeaterThread(void*)
@@ -153,20 +151,16 @@ static void HeaterThread(void*)
 
     while (true)
     {
-        // Read sensor state
-        float heaterEsr = GetController().GetSensorInternalResistance();
-
         auto heaterAllowState = GetHeaterAllowed();
 
         // If we haven't heard from rusEFI, use the internally sensed 
         // battery voltage instead of voltage over CAN.
+        // TODO: why do we ask the controller about internal battery voltage?
         float batteryVoltage = heaterAllowState == HeaterAllow::Unknown
                                     ? GetController().GetInternalBatteryVoltage()
                                     : GetRemoteBatteryVoltage();
 
-        // Run the state machine
-        state = GetNextState(state, heaterAllowState, batteryVoltage, heaterEsr);
-        float heaterVoltage = GetVoltageForState(state, heaterEsr);
+        float heaterVoltage = GetController().GetHeaterVoltage(heaterAllowState, batteryVoltage);
 
         // Limit to 11 volts
         if (heaterVoltage > 11) {
@@ -201,9 +195,9 @@ void StartHeaterControl()
     chThdCreateStatic(waHeaterThread, sizeof(waHeaterThread), NORMALPRIO + 1, HeaterThread, nullptr);
 }
 
-bool IsRunningClosedLoop()
+bool WidebandController::IsRunningClosedLoop() const
 {
-    return state == HeaterState::ClosedLoop;
+    return heatState == HeaterState::ClosedLoop;
 }
 
 float GetHeaterDuty()
@@ -211,9 +205,9 @@ float GetHeaterDuty()
     return heaterPwm.GetLastDuty();
 }
 
-HeaterState GetHeaterState()
+HeaterState WidebandController::GetHeaterState() const
 {
-    return state;
+    return heatState;
 }
 
 const char* describeHeaterState(HeaterState state)

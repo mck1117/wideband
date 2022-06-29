@@ -43,7 +43,7 @@ int main() {
             palTogglePad(LED_GREEN_PORT, LED_GREEN_PIN);
 
             // Slow blink if closed loop, fast if not
-            chThdSleepMilliseconds(IsRunningClosedLoop() ? 700 : 50);
+            chThdSleepMilliseconds(GetController().IsRunningClosedLoop() ? 700 : 50);
         }
         else
         {

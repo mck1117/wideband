@@ -145,7 +145,7 @@ void SendRusefiFormat(uint8_t idx)
         uint16_t lambda = GetController(internalIndex).GetLambda() * 10000;
         frame.get().Lambda = lambda;
         frame.get().TemperatureC = GetController(internalIndex).GetSensorTemperature();
-        frame.get().Valid = IsRunningClosedLoop() ? 0x01 : 0x00;
+        frame.get().Valid = GetController(internalIndex).IsRunningClosedLoop() ? 0x01 : 0x00;
     }
 
     {

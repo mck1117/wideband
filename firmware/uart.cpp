@@ -48,7 +48,7 @@ static void UartThread(void*)
             (int)GetController(0).GetSensorTemperature(),
             (int)(GetController(0).GetPumpNominalCurrent() * 1000),
             batteryVoltageMv,
-            describeHeaterState(GetHeaterState()), duty,
+            describeHeaterState(GetController(0).GetHeaterState()), duty,
             describeFault(GetCurrentFault()));
         uartStartSend(&UARTD1, writeCount, printBuffer);
 

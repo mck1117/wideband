@@ -1,3 +1,4 @@
+#include "wideband_controller.h"
 #include "pump_dac.h"
 #include "pwm.h"
 #include "heater_control.h"
@@ -23,7 +24,7 @@ void InitPumpDac()
 void SetPumpCurrentTarget(int32_t microampere)
 {
     // Don't allow pump current when the sensor isn't hot
-    if (!IsRunningClosedLoop())
+    if (!GetController().IsRunningClosedLoop())
     {
         microampere = 0;
     }
