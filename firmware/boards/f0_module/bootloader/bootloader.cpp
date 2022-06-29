@@ -2,6 +2,7 @@
 #include "port_shared.h"
 #include "flash.h"
 #include "io_pins.h"
+#include "crc.h"
 
 #include <cstring>
 
@@ -12,7 +13,6 @@ extern uint32_t __ram_vectors_start__[64];
 extern uint32_t __ram_vectors_size__;
 
 #define SWAP_UINT32(x) ((((x) >> 24) & 0xff) | (((x) << 8) & 0xff0000) | (((x) >> 8) & 0xff00) | (((x) << 24) & 0xff000000))
-uint32_t crc32(const uint8_t *buf, uint32_t size);
 
 bool isAppValid() {
     const uint32_t* appFlash = 
