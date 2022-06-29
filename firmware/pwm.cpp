@@ -35,15 +35,15 @@ void Pwm::Start()
 #endif
     };
 
-    pwmStart(m_driver, &config);
+    Start(config);
 }
 
-void Pwm::Start(PWMConfig *config)
+void Pwm::Start(PWMConfig& config)
 {
-    m_counterFrequency = config->frequency;
-    m_counterPeriod = config->period;
+    m_counterFrequency = config.frequency;
+    m_counterPeriod = config.period;
 
-    pwmStart(m_driver, config);
+    pwmStart(m_driver, &config);
 }
 
 float maxF(float i1, float i2) {
