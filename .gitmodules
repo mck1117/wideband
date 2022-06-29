@@ -8,3 +8,6 @@
 [submodule "kicad-libraries"]
 	path = kicad-libraries
 	url = https://github.com/rusefi/kicad-libraries
+[submodule "firmware/ext/openblt"]
+	path = firmware/ext/openblt
+	url = https://github.com/rusefi/openblt
