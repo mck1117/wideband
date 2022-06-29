@@ -45,6 +45,9 @@ static void SamplingThread(void*)
     // GD32: Insert delay after enabling ADC
     chThdSleepMilliseconds(1);
 
+    /* GD32: Insert 20us delay after ADC enable */
+    chThdSleepMilliseconds(1);
+
     while(true)
     {
         auto result = AnalogSample();
