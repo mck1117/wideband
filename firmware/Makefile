@@ -125,7 +125,8 @@ LDSCRIPT=app.ld
 
 # C sources that can be compiled in ARM or THUMB mode depending on the global
 # setting.
-CSRC = $(ALLCSRC) $(BOARDDIR)/board.c
+CSRC = $(ALLCSRC) $(BOARDDIR)/board.c \
+          util/math/crc.c
 
 # C++ sources that can be compiled in ARM or THUMB mode depending on the global
 # setting.
@@ -145,7 +146,6 @@ CPPSRC = $(ALLCPPSRC) \
           pump_control.cpp \
           uart.cpp \
           interpolation.cpp \
-          util/math/crc32.c \
           console/binary/tunerstudio_io.cpp \
           main.cpp
 
