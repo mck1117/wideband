@@ -125,7 +125,8 @@ LDSCRIPT=app.ld
 
 # C sources that can be compiled in ARM or THUMB mode depending on the global
 # setting.
-CSRC = $(ALLCSRC) $(BOARDDIR)/board.c
+CSRC = $(ALLCSRC) $(BOARDDIR)/board.c \
+          util/math/crc.c
 
 # C++ sources that can be compiled in ARM or THUMB mode depending on the global
 # setting.
@@ -145,6 +146,8 @@ CPPSRC = $(ALLCPPSRC) \
           pump_control.cpp \
           uart.cpp \
           interpolation.cpp \
+          console/binary/tunerstudio_io_serial.cpp \
+          console/binary/tunerstudio_io.cpp \
           main.cpp
 
 # List ASM source files here.
@@ -154,7 +157,13 @@ ASMSRC = $(ALLASMSRC)
 ASMXSRC = $(ALLXASMSRC)
 
 # Inclusion directories.
-INCDIR = $(CONFDIR) $(ALLINC) boards/ $(BOARDDIR)/io/
+INCDIR = $(CONFDIR) \
+         $(ALLINC) \
+         util/ \
+         util/math/ \
+         console/binary/ \
+         boards/ \
+         $(BOARDDIR)/io/
 
 # Define C warning options here.
 CWARN = -Wall -Wextra -Wundef -Wstrict-prototypes
