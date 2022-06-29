@@ -4,6 +4,7 @@
 #include "ch.h"
 #include "hal.h"
 
+#include "wideband_controller.h"
 #include "fault.h"
 #include "pwm.h"
 #include "sampling.h"
@@ -153,14 +154,14 @@ static void HeaterThread(void*)
     while (true)
     {
         // Read sensor state
-        float heaterEsr = GetSensorInternalResistance();
+        float heaterEsr = GetController().GetSensorInternalResistance();
 
         auto heaterAllowState = GetHeaterAllowed();
 
         // If we haven't heard from rusEFI, use the internally sensed 
         // battery voltage instead of voltage over CAN.
         float batteryVoltage = heaterAllowState == HeaterAllow::Unknown
-                                    ? GetInternalBatteryVoltage()
+                                    ? GetController().GetInternalBatteryVoltage()
                                     : GetRemoteBatteryVoltage();
 
         // Run the state machine

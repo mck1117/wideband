@@ -5,15 +5,11 @@
 #include "hal.h"
 
 #include "wideband_config.h"
+#include "wideband_controller.h"
+
 
 #include "port.h"
 #include "io_pins.h"
-
-// Stored results
-static float nernstAc = 0;
-static float nernstDc = 0;
-static float pumpCurrentSenseVoltage = 0;
-static float internalBatteryVoltage = 0;
 
 static const struct inter_point lsu49_r_to_temp[] =
 {
@@ -46,48 +42,21 @@ static THD_WORKING_AREA(waSamplingThread, 256);
 
 static void SamplingThread(void*)
 {
-    float r_2 = 0;
-    float r_3 = 0;
+    // GD32: Insert delay after enabling ADC
+    chThdSleepMilliseconds(1);
 
     while(true)
     {
-        /* TODO: run for all channels */
-        int ch = 0;
-
         auto result = AnalogSample();
 
         // Toggle the pin after sampling so that any switching noise occurs while we're doing our math instead of when sampling
+        // TODO: should this be per-controller, or one toggle pin for the whole board?
         palTogglePad(NERNST_ESR_DRIVER_PORT, NERNST_ESR_DRIVER_PIN);
 
-        float r_1 = result.ch[ch].NernstVoltage;
-
-        // r2_opposite_phase estimates where the previous sample would be had we not been toggling
-        // AKA the absolute value of the difference between r2_opposite_phase and r2 is the amplitude
-        // of the AC component on the nernst voltage.  We have to pull this trick so as to use the past 3
-        // samples to cancel out any slope in the DC (aka actual nernst cell output) from the AC measurement
-        // See firmware/sampling.png for a drawing of what's going on here
-        float r2_opposite_phase = (r_1 + r_3) / 2;
-
-        // Compute AC (difference) and DC (average) components
-        float nernstAcLocal = f_abs(r2_opposite_phase - r_2);
-        nernstDc = (r2_opposite_phase + r_2) / 2;
-
-        nernstAc =
-            (1 - ESR_SENSE_ALPHA) * nernstAc +
-            ESR_SENSE_ALPHA * nernstAcLocal;
-
-        // Exponential moving average (aka first order lpf)
-        pumpCurrentSenseVoltage =
-            (1 - PUMP_FILTER_ALPHA) * pumpCurrentSenseVoltage +
-            PUMP_FILTER_ALPHA * (result.ch[ch].PumpCurrentVoltage - result.VirtualGroundVoltageInt);
-
-        #ifdef BATTERY_INPUT_DIVIDER
-            internalBatteryVoltage = result.ch[ch].BatteryVoltage;
-        #endif
-
-        // Shift history over by one
-        r_3 = r_2;
-        r_2 = r_1;
+        for (size_t i = 0; i < AFR_CHANNELS; i++)
+        {
+            GetController(i).ProcessSample(result.ch[i], result.VirtualGroundVoltageInt);
+        }
     }
 }
 
@@ -97,12 +66,44 @@ void StartSampling()
     chThdCreateStatic(waSamplingThread, sizeof(waSamplingThread), NORMALPRIO + 5, SamplingThread, nullptr);
 }
 
-float GetNernstAc()
-{
-    return nernstAc;
+void WidebandController::ProcessSample(const ChannelAnalogResult& result, float virtualGroundVoltageInt) {
+    float r_1 = result.NernstVoltage;
+
+    // r2_opposite_phase estimates where the previous sample would be had we not been toggling
+    // AKA the absolute value of the difference between r2_opposite_phase and r2 is the amplitude
+    // of the AC component on the nernst voltage.  We have to pull this trick so as to use the past 3
+    // samples to cancel out any slope in the DC (aka actual nernst cell output) from the AC measurement
+    // See firmware/sampling.png for a drawing of what's going on here
+    float r2_opposite_phase = (r_1 + r_3) / 2;
+
+    // Compute AC (difference) and DC (average) components
+    float nernstAcLocal = f_abs(r2_opposite_phase - r_2);
+    NernstDc = (r2_opposite_phase + r_2) / 2;
+
+    NernstAc =
+        (1 - ESR_SENSE_ALPHA) * NernstAc +
+        ESR_SENSE_ALPHA * nernstAcLocal;
+
+    // Exponential moving average (aka first order lpf)
+    PumpCurrentSenseVoltage =
+        (1 - PUMP_FILTER_ALPHA) * PumpCurrentSenseVoltage +
+        PUMP_FILTER_ALPHA * (result.PumpCurrentVoltage - virtualGroundVoltageInt);
+
+#ifdef BATTERY_INPUT_DIVIDER
+    InternalBatteryVoltage = result.BatteryVoltage;
+#endif
+
+    // Shift history over by one
+    r_3 = r_2;
+    r_2 = r_1;
 }
 
-float GetSensorInternalResistance()
+float WidebandController::GetNernstAc() const
+{
+    return NernstAc;
+}
+
+float WidebandController::GetSensorInternalResistance() const
 {
     // Sensor is the lowside of a divider, top side is 22k, and 3.3v AC pk-pk is injected
     float totalEsr = ESR_SUPPLY_R / (VCC_VOLTS / GetNernstAc() - 1);
@@ -112,7 +113,7 @@ float GetSensorInternalResistance()
     return totalEsr - VM_RESISTOR_VALUE;
 }
 
-float GetSensorTemperature()
+float WidebandController::GetSensorTemperature() const
 {
     float esr = GetSensorInternalResistance();
 
@@ -124,21 +125,25 @@ float GetSensorTemperature()
     return interpolate_1d_float(lsu49_r_to_temp, ARRAY_SIZE(lsu49_r_to_temp), esr);
 }
 
-float GetNernstDc()
+float WidebandController::GetNernstDc() const
 {
-    return nernstDc;
+    return NernstDc;
 }
 
-float GetPumpNominalCurrent()
+float WidebandController::GetPumpNominalCurrent() const
 {
     // Gain is 10x, then a 61.9 ohm resistor
     // Effective resistance with the gain is 619 ohms
     // 1000 is to convert to milliamperes
     constexpr float ratio = -1000 / (PUMP_CURRENT_SENSE_GAIN * LSU_SENSE_R);
-    return pumpCurrentSenseVoltage * ratio;
+    return PumpCurrentSenseVoltage * ratio;
 }
 
-float GetInternalBatteryVoltage()
+float WidebandController::GetInternalBatteryVoltage() const
 {
-    return internalBatteryVoltage;
+#ifdef BATTERY_INPUT_DIVIDER
+    return InternalBatteryVoltage;
+#else
+    return 0;
+#endif
 }

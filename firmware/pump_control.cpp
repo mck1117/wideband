@@ -1,5 +1,6 @@
 #include "pump_control.h"
 #include "wideband_config.h"
+#include "wideband_controller.h"
 #include "heater_control.h"
 #include "sampling.h"
 #include "pump_dac.h"
@@ -18,7 +19,7 @@ static void PumpThread(void*)
         // Only actuate pump when running closed loop!
         if (IsRunningClosedLoop())
         {
-            float nernstVoltage = GetNernstDc();
+            float nernstVoltage = GetController().GetNernstDc();
 
             float result = pumpPid.GetOutput(NERNST_TARGET, nernstVoltage);
 

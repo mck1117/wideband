@@ -133,6 +133,7 @@ CSRC = $(ALLCSRC) $(BOARDDIR)/board.c \
 CPPSRC = $(ALLCPPSRC) \
           $(BOARDDIR)/port.cpp \
           $(BOARDDIR)/port_shared.cpp \
+          wideband_controller.cpp \
           shared/flash.cpp \
           can.cpp \
           can_helper.cpp \

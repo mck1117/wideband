@@ -1,10 +1,10 @@
 #include "can.h"
 #include "hal.h"
 
+#include "wideband_controller.h"
 #include "fault.h"
 #include "can_helper.h"
 #include "heater_control.h"
-#include "lambda_conversion.h"
 #include "sampling.h"
 #include "pump_dac.h"
 #include "port.h"
@@ -132,8 +132,9 @@ void InitCan()
 
 void SendRusefiFormat(uint8_t idx)
 {
+    size_t internalIndex = 0;
+
     auto baseAddress = 0x190 + 2 * idx;
-    auto esr = GetSensorInternalResistance();
 
     {
         CanTxTyped<wbo::StandardData> frame(baseAddress + 0);
@@ -141,17 +142,17 @@ void SendRusefiFormat(uint8_t idx)
         // The same header is imported by the ECU and checked against this data in the frame
         frame.get().Version = RUSEFI_WIDEBAND_VERSION;
 
-        uint16_t lambda = GetLambda() * 10000;
+        uint16_t lambda = GetController(internalIndex).GetLambda() * 10000;
         frame.get().Lambda = lambda;
-        frame.get().TemperatureC = GetSensorTemperature();
+        frame.get().TemperatureC = GetController(internalIndex).GetSensorTemperature();
         frame.get().Valid = IsRunningClosedLoop() ? 0x01 : 0x00;
     }
 
     {
         CanTxTyped<wbo::DiagData> frame(baseAddress + 1);
 
-        frame.get().Esr = esr;
-        frame.get().NernstDc = GetNernstDc() * 1000;
+        frame.get().Esr = GetController(internalIndex).GetSensorInternalResistance();
+        frame.get().NernstDc = GetController(internalIndex).GetNernstDc() * 1000;
         frame.get().PumpDuty = GetPumpOutputDuty() * 255;
         frame.get().Status = GetCurrentFault();
         frame.get().HeaterDuty = GetHeaterDuty() * 255;

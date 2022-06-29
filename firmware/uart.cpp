@@ -2,7 +2,7 @@
 #include "hal.h"
 #include "chprintf.h"
 
-#include "lambda_conversion.h"
+#include "wideband_controller.h"
 #include "sampling.h"
 #include "heater_control.h"
 #include "fault.h"
@@ -34,19 +34,19 @@ static void UartThread(void*)
 {
     while(true)
     {
-        float lambda = GetLambda();
+        float lambda = GetController(0).GetLambda();
         int lambdaIntPart = lambda;
         int lambdaThousandths = (lambda - lambdaIntPart) * 1000;
-        int batteryVoltageMv = GetInternalBatteryVoltage() * 1000;
+        int batteryVoltageMv = GetController(0).GetInternalBatteryVoltage() * 1000;
         int duty = GetHeaterDuty() * 100;
 
         size_t writeCount = chsnprintf(printBuffer, 200,
             "%d.%03d\tAC %d mV\tR: %d\tT: %d\tIpump: %d\tVbat: %d\theater: %s (%d)\tfault: %s\r\n",
             lambdaIntPart, lambdaThousandths,
-            (int)(GetNernstAc() * 1000.0),
-            (int)GetSensorInternalResistance(),
-            (int)GetSensorTemperature(),
-            (int)(GetPumpNominalCurrent() * 1000),
+            (int)(GetController(0).GetNernstAc() * 1000.0),
+            (int)GetController(0).GetSensorInternalResistance(),
+            (int)GetController(0).GetSensorTemperature(),
+            (int)(GetController(0).GetPumpNominalCurrent() * 1000),
             batteryVoltageMv,
             describeHeaterState(GetHeaterState()), duty,
             describeFault(GetCurrentFault()));

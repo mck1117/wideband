@@ -1,7 +1,6 @@
-#include "lambda_conversion.h"
-#include "sampling.h"
+#include "wideband_controller.h"
 
-static float GetPhi(float pumpCurrent)
+float WidebandController::GetPhi(float pumpCurrent) const
 {
     // Maximum lambda ~2
     if (pumpCurrent > 1.11f)
@@ -22,7 +21,7 @@ static float GetPhi(float pumpCurrent)
     return gain * pumpCurrent + 0.99559f;
 }
 
-float GetLambda()
+float WidebandController::GetLambda() const
 {
     float pumpCurrent = GetPumpNominalCurrent();
 
