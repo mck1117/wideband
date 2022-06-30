@@ -66,7 +66,7 @@ AnalogResult AnalogSample()
         .VirtualGroundVoltageInt = HALF_VCC,
         /* We also can measure output virtual ground voltage for diagnostic purposes */
         //.VirtualGroundVoltageExt = AverageSamples(adcBuffer, 0) / VM_INPUT_DIVIDER,
-        .BatteryVoltage = AverageSamples(adcBuffer, 3) / BATTERY_INPUT_DIVIDER,
+        .BatteryVoltage = 0,
         /* .HeaterVoltage = AverageSamples(adcBuffer, 4) / HEATER_INPUT_DIVIDER, */
     };
 }
