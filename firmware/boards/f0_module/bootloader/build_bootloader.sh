@@ -1,7 +1,10 @@
 #!/bin/bash
 
-# clean & build the bootloader
-make clean && make -j4
+echo "Building bootloader..."
+make clean
+pwd
+make -j4
+echo "Building bootloader: DONE"
 
 # convert bootloader bin output to a linkable .o file
 # first pad the binary out with 0xFF
