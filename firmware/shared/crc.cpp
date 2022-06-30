@@ -44,8 +44,9 @@ static const uint32_t crc32_tab[] = { 0x00000000, 0x77073096, 0xee0e612c, 0x9909
         0xbad03605, 0xcdd70693, 0x54de5729, 0x23d967bf, 0xb3667a2e, 0xc4614ab8,
         0x5d681b02, 0x2a6f2b94, 0xb40bbe37, 0xc30c8ea1, 0x5a05df1b, 0x2d02ef8d };
 
+#define EXTERNC extern "C"
 
-uint32_t crc32(const uint8_t *buf, uint32_t size) {
+EXTERNC uint32_t crc32(const uint8_t *buf, uint32_t size) {
     const uint8_t *p;
 
     p = buf;
