@@ -58,16 +58,15 @@ AnalogResult AnalogSample()
 
     return
     {
-        .NernstVoltage = AverageSamples(adcBuffer, 2) * NERNST_INPUT_GAIN,
-        .PumpCurrentVoltage = AverageSamples(adcBuffer, 1),
-        /* Rev 2 board has separate internal virtual ground = 3.3V / 2
-         * VirtualGroundVoltageInt is used to calculate Ip current only as it
-         * is used as offset for diffirential amp */
-        .VirtualGroundVoltageInt = HALF_VCC,
-        /* We also can measure output virtual ground voltage for diagnostic purposes */
-        //.VirtualGroundVoltageExt = AverageSamples(adcBuffer, 0) / VM_INPUT_DIVIDER,
-        .BatteryVoltage = 0,
-        /* .HeaterVoltage = AverageSamples(adcBuffer, 4) / HEATER_INPUT_DIVIDER, */
+        .ch =
+        {
+            {
+                .NernstVoltage = 0,
+                .PumpCurrentVoltage = 0,
+                .BatteryVoltage = 0,
+            },
+        },
+        .VirtualGroundVoltageInt = 0,
     };
 }
 
