@@ -1,4 +1,4 @@
-#include <cstdint>
+#include "crc.h"
 
 static const uint32_t crc32_tab[] = { 0x00000000, 0x77073096, 0xee0e612c, 0x990951ba,
         0x076dc419, 0x706af48f, 0xe963a535, 0x9e6495a3, 0x0edb8832, 0x79dcb8a4,
@@ -44,13 +44,14 @@ static const uint32_t crc32_tab[] = { 0x00000000, 0x77073096, 0xee0e612c, 0x9909
         0xbad03605, 0xcdd70693, 0x54de5729, 0x23d967bf, 0xb3667a2e, 0xc4614ab8,
         0x5d681b02, 0x2a6f2b94, 0xb40bbe37, 0xc30c8ea1, 0x5a05df1b, 0x2d02ef8d };
 
-#define EXTERNC extern "C"
+uint32_t crc32(const void *buf, uint32_t size) {
+	return crc32inc(buf, 0, size);
+}
 
-EXTERNC uint32_t crc32(const uint8_t *buf, uint32_t size) {
-    const uint8_t *p;
+uint32_t crc32inc(const void *buf, uint32_t crc, uint32_t size) {
+    auto p = reinterpret_cast<const uint8_t*>(buf);
 
-    p = buf;
-    uint32_t crc = 0xFFFFFFFF;
+    crc = crc ^ 0xFFFFFFFF;
 
     while (size--) {
         crc = crc32_tab[(crc ^ *p++) & 0xFF] ^ (crc >> 8);
