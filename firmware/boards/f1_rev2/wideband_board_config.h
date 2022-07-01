@@ -30,3 +30,8 @@
 #define VM_INPUT_DIVIDER (10.0 / (10.0 + 100.0))
 
 #define AFR_CHANNELS 1
+
+// *******************************
+//    Nernst voltage & ESR sense
+// *******************************
+#define VM_RESISTOR_VALUE (0)

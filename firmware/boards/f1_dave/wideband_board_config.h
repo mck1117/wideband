@@ -20,6 +20,11 @@
 #define AFR_CHANNELS 1
 
 // *******************************
+//    Nernst voltage & ESR sense
+// *******************************
+#define VM_RESISTOR_VALUE (10)
+
+// *******************************
 //          AUX outputs
 // *******************************
 // OpAmp with 82K + 160K
