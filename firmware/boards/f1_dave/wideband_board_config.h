@@ -18,3 +18,9 @@
 #define BATTERY_INPUT_DIVIDER (10.0 / (10.0 + 39.0))
 
 #define AFR_CHANNELS 1
+
+// *******************************
+//          AUX outputs
+// *******************************
+// OpAmp with 82K + 160K
+#define AUXOUT_GAIN         ((82.0 + 160.0) / 160.0)
