@@ -29,4 +29,4 @@
 // 100K + 10K divider
 #define VM_INPUT_DIVIDER (10.0 / (10.0 + 100.0))
 
-#define AFR_CHANNELS 2
+#define AFR_CHANNELS 1
