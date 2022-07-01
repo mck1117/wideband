@@ -9,7 +9,6 @@
 
 // Nernst AC injection resistor value
 #define ESR_SUPPLY_R (22000)
-#define VM_RESISTOR_VALUE (10)
 
 // Heater low pass filter
 #define ESR_SENSE_ALPHA (0.002f)
