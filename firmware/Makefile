@@ -164,6 +164,7 @@ INCDIR = $(CONFDIR) \
          util/math/ \
          console/binary/ \
          boards/ \
+         shared/ \
          $(BOARDDIR)/io/
 
 # Define C warning options here.
