@@ -17,7 +17,9 @@ ADCConversionGroup convGroup =
     .end_cb = nullptr,
     .error_cb = nullptr,
     .cr1 = 0,
-    .cr2 = ADC_CR2_CONT,
+    .cr2 =
+        ADC_CR2_CONT |
+        ADC_CR2_ADON,   /* keep ADC enabled between convertions - for GD32 */
     .smpr1 = 0,
     .smpr2 =
         ADC_SMPR2_SMP_AN0(ADC_SAMPLE) |
@@ -58,15 +60,20 @@ AnalogResult AnalogSample()
 
     return
     {
-        .ch =
-        {
+        .ch = {
             {
-                .NernstVoltage = 0,
-                .PumpCurrentVoltage = 0,
-                .BatteryVoltage = 0,
+                .NernstVoltage = AverageSamples(adcBuffer, 2) * NERNST_INPUT_GAIN,
+                .PumpCurrentVoltage = AverageSamples(adcBuffer, 1),
+                /* We also can measure output virtual ground voltage for diagnostic purposes */
+                //.VirtualGroundVoltageExt = AverageSamples(adcBuffer, 0) / VM_INPUT_DIVIDER,
+                .BatteryVoltage = AverageSamples(adcBuffer, 3) / BATTERY_INPUT_DIVIDER,
+                /* .HeaterVoltage = AverageSamples(adcBuffer, 4) / HEATER_INPUT_DIVIDER, */
             },
         },
-        .VirtualGroundVoltageInt = 0,
+        /* Rev 2 board has separate internal virtual ground = 3.3V / 2
+         * VirtualGroundVoltageInt is used to calculate Ip current only as it
+         * is used as offset for diffirential amp */
+        .VirtualGroundVoltageInt = HALF_VCC,
     };
 }
 

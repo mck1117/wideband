@@ -12,7 +12,6 @@ jobs:
       matrix:
         include:
           - build-target: f0_module
-          - build-target: f1_dave
           - build-target: f1_rev2
 
     steps:

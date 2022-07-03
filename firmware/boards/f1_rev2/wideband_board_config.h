@@ -29,4 +29,15 @@
 // 100K + 10K divider
 #define VM_INPUT_DIVIDER (10.0 / (10.0 + 100.0))
 
-#define AFR_CHANNELS 2
+#define AFR_CHANNELS 1
+
+// *******************************
+//    Nernst voltage & ESR sense
+// *******************************
+#define VM_RESISTOR_VALUE (0)
+
+// *******************************
+//          AUX outputs
+// *******************************
+// OpAmp with 82K + 160K
+#define AUXOUT_GAIN         ((82.0 + 160.0) / 160.0)
