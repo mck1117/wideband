@@ -10,6 +10,7 @@
 #include "stm32f1xx_ll_usart.h"                  /* STM32 LL USART header              */
 #include "stm32f1xx_ll_gpio.h"                   /* STM32 LL GPIO header               */
 
+#include "../io/io_pins.h"
 
 /****************************************************************************************
 * Function prototypes
@@ -126,36 +127,43 @@ void HAL_MspInit(void)
 
   /* GPIO ports clock enable. */
   LL_APB2_GRP1_EnableClock(LL_APB2_GRP1_PERIPH_GPIOA);
-  LL_APB2_GRP1_EnableClock(LL_APB2_GRP1_PERIPH_GPIOC);
+  LL_APB2_GRP1_EnableClock(LL_APB2_GRP1_PERIPH_GPIOB);
 
 #if (BOOT_COM_RS232_ENABLE > 0)
   /* UART clock enable. */
-  LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_USART2);
+  LL_APB2_GRP1_EnableClock(LL_APB2_GRP1_PERIPH_USART1);
+  /* UART TX and RX GPIO pin configuration. */
+  GPIO_InitStruct.Pin = LL_UART_TX_PIN;
+  GPIO_InitStruct.Mode = LL_GPIO_MODE_ALTERNATE;
+  GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_HIGH;
+  GPIO_InitStruct.OutputType = LL_GPIO_OUTPUT_PUSHPULL;
+  LL_GPIO_Init(UART_GPIO_PORT, &GPIO_InitStruct);
+  GPIO_InitStruct.Pin = LL_UART_RX_PIN;
+  GPIO_InitStruct.Mode = LL_GPIO_MODE_FLOATING;
+  GPIO_InitStruct.Pull = LL_GPIO_PULL_UP;
+  LL_GPIO_Init(UART_GPIO_PORT, &GPIO_InitStruct);
 #endif
 
-  /* Configure GPIO pin for the LED. */
-  GPIO_InitStruct.Pin = LL_GPIO_PIN_5;
-  GPIO_InitStruct.Mode = LL_GPIO_MODE_OUTPUT;
-  GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_LOW;
-  GPIO_InitStruct.OutputType = LL_GPIO_OUTPUT_PUSHPULL;
-  LL_GPIO_Init(GPIOA, &GPIO_InitStruct);
-  LL_GPIO_ResetOutputPin(GPIOA, LL_GPIO_PIN_5);
+#if (BOOT_COM_CAN_ENABLE > 0)
+  /* CAN clock enable. */
+  LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_CAN1);
+  /* CAN TX and RX GPIO pin configuration. */
+  GPIO_InitStruct.Pin = LL_CAN_TX_PIN;
+  GPIO_InitStruct.Mode = LL_GPIO_MODE_ALTERNATE;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_HIGH;
+  LL_GPIO_Init(CAN_GPIO_PORT, &GPIO_InitStruct);
+  GPIO_InitStruct.Pin = LL_CAN_RX_PIN;
+  GPIO_InitStruct.Mode = LL_GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = LL_GPIO_PULL_UP;
+  LL_GPIO_Init(CAN_GPIO_PORT, &GPIO_InitStruct);
+#endif
 
+#if (BOOT_CPU_USER_PROGRAM_START_HOOK > 0)
   /* Configure GPIO pin for (optional) backdoor entry input. */
   GPIO_InitStruct.Pin = LL_GPIO_PIN_13;
   GPIO_InitStruct.Mode = LL_GPIO_MODE_FLOATING;
   LL_GPIO_Init(GPIOC, &GPIO_InitStruct);
-
-#if (BOOT_COM_RS232_ENABLE > 0)
-  /* UART TX and RX GPIO pin configuration. */
-  GPIO_InitStruct.Pin = LL_GPIO_PIN_2;
-  GPIO_InitStruct.Mode = LL_GPIO_MODE_ALTERNATE;
-  GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_HIGH;
-  GPIO_InitStruct.OutputType = LL_GPIO_OUTPUT_PUSHPULL;
-  LL_GPIO_Init(GPIOA, &GPIO_InitStruct);
-  GPIO_InitStruct.Pin = LL_GPIO_PIN_3;
-  GPIO_InitStruct.Mode = LL_GPIO_MODE_FLOATING;
-  LL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 #endif
 } /*** end of HAL_MspInit ***/
 
@@ -173,16 +181,21 @@ void HAL_MspDeInit(void)
   LL_RCC_DeInit();
   
   /* Deinit used GPIOs. */
-  LL_GPIO_DeInit(GPIOC);
+  LL_GPIO_DeInit(GPIOB);
   LL_GPIO_DeInit(GPIOA);
+
+#if (BOOT_COM_CAN_ENABLE > 0)
+  /* CAN clock disable. */
+  LL_APB1_GRP1_DisableClock(LL_APB1_GRP1_PERIPH_CAN1);
+#endif
 
 #if (BOOT_COM_RS232_ENABLE > 0)
   /* UART clock disable. */
-  LL_APB1_GRP1_DisableClock(LL_APB1_GRP1_PERIPH_USART2);
+  LL_APB2_GRP1_DisableClock(LL_APB2_GRP1_PERIPH_USART1);
 #endif
 
   /* GPIO ports clock disable. */
-  LL_APB2_GRP1_DisableClock(LL_APB2_GRP1_PERIPH_GPIOC);
+  LL_APB2_GRP1_DisableClock(LL_APB2_GRP1_PERIPH_GPIOB);
   LL_APB2_GRP1_DisableClock(LL_APB2_GRP1_PERIPH_GPIOA);
 
   /* AFIO and PWR clock disable. */

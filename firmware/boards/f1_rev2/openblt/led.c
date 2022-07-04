@@ -6,6 +6,7 @@
 #include "stm32f1xx.h"                           /* STM32 registers and drivers        */
 #include "stm32f1xx_ll_gpio.h"                   /* STM32 LL GPIO header               */
 
+#include "../io/io_pins.h"
 
 /****************************************************************************************
 * Local data declarations
@@ -22,6 +23,16 @@ static blt_int16u ledBlinkIntervalMs;
 ****************************************************************************************/
 void LedBlinkInit(blt_int16u interval_ms)
 {
+  LL_GPIO_InitTypeDef GPIO_InitStruct;
+
+  /* Configure GPIO pin for the LED. */
+  GPIO_InitStruct.Pin = LL_LED_BLUE_PIN;
+  GPIO_InitStruct.Mode = LL_GPIO_MODE_OUTPUT;
+  GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_LOW;
+  GPIO_InitStruct.OutputType = LL_GPIO_OUTPUT_PUSHPULL;
+  LL_GPIO_Init(LED_BLUE_PORT, &GPIO_InitStruct);
+  LL_GPIO_ResetOutputPin(LED_BLUE_PORT, LL_LED_BLUE_PIN);
+
   /* store the interval time between LED toggles */
   ledBlinkIntervalMs = interval_ms;
 } /*** end of LedBlinkInit ***/
@@ -44,12 +55,12 @@ void LedBlinkTask(void)
     if (ledOn == BLT_FALSE)
     {
       ledOn = BLT_TRUE;
-      LL_GPIO_SetOutputPin(GPIOA, LL_GPIO_PIN_5);
+      LL_GPIO_SetOutputPin(LED_BLUE_PORT,LL_LED_BLUE_PIN);
     }
     else
     {
       ledOn = BLT_FALSE;
-      LL_GPIO_ResetOutputPin(GPIOA, LL_GPIO_PIN_5);
+      LL_GPIO_ResetOutputPin(LED_BLUE_PORT, LL_LED_BLUE_PIN);
     }
     /* schedule the next blink event */
     nextBlinkEvent = TimerGet() + ledBlinkIntervalMs;
@@ -66,7 +77,7 @@ void LedBlinkTask(void)
 void LedBlinkExit(void)
 {
   /* turn the LED off */
-  LL_GPIO_ResetOutputPin(GPIOA, LL_GPIO_PIN_5);
+  LL_GPIO_ResetOutputPin(LED_BLUE_PORT, LL_LED_BLUE_PIN);
 } /*** end of LedBlinkExit ***/
 
 
