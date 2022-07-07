@@ -87,3 +87,7 @@ void SetConfiguration(const Configuration& newConfig)
 {
     // TODO: implement me!
 }
+
+const char *getTsSignature() {
+    return BOARD_NAME;
+}

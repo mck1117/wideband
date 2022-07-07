@@ -40,3 +40,4 @@ public:
 Configuration GetConfiguration();
 void SetConfiguration(const Configuration& newConfig);
 
+const char *getTsSignature();
