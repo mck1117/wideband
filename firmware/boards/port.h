@@ -38,6 +38,7 @@ public:
     uint8_t pad[128 - 1 - 4];
 };
 
+int InitConfiguration();
 Configuration GetConfiguration();
 uint8_t *GetConfiguratiuonPtr();
 int GetConfiguratiuonSize();
