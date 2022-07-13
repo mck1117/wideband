@@ -210,6 +210,11 @@ ifeq ($(USE_BOOTLOADER),yes)
   USE_OPT += -Wl,--defsym=USE_BOOTLOADER=1
 endif
 
+ifeq ($(USE_OPENBLT),yes)
+  # Reserve start of flash for OpenBLT
+  USE_OPT += -Wl,--defsym=USE_BOOTLOADER=1
+endif
+
 #
 # End of user section
 ##############################################################################
