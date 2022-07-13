@@ -15,7 +15,7 @@ CanTxMessage::CanTxMessage(uint32_t eid, uint8_t dlc, bool isExtended) {
 
 CanTxMessage::~CanTxMessage() {
     // 100 ms timeout
-    canTransmitTimeout(&CAND1, can1_mailbox, &m_frame, TIME_IMMEDIATE);
+    canTransmitTimeout(&CAND1, can1_mailbox, &m_frame, TIME_MS2I(100));
 
     // GD32 workaround: rotate mailboxes
     // Does not affect STM32 devices
