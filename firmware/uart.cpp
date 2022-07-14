@@ -13,6 +13,7 @@
 #include "wideband_board_config.h"
 
 #ifdef UART_DEBUG
+// just a reminder that we have either TS connectivity or this UART_DEBUG but not both
 
 SerialConfig cfg = {
     .speed = 115200,
@@ -26,6 +27,7 @@ static char printBuffer[200];
 static THD_WORKING_AREA(waUartThread, 512);
 static void UartThread(void*)
 {
+    // in UART_DEBUG mode we only support Serial - this file name here has a bit of a confusing naming
     sdStart(&SD1, &cfg);
 
     while(true)
