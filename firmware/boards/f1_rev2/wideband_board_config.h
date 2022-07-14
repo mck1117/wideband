@@ -45,5 +45,5 @@
 // *******************************
 //   TunerStudio Primary Port
 // *******************************
-#define TS_PRIMARY_UART_PORT	UARTD1
+#define TS_PRIMARY_SERIAL_PORT	SD1
 #define TS_PRIMARY_BAUDRATE		115200
