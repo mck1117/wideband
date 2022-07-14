@@ -90,6 +90,11 @@ uint8_t readSelPin(ioportid_t port, iopadid_t pad)
 
 extern Configuration __configflash__start__;
 
+int InitConfiguration()
+{
+    return 0;
+}
+
 Configuration GetConfiguration()
 {
     const auto& cfg = __configflash__start__;
