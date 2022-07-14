@@ -32,32 +32,25 @@ static void UartThread(void*)
 
     while(true)
     {
-        int ch;
+        float lambda = GetLambda();
+        int lambdaIntPart = lambda;
+        int lambdaThousandths = (lambda - lambdaIntPart) * 1000;
+        int batteryVoltageMv = GetInternalBatteryVoltage() * 1000;
+        int duty = GetHeaterDuty() * 100;
 
-        for (ch = 0; ch < AFR_CHANNELS; ch++) {
-            float lambda = GetLambda(ch);
-            int lambdaIntPart = lambda;
-            int lambdaThousandths = (lambda - lambdaIntPart) * 1000;
-            int batteryVoltageMv = GetInternalBatteryVoltage(ch) * 1000;
-            int duty = GetHeaterDuty(ch) * 100;
+        size_t writeCount = chsnprintf(printBuffer, 200,
+            "%d.%03d\tAC %d mV\tR: %d\tT: %d\tIpump: %d\tVbat: %d\theater: %s (%d)\tfault: %s\r\n",
+            lambdaIntPart, lambdaThousandths,
+            (int)(GetNernstAc() * 1000.0),
+            (int)GetSensorInternalResistance(),
+            (int)GetSensorTemperature(),
+            (int)(GetPumpNominalCurrent() * 1000),
+            batteryVoltageMv,
+            describeHeaterState(GetHeaterState()), duty,
+            describeFault(GetCurrentFault()));
+        chnWrite(&SD1, (const uint8_t *)printBuffer, writeCount);
 
-            size_t writeCount = chsnprintf(printBuffer, 200,
-                "[AFR%d]: %d.%03d DC %4d mV AC %4d mV Rint: %5d T: %4d C Ipump: %6d uA Vheater: %5d heater: %s (%d)\tfault: %s\r\n",
-                ch,
-                lambdaIntPart, lambdaThousandths,
-                (int)(GetNernstDc(ch) * 1000.0),
-                (int)(GetNernstAc(ch) * 1000.0),
-                (int)GetSensorInternalResistance(ch),
-                (int)GetSensorTemperature(ch),
-                (int)(GetPumpNominalCurrent(ch) * 1000),
-                batteryVoltageMv,
-                describeHeaterState(GetHeaterState(ch)), duty,
-                describeFault(GetCurrentFault(ch)));
-            chnWrite(&SD1, (const uint8_t *)printBuffer, writeCount);
-        }
-
-
-        chThdSleepMilliseconds(100);
+        chThdSleepMilliseconds(50);
     }
 }
 
