@@ -128,8 +128,6 @@ void InitCan()
     chThdCreateStatic(waCanRxThread, sizeof(waCanRxThread), NORMALPRIO - 4, CanRxThread, nullptr);
 }
 
-#define SWAP_UINT16(x) (((x) << 8) | ((x) >> 8))
-
 void SendRusefiFormat(uint8_t idx)
 {
     auto baseAddress = 0x190 + 2 * idx;

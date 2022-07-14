@@ -13,6 +13,7 @@ jobs:
         include:
           - build-target: f0_module
           - build-target: f1_rev2
+          - build-target: f1_dual
 
     steps:
       - uses: actions/checkout@v1
