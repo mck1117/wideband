@@ -18,7 +18,8 @@ struct AnalogResult
 
 AnalogResult AnalogSample();
 
-enum class SensorType : uint8_t {
+//enum class SensorType : uint8_t {
+enum SensorType {
     LSU49 = 0,
     LSU42 = 1,
     LSUADV = 2,
