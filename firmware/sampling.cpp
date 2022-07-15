@@ -126,7 +126,11 @@ float GetSensorTemperature(int ch)
         return 0;
     }
 
-    return interpolate2d(esr, lsu49TempBins, lsu49TempValues);
+    if (GetSensorType() == SensorType::LSU49)
+        return interpolate2d(esr, lsu49TempBins, lsu49TempValues);
+
+    // TODO: implement for LSU4.2 and ADV
+    return 0;
 }
 
 float GetNernstDc(int ch)
