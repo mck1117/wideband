@@ -9,8 +9,9 @@
 #include <cstring>
 
 #include "tunerstudio_io.h"
-#include "crc.h"
 #include "byteswap.h"
+
+#include <rusefi/crc.h>
 
 size_t TsChannelBase::read(uint8_t* buffer, size_t size) {
 	return readTimeout(buffer, size, SR5_READ_TIMEOUT);

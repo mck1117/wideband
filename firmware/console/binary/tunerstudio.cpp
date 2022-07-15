@@ -71,8 +71,9 @@
 
 #include "tunerstudio.h"
 #include "tunerstudio_impl.h"
-#include "crc.h"
 #include "byteswap.h"
+
+#include <rusefi/crc.h>
 
 #ifndef EFI_BLUETOOTH_SETUP
 	#define EFI_BLUETOOTH_SETUP 0

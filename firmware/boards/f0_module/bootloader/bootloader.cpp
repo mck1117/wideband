@@ -2,9 +2,9 @@
 #include "port_shared.h"
 #include "flash.h"
 #include "io_pins.h"
-#include "crc.h"
 
 #include <cstring>
+#include <rusefi/crc.h>
 
 // These are defined in the linker script
 extern uint32_t __appflash_start__[64];
