@@ -46,6 +46,7 @@ static Pwm heaterPwm(HEATER_PWM_DEVICE, HEATER_PWM_CHANNEL, 400'000, 1024);
 
 static constexpr int preheatTimeCounter = HEATER_PREHEAT_TIME / HEATER_CONTROL_PERIOD;
 static constexpr int batteryStabTimeCounter = HEATER_BATTERY_STAB_TIME / HEATER_CONTROL_PERIOD;
+static constexpr int closedLoopStabTimeCounter = HEATER_CLOSED_LOOP_STAB_TIME / HEATER_CONTROL_PERIOD;
 static int timeCounter = preheatTimeCounter;
 static int batteryStabTime = batteryStabTimeCounter;
 static float rampVoltage = 0;
@@ -101,6 +102,7 @@ static HeaterState GetNextState(HeaterState state, HeaterAllow heaterAllowState,
         case HeaterState::WarmupRamp:
             if (sensorEsr < heater->closedLoopThresholdESR)
             {
+                timeCounter = closedLoopStabTimeCounter;
                 return HeaterState::ClosedLoop;
             }
             else if (timeCounter == 0)
@@ -113,16 +115,23 @@ static HeaterState GetNextState(HeaterState state, HeaterAllow heaterAllowState,
 
             break;
         case HeaterState::ClosedLoop:
-            // Check that the sensor's ESR is acceptable for normal operation
-            if (sensorEsr < heater->overheatESR)
-            {
-                SetFault(Fault::SensorOverheat);
-                return HeaterState::Stopped;
-            }
-            else if (sensorEsr > heater->underheatESR)
-            {
-                SetFault(Fault::SensorUnderheat);
-                return HeaterState::Stopped;
+            if (timeCounter > 0) {
+                // give some time for stabilization...
+                // looks like heavy ramped Ipump affects sensorEsr measure
+                // and right after switch to closed loop sensorEsr rises above underhead threshold
+                timeCounter--;
+            } else {
+                // Check that the sensor's ESR is acceptable for normal operation
+                if (sensorEsr < heater->overheatESR)
+                {
+                    SetFault(Fault::SensorOverheat);
+                    return HeaterState::Stopped;
+                }
+                else if (sensorEsr > heater->underheatESR)
+                {
+                    SetFault(Fault::SensorUnderheat);
+                    return HeaterState::Stopped;
+                }
             }
 
             break;
