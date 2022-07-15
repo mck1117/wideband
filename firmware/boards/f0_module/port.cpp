@@ -144,3 +144,9 @@ SensorType GetSensorType()
 {
     return SENSOR_TYPE_LSU49;
 }
+
+void SetupESRDriver(SensorType sensor)
+{
+    // NOP
+}
+
