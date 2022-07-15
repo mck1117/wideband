@@ -97,7 +97,7 @@ BUILDDIR := ./build
 DEPDIR   := ./.dep
 
 # Configure libfirmware Paths/Includes
-RUSEFI_LIB = libfirmware
+RUSEFI_LIB = $(SRCDIR)/libfirmware
 include $(RUSEFI_LIB)/util/util.mk
 
 # Licensing files.
