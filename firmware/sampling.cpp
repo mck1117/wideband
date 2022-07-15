@@ -20,8 +20,6 @@ static float internalBatteryVoltage = 0;
 static const float lsu49TempBins[]   = {   80, 150, 200, 250, 300, 350, 400, 450, 550, 650, 800, 1000, 1200, 2500, 5000 };
 static const float lsu49TempValues[] = { 1030, 890, 840, 805, 780, 760, 745, 730, 705, 685, 665,  640,  630,  565,  500 };
 
-#define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
-
 constexpr float f_abs(float x)
 {
     return x > 0 ? x : -x;
