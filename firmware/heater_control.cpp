@@ -4,11 +4,40 @@
 #include "ch.h"
 #include "hal.h"
 
+#include "port.h"
 #include "fault.h"
 #include "pwm.h"
 #include "sampling.h"
 #include "pid.h"
 #include "can.h"
+
+struct sensorHeaterParams {
+    uint16_t closedLoopThresholdESR;
+    uint16_t targetESR;
+    uint16_t overheatESR;
+    uint16_t underheatESR;
+};
+
+static const struct sensorHeaterParams heaterParams[] = {
+    [SENSOR_TYPE_LSU42] = {
+        //LSU4.2
+        .closedLoopThresholdESR = LSU42_HEATER_CLOSED_LOOP_THRESHOLD_ESR,
+        .targetESR = LSU42_HEATER_TARGET_ESR,
+        .overheatESR = LSU42_HEATER_OVERHEAT_ESR,
+        .underheatESR = LSU42_HEATER_UNDERHEAT_ESR,
+    },
+    [SENSOR_TYPE_LSU49] = {
+        //LSU4.9
+        .closedLoopThresholdESR = LSU49_HEATER_CLOSED_LOOP_THRESHOLD_ESR,
+        .targetESR = LSU49_HEATER_TARGET_ESR,
+        .overheatESR = LSU49_HEATER_OVERHEAT_ESR,
+        .underheatESR = LSU49_HEATER_UNDERHEAT_ESR,
+    },
+    [SENSOR_TYPE_LSUADV] = {
+        //LSU_ADV
+        //TODO
+    }
+};
 
 using namespace wbo;
 
@@ -20,6 +49,7 @@ static constexpr int batteryStabTimeCounter = HEATER_BATTERY_STAB_TIME / HEATER_
 static int timeCounter = preheatTimeCounter;
 static int batteryStabTime = batteryStabTimeCounter;
 static float rampVoltage = 0;
+static const struct sensorHeaterParams *heater;
 
 static HeaterState GetNextState(HeaterState state, HeaterAllow heaterAllowState, float batteryVoltage, float sensorEsr)
 {
@@ -54,7 +84,7 @@ static HeaterState GetNextState(HeaterState state, HeaterAllow heaterAllowState,
             timeCounter--;
 
             // If preheat timeout, or sensor is already hot (engine running?)
-            if (timeCounter <= 0 || sensorEsr < HEATER_CLOSED_LOOP_THRESHOLD_ESR)
+            if (timeCounter <= 0 || sensorEsr < heater->closedLoopThresholdESR)
             {
                 // If enough time has elapsed, start the ramp
                 // Start the ramp at 4 volts
@@ -69,7 +99,7 @@ static HeaterState GetNextState(HeaterState state, HeaterAllow heaterAllowState,
             // Stay in preheat - wait for time to elapse
             break;
         case HeaterState::WarmupRamp:
-            if (sensorEsr < HEATER_CLOSED_LOOP_THRESHOLD_ESR)
+            if (sensorEsr < heater->closedLoopThresholdESR)
             {
                 return HeaterState::ClosedLoop;
             }
@@ -84,12 +114,12 @@ static HeaterState GetNextState(HeaterState state, HeaterAllow heaterAllowState,
             break;
         case HeaterState::ClosedLoop:
             // Check that the sensor's ESR is acceptable for normal operation
-            if (sensorEsr < HEATER_OVERHEAT_ESR)
+            if (sensorEsr < heater->overheatESR)
             {
                 SetFault(Fault::SensorOverheat);
                 return HeaterState::Stopped;
             }
-            else if (sensorEsr > HEATER_UNDERHEAT_ESR)
+            else if (sensorEsr > heater->underheatESR)
             {
                 SetFault(Fault::SensorUnderheat);
                 return HeaterState::Stopped;
@@ -130,7 +160,7 @@ static float GetVoltageForState(HeaterState state, float heaterEsr)
         case HeaterState::ClosedLoop:
             // "nominal" heater voltage is 7.5v, so apply correction around that point (instead of relying on integrator so much)
             // Negated because lower resistance -> hotter
-            return 7.5f - heaterPid.GetOutput(HEATER_TARGET_ESR, heaterEsr);
+            return 7.5f - heaterPid.GetOutput(heater->targetESR, heaterEsr);
         case HeaterState::Stopped:
             // Something has gone wrong, turn off the heater.
             return 0;
@@ -149,6 +179,9 @@ static void HeaterThread(void*)
     // Wait for temperature sensing to stabilize so we don't
     // immediately think we overshot the target temperature
     chThdSleepMilliseconds(1000);
+
+    // Get sensor type and settings
+    heater = &heaterParams[GetSensorType()];
 
     while (true)
     {
