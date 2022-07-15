@@ -126,7 +126,11 @@ float GetSensorTemperature()
         return 0;
     }
 
-    return interpolate_1d_float(lsu49_r_to_temp, ARRAY_SIZE(lsu49_r_to_temp), esr);
+    if (GetSensorType() == SENSOR_TYPE_LSU49)
+        return interpolate_1d_float(lsu49_r_to_temp, ARRAY_SIZE(lsu49_r_to_temp), esr);
+
+    // TODO: implement for LSU4.2 and ADV
+    return 0;
 }
 
 float GetNernstDc()
