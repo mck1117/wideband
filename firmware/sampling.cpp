@@ -55,7 +55,7 @@ static void SamplingThread(void*)
         auto result = AnalogSample();
 
         // Toggle the pin after sampling so that any switching noise occurs while we're doing our math instead of when sampling
-        palTogglePad(NERNST_ESR_DRIVER_PORT, NERNST_ESR_DRIVER_PIN);
+        ToggleESRDriver(GetSensorType());
 
         for (int ch = 0; ch < AFR_CHANNELS; ch++) {
             measure_results &res = results[ch];

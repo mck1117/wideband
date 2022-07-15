@@ -23,10 +23,15 @@ static MFSDriver mfs1;
 static Configuration cfg;
 #define MFS_CONFIGURATION_RECORD_ID     1
 
+#ifndef BOARD_DEFAULT_SENSOR_TYPE
+#define BOARD_DEFAULT_SENSOR_TYPE SensorType::LSU49
+#endif
+
 // Configuration defaults
 void Configuration::LoadDefaults()
 {
     CanIndexOffset = 0;
+    sensorType = BOARD_DEFAULT_SENSOR_TYPE;
 
     /* Finaly */
     Tag = ExpectedTag;
@@ -84,13 +89,20 @@ const char *getTsSignature() {
 
 SensorType GetSensorType()
 {
-    /* TODO: load from settings */
-#if defined(BOARD_SENSOR_LSU42)
-    return SensorType::LSU42;
-#elif defined(BOARD_SENSOR_LSUADV)
-    return SensorType::LSUADV;
-#else
-    /* default is LSU4.9 */
-    return SensorType::LSU49;
-#endif
+    return cfg.sensorType;
+}
+
+void ToggleESRDriver(SensorType sensor)
+{
+    switch (sensor) {
+        case SensorType::LSU42:
+            palTogglePad(NERNST_42_ESR_DRIVER_PORT, NERNST_42_ESR_DRIVER_PIN);
+        break;
+        case SensorType::LSU49:
+            palTogglePad(NERNST_49_ESR_DRIVER_PORT, NERNST_49_ESR_DRIVER_PIN);
+        break;
+        case SensorType::LSUADV:
+            palTogglePad(NERNST_ADV_ESR_DRIVER_PORT, NERNST_ADV_ESR_DRIVER_PIN);
+        break;
+    }
 }

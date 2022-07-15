@@ -160,3 +160,9 @@ int GetESRSupplyR()
     // Nernst AC injection resistor value
     return 22000;
 }
+
+void ToggleESRDriver(SensorType sensor)
+{
+    (void)sensor;
+    palTogglePad(NERNST_49_ESR_DRIVER_PORT, NERNST_49_ESR_DRIVER_PIN);
+}
