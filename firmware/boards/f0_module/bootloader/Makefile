@@ -124,10 +124,11 @@ CSRC = $(ALLCSRC) cfg/board.c
 # C++ sources that can be compiled in ARM or THUMB mode depending on the global
 # setting.
 CPPSRC = $(ALLCPPSRC) \
+  $(RUSEFI_LIB_CPP) \
   bootloader.cpp \
   ../port_shared.cpp \
   $(SRCDIR)/shared/flash.cpp \
-  $(SRCDIR)/shared/crc.cpp
+
 
 # List ASM source files here.
 ASMSRC = $(ALLASMSRC)
@@ -136,7 +137,7 @@ ASMSRC = $(ALLASMSRC)
 ASMXSRC = $(ALLXASMSRC)
 
 # Inclusion directories.
-INCDIR = $(CONFDIR) $(ALLINC) $(SRCDIR)/shared/ \
+INCDIR = $(CONFDIR) $(ALLINC) $(RUSEFI_LIB_INC) $(SRCDIR)/shared/ \
   ../io ../..
 
 # Define C warning options here.
