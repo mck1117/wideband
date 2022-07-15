@@ -1,5 +1,9 @@
 #include "lambda_conversion.h"
 #include "sampling.h"
+#include "interpolation.h"
+#include "port.h"
+
+#define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
 
 static float GetPhi(float pumpCurrent)
 {
@@ -22,10 +26,36 @@ static float GetPhi(float pumpCurrent)
     return gain * pumpCurrent + 0.99559f;
 }
 
+static float LSU42GetLambda(float pumpCurrent)
+{
+    const struct inter_point lsu42[] =
+    {
+        {-1.85, 0.700},
+        {-1.08, 0.800},
+        {-0.76, 0.850},
+        {-0.47, 0.900},
+        { 0.00, 1.009},
+        { 0.34, 1.180},
+        { 0.68, 1.430},
+        { 0.95, 1.700},
+        { 1.40, 2.420},
+    };
+
+    return interpolate_1d_float(lsu42, ARRAY_SIZE(lsu42), pumpCurrent);
+}
+
 float GetLambda()
 {
     float pumpCurrent = GetPumpNominalCurrent();
 
-    // Lambda is reciprocal of phi
-    return 1 / GetPhi(pumpCurrent);
+    if (GetSensorType() == SENSOR_TYPE_LSU49)
+    {
+        // Lambda is reciprocal of phi
+        return 1 / GetPhi(pumpCurrent);
+    } else if (GetSensorType() == SENSOR_TYPE_LSU42)
+    {
+        return LSU42GetLambda(pumpCurrent);
+    }
+
+    return 1.0;
 }
