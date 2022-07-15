@@ -60,6 +60,20 @@ static float AverageSamples(adcsample_t* buffer, size_t idx)
     return (float)sum * scale;
 }
 
+static float GetMaxSample(adcsample_t* buffer, size_t idx)
+{
+    uint32_t max = 0;
+    for (size_t i = 0; i < ADC_OVERSAMPLE; i++) {
+        if (buffer[idx] > max)
+            max = buffer[idx];
+        idx += ADC_CHANNEL_COUNT;
+    }
+
+    constexpr float scale = VCC_VOLTS / ADC_MAX_COUNT;
+
+    return (float) max * scale;
+}
+
 static float l_vbatt = 0.0, r_vbatt = 0.0;
 
 AnalogResult AnalogSample()
@@ -70,9 +84,11 @@ AnalogResult AnalogSample()
     adcConvert(&ADCD1, &convGroup, adcBuffer, ADC_OVERSAMPLE);
 
     if ((l_heater) && (!palReadPad(L_HEATER_PORT, L_HEATER_PIN)))
-        l_vbatt = AverageSamples(adcBuffer, 6) / BATTERY_INPUT_DIVIDER;
+        l_vbatt = BATTERY_FILTER_ALPHA * GetMaxSample(adcBuffer, 6) / BATTERY_INPUT_DIVIDER
+                + (1.0 - BATTERY_FILTER_ALPHA) * l_vbatt;
     if ((r_heater) && (!palReadPad(R_HEATER_PORT, R_HEATER_PIN)))
-        r_vbatt = AverageSamples(adcBuffer, 7) / BATTERY_INPUT_DIVIDER;
+        r_vbatt = BATTERY_FILTER_ALPHA * GetMaxSample(adcBuffer, 7) / BATTERY_INPUT_DIVIDER
+                + (1.0 - BATTERY_FILTER_ALPHA) * r_vbatt;
 
     return
     {

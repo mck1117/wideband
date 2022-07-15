@@ -176,6 +176,12 @@ static void HeaterThread(void*)
         float voltageRatio = heaterVoltage / batteryVoltage;
         float duty = voltageRatio * voltageRatio;
 
+        #ifdef HEATER_MAX_DUTY
+        if (duty > HEATER_MAX_DUTY) {
+            duty = HEATER_MAX_DUTY;
+        }
+        #endif
+
         if (batteryVoltage < 23)
         {
             // Pipe the output to the heater driver
