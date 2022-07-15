@@ -97,7 +97,7 @@ void WaitForBootloaderCmd()
         }
 
         // if we got a bootloader-init message, here we go!
-        if (frame.DLC == 0 && frame.EID == 0xEF0'0000)
+        if (frame.DLC == 0 && frame.EID == WB_BL_ENTER)
         {
             return;
         }
@@ -154,7 +154,7 @@ void RunBootloaderLoop()
         uint16_t header = frame.EID >> 20;
 
         // All rusEfi bootloader packets start with 0x0EF, ignore other traffic on the bus
-        if (header != 0x0EF)
+        if (header != WB_BL_HEADER)
         {
             continue;
         }
@@ -163,12 +163,12 @@ void RunBootloaderLoop()
         uint16_t embeddedData = frame.EID & 0xFFFF;
 
         switch (opcode) {
-            case 0x00: // opcode 0 is simply the "enter BL" command, but we're already here.  Send an ack.
+            case WB_OPCODE_START: // opcode 0 is simply the "enter BL" command, but we're already here.  Send an ack.
                 sendAck();
                 break;
-            case 0x01: // opcode 1 is "erase app flash"
+            case WB_OPCODE_ERASE: // opcode 1 is "erase app flash"
                 // embedded data must be 0x5A5A
-                if (embeddedData == 0x5A5A)
+                if (embeddedData == WB_ERASE_TAG)
                 {
                     EraseAppPages();
                     sendAck();
@@ -199,7 +199,7 @@ void RunBootloaderLoop()
                 }
 
                 break;
-            case 0x03: // opcode 3 is "boot app"
+            case WB_OPCODE_REBOOT: // opcode 3 is "boot app"
                 sendAck();
 
                 // Let the message get out
