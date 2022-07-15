@@ -74,3 +74,6 @@ uint8_t *GetConfiguratiuonPtr();
 size_t GetConfigurationSize();
 void SaveConfiguration();
 const char *getTsSignature();
+
+// LSU4.2, LSU4.9 or LSU_ADV
+SensorType GetSensorType();
