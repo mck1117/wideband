@@ -22,7 +22,6 @@ cd ../..
 
 echo ""
 echo "Build application"
-export EXTRA_PARAMS="-DECHO_UART=TRUE"
 # make clean
 make -j12 BOARD=${BOARD} || exit 1
 
