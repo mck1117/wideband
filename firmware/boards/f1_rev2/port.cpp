@@ -151,3 +151,16 @@ void SetupESRDriver(SensorType sensor)
         break;
     }
 }
+
+int GetESRSupplyR()
+{
+    switch (GetSensorType()) {
+        case SENSOR_TYPE_LSU42:
+            return 6800;
+        case SENSOR_TYPE_LSU49:
+            return 22000;
+        case SENSOR_TYPE_LSUADV:
+            return 47000;
+    }
+    return 0;
+}

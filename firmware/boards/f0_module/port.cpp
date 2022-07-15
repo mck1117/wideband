@@ -150,3 +150,8 @@ void SetupESRDriver(SensorType sensor)
     // NOP
 }
 
+int GetESRSupplyR()
+{
+    // Nernst AC injection resistor value
+    return 22000;
+}
