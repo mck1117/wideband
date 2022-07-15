@@ -60,11 +60,7 @@
 #define TS_COMPOSITE_ENABLE 1
 #define TS_CRC_CHECK_COMMAND 'k'
 #define TS_CRC_CHECK_COMMAND_char k
-#define TS_EXECUTE 'E'
-#define TS_EXECUTE_char E
 #define TS_FILE_VERSION 20210312
-#define TS_GET_COMPOSITE_BUFFER_DONE_DIFFERENTLY '8'
-#define TS_GET_COMPOSITE_BUFFER_DONE_DIFFERENTLY_char 8
 #define TS_GET_CONFIG_ERROR 'e'
 #define TS_GET_CONFIG_ERROR_char e
 #define TS_GET_FIRMWARE_VERSION 'V'
@@ -73,24 +69,14 @@
 #define TS_GET_LOGGER_GET_BUFFER_char L
 #define TS_GET_OUTPUTS_SIZE '4'
 #define TS_GET_OUTPUTS_SIZE_char 4
-#define TS_GET_STRUCT '9'
-#define TS_GET_STRUCT_char 9
-#define TS_GET_TEXT 'G'
-#define TS_GET_TEXT_char G
 #define TS_HELLO_COMMAND 'S'
 #define TS_HELLO_COMMAND_char S
-#define TS_IO_TEST_COMMAND 'Z'
-#define TS_IO_TEST_COMMAND_char Z
 #define TS_ONLINE_PROTOCOL 'z'
 #define TS_ONLINE_PROTOCOL_char z
 #define TS_OUTPUT_COMMAND 'O'
 #define TS_OUTPUT_COMMAND_char O
 #define TS_PAGE_COMMAND 'P'
 #define TS_PAGE_COMMAND_char P
-#define TS_PERF_TRACE_BEGIN '_'
-#define TS_PERF_TRACE_BEGIN_char _
-#define TS_PERF_TRACE_GET_BUFFER 'b'
-#define TS_PERF_TRACE_GET_BUFFER_char b
 #define TS_PROTOCOL "001"
 #define TS_QUERY_COMMAND 'Q'
 #define TS_QUERY_COMMAND_char Q
@@ -104,13 +90,10 @@
 #define TS_RESPONSE_OUT_OF_RANGE 0x84
 #define TS_RESPONSE_UNDERRUN 0x80
 #define TS_RESPONSE_UNRECOGNIZED_COMMAND 0x83
-#define TS_SET_LOGGER_SWITCH 'l'
-#define TS_SET_LOGGER_SWITCH_char l
 #define TS_SINGLE_WRITE_COMMAND 'W'
 #define TS_SINGLE_WRITE_COMMAND_char W
 #define TS_TEST_COMMAND 't'
 #define TS_TEST_COMMAND_char t
-#define TS_TOTAL_OUTPUT_SIZE 1016
 
 class TsChannelBase {
 public:

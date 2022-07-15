@@ -8,23 +8,18 @@
 #include "fault.h"
 #include "uart.h"
 
-static const UARTConfig uartCfg =
-{
-    .txend1_cb = nullptr,
-    .txend2_cb = nullptr,
-    .rxend_cb = nullptr,
-    .rxchar_cb = nullptr,
-    .rxerr_cb = nullptr,
-    .timeout_cb = nullptr,
+#include "tunerstudio.h"
+#include "tunerstudio_io.h"
+#include "wideband_board_config.h"
 
-#ifdef STM32F0XX
-    .timeout = 0,
-#endif
+#ifdef UART_DEBUG
+// just a reminder that we have either TS connectivity or this UART_DEBUG but not both
 
+SerialConfig cfg = {
     .speed = 115200,
     .cr1 = 0,
-    .cr2 = 0,
-    .cr3 = 0,
+    .cr2 = USART_CR2_STOP1_BITS | USART_CR2_LINEN,
+    .cr3 = 0
 };
 
 static char printBuffer[200];
@@ -32,6 +27,9 @@ static char printBuffer[200];
 static THD_WORKING_AREA(waUartThread, 512);
 static void UartThread(void*)
 {
+    // in UART_DEBUG mode we only support Serial - this file name here has a bit of a confusing naming
+    sdStart(&SD1, &cfg);
+
     while(true)
     {
         float lambda = GetLambda();
@@ -50,15 +48,41 @@ static void UartThread(void*)
             batteryVoltageMv,
             describeHeaterState(GetHeaterState()), duty,
             describeFault(GetCurrentFault()));
-        uartStartSend(&UARTD1, writeCount, printBuffer);
+        chnWrite(&SD1, (const uint8_t *)printBuffer, writeCount);
 
         chThdSleepMilliseconds(50);
     }
 }
 
+#elif defined(TS_PRIMARY_UART_PORT) || defined(TS_PRIMARY_SERIAL_PORT)
+
+#ifdef TS_PRIMARY_UART_PORT
+static UartTsChannel primaryChannel(TS_PRIMARY_UART_PORT);
+#endif
+
+#ifdef TS_PRIMARY_SERIAL_PORT
+static SerialTsChannel primaryChannel(TS_PRIMARY_SERIAL_PORT);
+#endif
+
+struct PrimaryChannelThread : public TunerstudioThread {
+    PrimaryChannelThread() : TunerstudioThread("Primary TS Channel") { }
+
+    TsChannelBase* setupChannel() {
+        primaryChannel.start(TS_PRIMARY_BAUDRATE);
+
+        return &primaryChannel;
+    }
+};
+
+static PrimaryChannelThread primaryChannelThread;
+
+#endif
+
 void InitUart()
 {
-    uartStart(&UARTD1, &uartCfg);
-
+#ifdef UART_DEBUG
     chThdCreateStatic(waUartThread, sizeof(waUartThread), NORMALPRIO, UartThread, nullptr);
+#elif defined(TS_PRIMARY_UART_PORT) || defined(TS_PRIMARY_SERIAL_PORT)
+    primaryChannelThread.Start();
+#endif
 }
