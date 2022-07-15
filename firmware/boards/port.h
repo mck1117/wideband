@@ -41,3 +41,6 @@ Configuration GetConfiguration();
 void SetConfiguration(const Configuration& newConfig);
 
 const char *getTsSignature();
+
+// LSU4.2, LSU4.9 or LSU_ADV
+SensorType GetSensorType();

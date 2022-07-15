@@ -91,3 +91,16 @@ void SetConfiguration(const Configuration& newConfig)
 const char *getTsSignature() {
     return BOARD_NAME;
 }
+
+SensorType GetSensorType()
+{
+    /* TODO: load from settings */
+#if defined(BOARD_SENSOR_LSU42)
+    return SENSOR_TYPE_LSU42;
+#elif defined(BOARD_SENSOR_LSUADV)
+    return SENSOT_TYPE_LSUADV;
+#else
+    /* default is LSU4.9 */
+    return SENSOR_TYPE_LSU49;
+#endif
+}

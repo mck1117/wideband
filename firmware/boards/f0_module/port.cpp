@@ -139,3 +139,8 @@ void SetConfiguration(const Configuration& newConfig)
         sizeof(Configuration)
     );
 }
+
+SensorType GetSensorType()
+{
+    return SENSOR_TYPE_LSU49;
+}
