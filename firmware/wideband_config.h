@@ -49,3 +49,10 @@
 #define HEATER_TARGET_ESR 300
 #define HEATER_OVERHEAT_ESR 150
 #define HEATER_UNDERHEAT_ESR 700
+
+// *******************************
+//    TunerStudio configuration
+// *******************************
+#if defined(TS_PRIMARY_UART_PORT) || defined(TS_PRIMARY_SERIAL_PORT)
+#define TS_ENABLED
+#endif

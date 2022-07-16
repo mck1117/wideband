@@ -54,7 +54,7 @@ static void UartThread(void*)
     }
 }
 
-#elif defined(TS_PRIMARY_UART_PORT) || defined(TS_PRIMARY_SERIAL_PORT)
+#elif defined(TS_ENABLED)
 
 #ifdef TS_PRIMARY_UART_PORT
 static UartTsChannel primaryChannel(TS_PRIMARY_UART_PORT);
@@ -82,7 +82,7 @@ void InitUart()
 {
 #ifdef UART_DEBUG
     chThdCreateStatic(waUartThread, sizeof(waUartThread), NORMALPRIO, UartThread, nullptr);
-#elif defined(TS_PRIMARY_UART_PORT) || defined(TS_PRIMARY_SERIAL_PORT)
+#elif defined(TS_ENABLED)
     primaryChannelThread.Start();
 #endif
 }
