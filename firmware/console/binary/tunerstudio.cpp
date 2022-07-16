@@ -282,7 +282,7 @@ void TunerStudio::handlePageReadCommand(TsChannelBase* tsChannel, ts_response_fo
 }
 
 void requestBurn(void) {
-	//SaveConfiguration();
+	SaveConfiguration();
 }
 
 static void sendResponseCode(ts_response_format_e mode, TsChannelBase *tsChannel, const uint8_t responseCode) {
@@ -297,7 +297,7 @@ static void sendResponseCode(ts_response_format_e mode, TsChannelBase *tsChannel
 static void handleBurnCommand(TsChannelBase* tsChannel, ts_response_format_e mode) {
 	tsState.burnCommandCounter++;
 
-	//SaveConfiguration();
+	SaveConfiguration();
 
 	sendResponseCode(mode, tsChannel, TS_RESPONSE_BURN_OK);
 }
