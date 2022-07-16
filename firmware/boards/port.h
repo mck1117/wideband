@@ -40,4 +40,8 @@ public:
 Configuration GetConfiguration();
 void SetConfiguration(const Configuration& newConfig);
 
+/* TS stuff */
+void SaveConfiguration();
+uint8_t *GetConfiguratiuonPtr();
+int GetConfiguratiuonSize();
 const char *getTsSignature();
