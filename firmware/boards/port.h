@@ -34,10 +34,13 @@ public:
     // Actual configuration data
     uint8_t CanIndexOffset = 0;
 
-    uint8_t pad[3];
+    // pad to 128 bytes
+    uint8_t pad[128 - 1 - 4];
 };
 
 Configuration GetConfiguration();
+uint8_t *GetConfiguratiuonPtr();
+int GetConfiguratiuonSize();
 void SetConfiguration(const Configuration& newConfig);
 
 /* TS stuff */

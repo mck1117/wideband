@@ -77,6 +77,10 @@ AnalogResult AnalogSample()
     };
 }
 
+static struct {
+    uint8_t        pad[128];
+} config;
+
 Configuration GetConfiguration()
 {
     // TODO: implement me!
@@ -86,6 +90,21 @@ Configuration GetConfiguration()
 void SetConfiguration(const Configuration& newConfig)
 {
     // TODO: implement me!
+}
+
+/* TS stuff */
+void SaveConfiguration() {
+    // TODO: implement me!
+}
+
+uint8_t *GetConfiguratiuonPtr()
+{
+    return (uint8_t *)&config;
+}
+
+int GetConfiguratiuonSize()
+{
+    return sizeof(config);
 }
 
 const char *getTsSignature() {
