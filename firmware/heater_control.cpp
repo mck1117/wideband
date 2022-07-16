@@ -35,7 +35,11 @@ static const struct sensorHeaterParams heaterParams[] = {
     },
     [SENSOR_TYPE_LSUADV] = {
         //LSU_ADV
-        //TODO
+        //LSU4.9
+        .closedLoopThresholdESR = LSUADV_HEATER_CLOSED_LOOP_THRESHOLD_ESR,
+        .targetESR = LSUADV_HEATER_TARGET_ESR,
+        .overheatESR = LSUADV_HEATER_OVERHEAT_ESR,
+        .underheatESR = LSUADV_HEATER_UNDERHEAT_ESR,
     }
 };
 
