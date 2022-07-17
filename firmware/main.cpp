@@ -31,9 +31,7 @@ int main() {
 #endif
 
     InitCan();
-#ifdef ECHO_UART
     InitUart();
-#endif
 
     while(true)
     {
