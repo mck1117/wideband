@@ -5,6 +5,8 @@
 
 #include "hal.h"
 
+#include <rusefi/math.h>
+
 #ifdef AUXOUT_DAC_PWM_DEVICE
 
 // Rev2 low pass filter cut frequency is about 21Hz (sic!)
@@ -34,8 +36,6 @@ static const uint8_t auxOutPwmCh[] = {
     AUXOUT_DAC_PWM_CHANNEL_1,
 #endif
 };
-
-extern float clampF(float min, float clamp, float max);
 
 void SetAuxDac(int channel, float voltage)
 {
