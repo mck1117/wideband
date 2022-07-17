@@ -1,5 +1,4 @@
 #include "sampling.h"
-#include "interpolation.h"
 
 #include "ch.h"
 #include "hal.h"
@@ -9,33 +8,17 @@
 #include "port.h"
 #include "io_pins.h"
 
+#include <rusefi/interpolation.h>
+
 // Stored results
 static float nernstAc = 0;
 static float nernstDc = 0;
 static float pumpCurrentSenseVoltage = 0;
 static float internalBatteryVoltage = 0;
 
-static const struct inter_point lsu49_r_to_temp[] =
-{
-    {   80, 1030 },
-    {  150,  890 },
-    {  200,  840 },
-    {  250,  805 },
-    {  300,  780 },
-    {  350,  760 },
-    {  400,  745 },
-    {  450,  730 },
-    {  550,  705 },
-    {  650,  685 },
-    {  800,  665 },
-    { 1000,  640 },
-    { 1200,  630 },
-    { 2500,  565 },
-    // approximated by the greatest measurable sensor resistance
-    { 5000,  500 }
-};
-
-#define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
+// Last point is approximated by the greatest measurable sensor resistance
+static const float lsu49TempBins[]   = {   80, 150, 200, 250, 300, 350, 400, 450, 550, 650, 800, 1000, 1200, 2500, 5000 };
+static const float lsu49TempValues[] = { 1030, 890, 840, 805, 780, 760, 745, 730, 705, 685, 665,  640,  630,  565,  500 };
 
 constexpr float f_abs(float x)
 {
@@ -124,7 +107,7 @@ float GetSensorTemperature()
         return 0;
     }
 
-    return interpolate_1d_float(lsu49_r_to_temp, ARRAY_SIZE(lsu49_r_to_temp), esr);
+    return interpolate2d(esr, lsu49TempBins, lsu49TempValues);
 }
 
 float GetNernstDc()

@@ -21,7 +21,7 @@ endif
 
 # C++ specific options here (added to USE_OPT).
 ifeq ($(USE_CPPOPT),)
-  USE_CPPOPT = -fno-rtti -fno-exceptions -ffast-math -funsafe-math-optimizations -fno-threadsafe-statics -fno-use-cxa-atexit
+  USE_CPPOPT = -fno-rtti -fno-exceptions -ffast-math -funsafe-math-optimizations -fno-threadsafe-statics -fno-use-cxa-atexit -std=c++17
 endif
 
 # Enable this if you want the linker to remove unused code and data.
@@ -107,6 +107,10 @@ ifeq ("$(wildcard $(CHIBIOS)/os/license/license.mk)","")
 $(error Please run 'git submodule update --init --recursive' before trying to build!)
 endif
 
+# Configure libfirmware Paths/Includes
+RUSEFI_LIB = libfirmware
+include $(RUSEFI_LIB)/util/util.mk
+
 # Licensing files.
 include $(CHIBIOS)/os/license/license.mk
 # HAL-OSAL files (optional).
@@ -132,6 +136,7 @@ CSRC = $(ALLCSRC) $(BOARDDIR)/board.c
 CPPSRC = $(ALLCPPSRC) \
           $(BOARDDIR)/port.cpp \
           $(BOARDDIR)/port_shared.cpp \
+          $(RUSEFI_LIB_CPP) \
           shared/flash.cpp \
           can.cpp \
           can_helper.cpp \
@@ -144,7 +149,6 @@ CPPSRC = $(ALLCPPSRC) \
           pid.cpp \
           pump_control.cpp \
           uart.cpp \
-          shared/crc.cpp \
           interpolation.cpp \
           auxout.cpp \
           efilib.cpp \
@@ -163,6 +167,7 @@ ASMXSRC = $(ALLXASMSRC)
 # Inclusion directories.
 INCDIR = $(CONFDIR) \
          $(ALLINC) \
+         $(RUSEFI_LIB_INC) \
          util/ \
          util/math/ \
          console/binary/ \

@@ -15,7 +15,7 @@ endif
 
 # C++ specific options here (added to USE_OPT).
 ifeq ($(USE_CPPOPT),)
-  USE_CPPOPT = -fno-rtti -fno-exceptions -ffast-math -funsafe-math-optimizations -fno-threadsafe-statics -fno-use-cxa-atexit
+  USE_CPPOPT = -fno-rtti -fno-exceptions -ffast-math -funsafe-math-optimizations -fno-threadsafe-statics -fno-use-cxa-atexit -std=c++17
 endif
 
 # Enable this if you want the linker to remove unused code and data.
@@ -96,6 +96,10 @@ CONFDIR  := ./cfg
 BUILDDIR := ./build
 DEPDIR   := ./.dep
 
+# Configure libfirmware Paths/Includes
+RUSEFI_LIB = $(SRCDIR)/libfirmware
+include $(RUSEFI_LIB)/util/util.mk
+
 # Licensing files.
 include $(CHIBIOS)/os/license/license.mk
 # Startup files.
@@ -120,10 +124,11 @@ CSRC = $(ALLCSRC) cfg/board.c
 # C++ sources that can be compiled in ARM or THUMB mode depending on the global
 # setting.
 CPPSRC = $(ALLCPPSRC) \
+  $(RUSEFI_LIB_CPP) \
   bootloader.cpp \
   ../port_shared.cpp \
   $(SRCDIR)/shared/flash.cpp \
-  $(SRCDIR)/shared/crc.cpp
+
 
 # List ASM source files here.
 ASMSRC = $(ALLASMSRC)
@@ -132,7 +137,7 @@ ASMSRC = $(ALLASMSRC)
 ASMXSRC = $(ALLXASMSRC)
 
 # Inclusion directories.
-INCDIR = $(CONFDIR) $(ALLINC) $(SRCDIR)/shared/ \
+INCDIR = $(CONFDIR) $(ALLINC) $(RUSEFI_LIB_INC) $(SRCDIR)/shared/ \
   ../io ../..
 
 # Define C warning options here.
