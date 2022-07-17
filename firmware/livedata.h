@@ -13,8 +13,6 @@ struct livedata_common_s {
 	};
 };
 
-extern struct livedata_common_s livedata_common;
-
 /* +32 offset */
 struct livedata_afr_s {
 	union {
@@ -30,7 +28,9 @@ struct livedata_afr_s {
 	};
 };
 
-extern struct livedata_afr_s livedata_afr;
-
 /* update functions */
 void SamplingUpdateLiveData();
+
+/* access functions */
+const struct livedata_common_s * getCommonLiveDataStructAddr();
+const struct livedata_afr_s * getAfrLiveDataStructAddr();
