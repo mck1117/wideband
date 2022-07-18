@@ -59,4 +59,4 @@
 // *******************************
 //   MAX31855 spi port
 // *******************************
-#define EGT_SPI_PORT			SPID1
+#define EGT_SPI_DRIVER			(&SPID1)

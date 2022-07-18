@@ -54,7 +54,8 @@ static void UartThread(void*)
 
         writeCount = chsnprintf(printBuffer, 200,
             "EGT: %d C (int %d C)\r\n",
-            (int)EgtThread.temp[0], (int)EgtThread.int_temp[0]);
+            (int)getEgtDrivers()[0].temperature,
+            (int)getEgtDrivers()[0].cold_joint_temperature);
         chnWrite(&SD1, (const uint8_t *)printBuffer, writeCount);
         chThdSleepMilliseconds(50);
     }

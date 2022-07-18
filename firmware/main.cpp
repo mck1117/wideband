@@ -37,7 +37,7 @@ int main() {
     InitUart();
 
 #if (EGT_CHANNELS > 0)
-    EgtThread.Start();
+    StartEgt();
 #endif
 
     while(true)

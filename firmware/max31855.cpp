@@ -39,22 +39,26 @@ static SPIConfig spi_config[2] =
 	}
 };
 
-int Max31855Thread::spi_rx(SPIDriver *spi, int ch, uint32_t *data)
+static Max31855 instances[] = {&spi_config[0], &spi_config[1]};
+
+static Max31855Thread EgtThread(instances);
+
+int Max31855::spi_rx(uint32_t *data)
 {
 	uint8_t rx[4];
 
 	/* Acquire ownership of the bus. */
-	spiAcquireBus(spi);
+	spiAcquireBus(EGT_SPI_DRIVER);
 	/* Setup transfer parameters. */
-	spiStart(spi, &spi_config[ch]);
+	spiStart(EGT_SPI_DRIVER, spi);
 	/* Slave Select assertion. */
-	spiSelect(spi);
+	spiSelect(EGT_SPI_DRIVER);
 	//spiExchange(spi, 4, tx, rx);
-	spiReceive(spi, 4, rx);
+	spiReceive(EGT_SPI_DRIVER, 4, rx);
 	/* Slave Select de-assertion. */
-	spiUnselect(spi);
+	spiUnselect(EGT_SPI_DRIVER);
 	/* Ownership release. */
-	spiReleaseBus(spi);
+	spiReleaseBus(EGT_SPI_DRIVER);
 
 	if (data) {
 		*data = (rx[0] << 24) |
@@ -67,12 +71,12 @@ int Max31855Thread::spi_rx(SPIDriver *spi, int ch, uint32_t *data)
 	return 0;
 }
 
-int Max31855Thread::Read(int ch)
+int Max31855::readPacket()
 {
-	int ret;
 	uint32_t data;
+	state = MAX31855_NO_REPLY;
 
-	ret = spi_rx(&EGT_SPI_PORT, ch, &data);
+	int ret = spi_rx(&data);
 	if (ret)
 		return ret;
 
@@ -82,15 +86,16 @@ int Max31855Thread::Read(int ch)
 	}
 
 	if (data & BIT(16)) {
-		if (data & BIT(0))
+		if (data & BIT(0)) {
 			state = MAX31855_OPEN_CIRCUIT;
-		else if (data & BIT(1))
+		} else if (data & BIT(1)) {
 			state = MAX31855_SHORT_TO_GND;
-		else if (data & BIT(2))
+		} else if (data & BIT(2)) {
 			state = MAX31855_SHORT_TO_VCC;
+		}
 
-		int_temp[ch] = NAN;
-		temp[ch] = NAN;
+		cold_joint_temperature = NAN;
+		temperature = NAN;
 
 		return -1;
 	}
@@ -101,35 +106,36 @@ int Max31855Thread::Read(int ch)
 	/* extend sign */
 	tmp = tmp << 4;
 	tmp = tmp >> 4;	/* shifting right signed is not a good idea */
-	int_temp[ch] = (float)tmp * 0.0625;
+	cold_joint_temperature = (float)tmp * 0.0625;
 
 	/* D[31:18] */
 	tmp = (data >> 18) & 0x3fff;
 	/* extend sign */
 	tmp = tmp << 2;
 	tmp = tmp >> 2;	/* shifting right signed is not a good idea */
-	temp[ch] = (float) tmp * 0.25;
+	temperature = (float) tmp * 0.25;
 
 	return 0;
 }
 
 void Max31855Thread::ThreadTask() {
-	state = MAX31855_NO_REPLY;
 
 	while (true) {
-		int ch;
-
-		for (ch = 0; ch < EGT_CHANNELS; ch++) {
-			int ret = Read(ch);
-
-			if (ret)
-				continue;
+		for (int ch = 0; ch < EGT_CHANNELS; ch++) {
+		    Max31855 current = max31855[ch];
+			current.readPacket();
 		}
 
         chThdSleepMilliseconds(500);
 	}
 }
 
-Max31855Thread EgtThread("egt");
+void StartEgt() {
+    EgtThread.Start();
+}
+
+Max31855* getEgtDrivers() {
+    return instances;
+}
 
 #endif /* HAL_USE_SPI */
