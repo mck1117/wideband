@@ -3,7 +3,7 @@
 #include "wideband_config.h"
 #include "thread_controller.h"
 
-#ifdef HAL_USE_SPI
+#if HAL_USE_SPI
 
 #define MAX31855_THREAD_STACK 	(512)
 #define MAX31855_THREAD_PRIO	(NORMALPRIO + 1)

@@ -7,7 +7,7 @@
 
 #include "max31855.h"
 
-#ifdef HAL_USE_SPI
+#if HAL_USE_SPI
 
 static SPIConfig spi_config[2] =
 {
