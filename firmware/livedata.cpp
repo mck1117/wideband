@@ -5,8 +5,8 @@
 #include "pump_dac.h"
 #include "heater_control.h"
 
-static struct livedata_common_s livedata_common;
-static struct livedata_afr_s livedata_afr;
+static livedata_common_s livedata_common;
+static livedata_afr_s livedata_afr;
 
 void SamplingUpdateLiveData()
 {
@@ -20,12 +20,12 @@ void SamplingUpdateLiveData()
     livedata_common.vbatt = GetInternalBatteryVoltage();
 }
 
-const struct livedata_common_s * getCommonLiveDataStructAddr()
+const livedata_common_s * getCommonLiveDataStructAddr()
 {
     return &livedata_common;
 }
 
-const struct livedata_afr_s * getAfrLiveDataStructAddr()
+const livedata_afr_s * getAfrLiveDataStructAddr()
 {
     return &livedata_afr;
 }
