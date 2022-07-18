@@ -47,8 +47,8 @@ void copyRange(uint8_t* destination, FragmentList src, size_t skip, size_t size)
 }
 
 static const FragmentEntry fragments[] = {
-	FragmentEntry(getCommonLiveDataStructAddr()),
-	FragmentEntry(getAfrLiveDataStructAddr()),
+	getCommonLiveDataStructAddr(),
+	getAfrLiveDataStructAddr(),
 };
 
 FragmentList getFragments() {
