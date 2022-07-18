@@ -1,6 +1,7 @@
 #include "tunerstudio_impl.h"
 #include "tunerstudio.h"
 #include "tunerstudio_io.h"
+#include "FragmentEntry.h"
 
 /* configuration */
 #include "port.h"
@@ -8,7 +9,7 @@
 void sendErrorCode(TsChannelBase *tsChannel, uint8_t code);
 
 size_t getTunerStudioPageSize() {
-	return 0; // todo!
+	return GetConfiguratiuonSize();
 }
 
 // Validate whether the specified offset and count would cause an overrun in the tune.
@@ -28,10 +29,11 @@ bool validateOffsetCount(size_t offset, size_t count, TsChannelBase* tsChannel) 
  * Gauges refresh
  */
 void TunerStudio::cmdOutputChannels(TsChannelBase* tsChannel, uint16_t offset, uint16_t count) {
-	if (offset + count > 0/*todo*/) {
-		sendErrorCode(tsChannel, TS_RESPONSE_OUT_OF_RANGE);
-		return;
-	}
+	// TODO: check against total framents size
+//	if (offset + count > TS_TOTAL_OUTPUT_SIZE) {
+//		sendErrorCode(tsChannel, TS_RESPONSE_OUT_OF_RANGE);
+//		return;
+//	}
 
 	tsState.outputChannelsCommandCounter++;
 	tsChannel->assertPacketSize(count, false);
@@ -40,7 +42,7 @@ void TunerStudio::cmdOutputChannels(TsChannelBase* tsChannel, uint16_t offset, u
 	/**
 	 * collect data from all models
 	 */
-	//todo
+	copyRange(scratchBuffer + 3, getFragments(), offset, count);
 
 	tsChannel->crcAndWriteBuffer(TS_RESPONSE_OK, count);
 }
