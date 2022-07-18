@@ -156,7 +156,6 @@ CPPSRC = $(ALLCPPSRC) \
           console/binary/tunerstudio_io.cpp \
           console/binary/tunerstudio_io_serial.cpp \
           console/binary/tunerstudio_commands.cpp \
-          console/binary/FragmentEntry.cpp \
           main.cpp
 
 # List ASM source files here.

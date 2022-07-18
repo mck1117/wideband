@@ -5,6 +5,9 @@
 #include "pump_dac.h"
 #include "heater_control.h"
 
+#include <rusefi/arrays.h>
+#include <rusefi/fragments.h>
+
 static livedata_common_s livedata_common;
 static livedata_afr_s livedata_afr;
 
@@ -28,4 +31,13 @@ const livedata_common_s * getCommonLiveDataStructAddr()
 const livedata_afr_s * getAfrLiveDataStructAddr()
 {
     return &livedata_afr;
+}
+
+static const FragmentEntry fragments[] = {
+	getCommonLiveDataStructAddr(),
+	getAfrLiveDataStructAddr(),
+};
+
+FragmentList getFragments() {
+	return { fragments, efi::size(fragments) };
 }

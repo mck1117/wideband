@@ -1,10 +1,11 @@
 #include "tunerstudio_impl.h"
 #include "tunerstudio.h"
 #include "tunerstudio_io.h"
-#include "FragmentEntry.h"
 
 /* configuration */
 #include "port.h"
+
+#include <rusefi/fragments.h>
 
 void sendErrorCode(TsChannelBase *tsChannel, uint8_t code);
 
@@ -23,6 +24,8 @@ bool validateOffsetCount(size_t offset, size_t count, TsChannelBase* tsChannel) 
 
 	return false;
 }
+
+FragmentList getFragments();
 
 /**
  * @brief 'Output' command sends out a snapshot of current values
