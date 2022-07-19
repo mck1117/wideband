@@ -1,6 +1,21 @@
 #!/bin/bash
 
+if [ ! -d tools ]; then
+	echo "Please run this script from firmware directory, not tools!"
+	exit -1
+fi
+
+if [ -z $1 ]; then
+	echo "Please provide board name as argunment"
+	exit -1
+fi
+
 FW_FILE=deliver/$1/wideband_update.srec
+
+if [ ! -f $FW_FILE ]; then
+	echo "FW_FILE $FW_FILE not found"
+	exit -1
+fi
 
 # This script will try to flash/update RusEFI part of firmware over can0 interface.
 #
@@ -12,9 +27,6 @@ FW_FILE=deliver/$1/wideband_update.srec
 
 # sudo apt-get install can-utils
 # candump can0
-
-# project root
-cd ..
 
 /sbin/ifconfig can0 | grep RUNNING
 
@@ -28,5 +40,11 @@ cd ..
 # and
 # (cd ext/openblt/Host/Source/BootCommander/ ; mkdir build ; cd build ; cmake .. ; make -j )
 # And run:
+
+if [ ! -f ext/openblt/Host/BootCommander ]; then
+	echo "Please build BootCommander first!"
+	echo "Run: (cd ext/openblt/Host/Source/LibOpenBLT/ ; mkdir build ; cd build ; cmake .. ; make -j )"
+	echo "Run: (cd ext/openblt/Host/Source/BootCommander/ ; mkdir build ; cd build ; cmake .. ; make -j )"
+fi
 
 ext/openblt/Host/BootCommander -t=xcp_can -d=can0 $FW_FILE
