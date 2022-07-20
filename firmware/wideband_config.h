@@ -4,6 +4,13 @@
 #include "wideband_board_config.h"
 
 // *******************************
+//    Defaults
+// *******************************
+#ifndef EGT_CHANNELS
+    #define EGT_CHANNELS 0
+#endif
+
+// *******************************
 //    Nernst voltage & ESR sense
 // *******************************
 
