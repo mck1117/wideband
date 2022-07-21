@@ -120,6 +120,7 @@ include $(CHIBIOS)/os/hal/osal/rt-nil/osal.mk
 include $(CHIBIOS)/os/rt/rt.mk
 # Other files (optional).
 include $(CHIBIOS)/os/hal/lib/streams/streams.mk
+include $(CHIBIOS)/os/various/cpp_wrappers/chcpp.mk
 
 # include board.mk that sets per-board options
 include $(BOARDDIR)/board.mk
