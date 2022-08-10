@@ -130,7 +130,7 @@ void InitCan()
 
 void SendRusefiFormat(uint8_t idx)
 {
-    auto baseAddress = 0x190 + 2 * idx;
+    auto baseAddress = WB_DATA_BASE_ADDR + 2 * idx;
     auto esr = GetSensorInternalResistance();
 
     {
