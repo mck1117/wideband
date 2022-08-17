@@ -136,5 +136,8 @@ float GetPumpNominalCurrent(int ch)
 
 float GetInternalBatteryVoltage(int ch)
 {
+    // Dual HW can measure heater voltage for each channel
+    // by measuring voltage on Heater- while FET is off
+    // TODO: rename function?
     return results[ch].internalBatteryVoltage;
 }
