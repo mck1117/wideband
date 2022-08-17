@@ -30,14 +30,14 @@ static void PumpThread(void*)
     {
         for (int ch = 0; ch < AFR_CHANNELS; ch++)
         {
-            struct pump_control_state *s = &state[ch];
+            pump_control_state &s = state[ch];
 
             // Only actuate pump when running closed loop!
             if (IsRunningClosedLoop(ch))
             {
                 float nernstVoltage = GetNernstDc(ch);
 
-                float result = s->pumpPid.GetOutput(NERNST_TARGET, nernstVoltage);
+                float result = s.pumpPid.GetOutput(NERNST_TARGET, nernstVoltage);
 
                 // result is in mA
                 SetPumpCurrentTarget(ch, result * 1000);
