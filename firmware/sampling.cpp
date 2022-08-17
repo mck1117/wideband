@@ -48,7 +48,7 @@ static void SamplingThread(void*)
         palTogglePad(NERNST_ESR_DRIVER_PORT, NERNST_ESR_DRIVER_PIN);
 
         for (int ch = 0; ch < AFR_CHANNELS; ch++) {
-            struct measure_results *res = &results[ch];
+            measure_results &res = results[ch];
             float r_1 = result.ch[ch].NernstVoltage;
 
             // r2_opposite_phase estimates where the previous sample would be had we not been toggling
@@ -60,19 +60,19 @@ static void SamplingThread(void*)
 
             // Compute AC (difference) and DC (average) components
             float nernstAcLocal = f_abs(r2_opposite_phase - r_2[ch]);
-            res->nernstDc = (r2_opposite_phase + r_2[ch]) / 2;
+            res.nernstDc = (r2_opposite_phase + r_2[ch]) / 2;
 
-            res->nernstAc =
-                (1 - ESR_SENSE_ALPHA) * res->nernstAc +
+            res.nernstAc =
+                (1 - ESR_SENSE_ALPHA) * res.nernstAc +
                 ESR_SENSE_ALPHA * nernstAcLocal;
 
             // Exponential moving average (aka first order lpf)
-            res->pumpCurrentSenseVoltage =
-                (1 - PUMP_FILTER_ALPHA) * res->pumpCurrentSenseVoltage +
+            res.pumpCurrentSenseVoltage =
+                (1 - PUMP_FILTER_ALPHA) * res.pumpCurrentSenseVoltage +
                 PUMP_FILTER_ALPHA * (result.ch[ch].PumpCurrentVoltage - result.VirtualGroundVoltageInt);
 
             #ifdef BATTERY_INPUT_DIVIDER
-                res->internalBatteryVoltage = result.ch[ch].BatteryVoltage;
+                res.internalBatteryVoltage = result.ch[ch].BatteryVoltage;
             #endif
 
             // Shift history over by one
