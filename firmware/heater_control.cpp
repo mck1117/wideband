@@ -80,7 +80,7 @@ static struct heater_state state[AFR_CHANNELS] =
 #endif
 };
 
-static HeaterState GetNextState(struct heater_state *s, HeaterAllow heaterAllowState, float batteryVoltage, float sensorEsr)
+static HeaterState GetNextState(struct heater_state &s, HeaterAllow heaterAllowState, float batteryVoltage, float sensorEsr)
 {
     bool heaterAllowed = heaterAllowState == HeaterAllow::Allowed;
 
@@ -90,37 +90,37 @@ static HeaterState GetNextState(struct heater_state *s, HeaterAllow heaterAllowS
         // measured voltage too low to auto-start heating
         if (batteryVoltage < HEATER_BATTETY_OFF_VOLTAGE)
         {
-            s->batteryStabTime = batteryStabTimeCounter;
+            s.batteryStabTime = batteryStabTimeCounter;
         }
         // measured voltage is high enougth to auto-start heating, wait some time to stabilize
-        if ((batteryVoltage > HEATER_BATTERY_ON_VOLTAGE) && (s->batteryStabTime > 0))
+        if ((batteryVoltage > HEATER_BATTERY_ON_VOLTAGE) && (s.batteryStabTime > 0))
         {
-            s->batteryStabTime--;
+            s.batteryStabTime--;
         }
-        heaterAllowed = s->batteryStabTime == 0;
+        heaterAllowed = s.batteryStabTime == 0;
     }
 
     if (!heaterAllowed)
     {
         // ECU hasn't allowed preheat yet, reset timer, and force preheat state
-        s->timeCounter = preheatTimeCounter;
+        s.timeCounter = preheatTimeCounter;
         return HeaterState::Preheat;
     }
 
-    switch (s->heaterState)
+    switch (s.heaterState)
     {
         case HeaterState::Preheat:
-            s->timeCounter--;
+            s.timeCounter--;
 
             // If preheat timeout, or sensor is already hot (engine running?)
-            if (s->timeCounter <= 0 || sensorEsr < HEATER_CLOSED_LOOP_THRESHOLD_ESR)
+            if (s.timeCounter <= 0 || sensorEsr < HEATER_CLOSED_LOOP_THRESHOLD_ESR)
             {
                 // If enough time has elapsed, start the ramp
                 // Start the ramp at 4 volts
-                s->rampVoltage = 4;
+                s.rampVoltage = 4;
 
                 // Next phase times out at 15 seconds
-                s->timeCounter = HEATER_WARMUP_TIMEOUT / HEATER_CONTROL_PERIOD;
+                s.timeCounter = HEATER_WARMUP_TIMEOUT / HEATER_CONTROL_PERIOD;
 
                 return HeaterState::WarmupRamp;
             }
@@ -132,25 +132,25 @@ static HeaterState GetNextState(struct heater_state *s, HeaterAllow heaterAllowS
             {
                 return HeaterState::ClosedLoop;
             }
-            else if (s->timeCounter == 0)
+            else if (s.timeCounter == 0)
             {
-                SetFault(s->ch, Fault::SensorDidntHeat);
+                SetFault(s.ch, Fault::SensorDidntHeat);
                 return HeaterState::Stopped;
             }
 
-            s->timeCounter--;
+            s.timeCounter--;
 
             break;
         case HeaterState::ClosedLoop:
             // Check that the sensor's ESR is acceptable for normal operation
             if (sensorEsr < HEATER_OVERHEAT_ESR)
             {
-                SetFault(s->ch, Fault::SensorOverheat);
+                SetFault(s.ch, Fault::SensorOverheat);
                 return HeaterState::Stopped;
             }
             else if (sensorEsr > HEATER_UNDERHEAT_ESR)
             {
-                SetFault(s->ch, Fault::SensorUnderheat);
+                SetFault(s.ch, Fault::SensorUnderheat);
                 return HeaterState::Stopped;
             }
 
@@ -158,30 +158,30 @@ static HeaterState GetNextState(struct heater_state *s, HeaterAllow heaterAllowS
         case HeaterState::Stopped: break;
     }
 
-    return s->heaterState;
+    return s.heaterState;
 }
 
-static float GetVoltageForState(struct heater_state *s, float heaterEsr)
+static float GetVoltageForState(struct heater_state &s, float heaterEsr)
 {
-    switch (s->heaterState)
+    switch (s.heaterState)
     {
         case HeaterState::Preheat:
             // Max allowed during condensation phase (preheat) is 2v
             return 1.5f;
         case HeaterState::WarmupRamp:
-            if (s->rampVoltage < 10)
+            if (s.rampVoltage < 10)
             {
                 // 0.3 volt per second, divided by battery voltage and update rate
                 constexpr float rampRateVoltPerSecond = 0.3f;
                 constexpr float heaterFrequency = 1000.0f / HEATER_CONTROL_PERIOD;
-                s->rampVoltage += (rampRateVoltPerSecond / heaterFrequency);
+                s.rampVoltage += (rampRateVoltPerSecond / heaterFrequency);
             }
 
-            return s->rampVoltage;
+            return s.rampVoltage;
         case HeaterState::ClosedLoop:
             // "nominal" heater voltage is 7.5v, so apply correction around that point (instead of relying on integrator so much)
             // Negated because lower resistance -> hotter
-            return 7.5f - s->heaterPid.GetOutput(HEATER_TARGET_ESR, heaterEsr);
+            return 7.5f - s.heaterPid.GetOutput(HEATER_TARGET_ESR, heaterEsr);
         case HeaterState::Stopped:
             // Something has gone wrong, turn off the heater.
             return 0;
@@ -205,7 +205,7 @@ static void HeaterThread(void*)
         auto heaterAllowState = GetHeaterAllowed();
 
         for (ch = 0; ch < AFR_CHANNELS; ch++) {
-            struct heater_state *s = &state[ch];
+            heater_state &s = state[ch];
 
             // Read sensor state
             float heaterEsr = GetSensorInternalResistance(ch);
@@ -217,7 +217,7 @@ static void HeaterThread(void*)
                                         : GetRemoteBatteryVoltage();
 
             // Run the state machine
-            s->heaterState = GetNextState(s, heaterAllowState, batteryVoltage, heaterEsr);
+            s.heaterState = GetNextState(s, heaterAllowState, batteryVoltage, heaterEsr);
             float heaterVoltage = GetVoltageForState(s, heaterEsr);
 
             // Limit to 11 volts
@@ -238,12 +238,12 @@ static void HeaterThread(void*)
             if (batteryVoltage < 23)
             {
                 // Pipe the output to the heater driver
-                heaterPwm.SetDuty(s->pwm_ch, duty);
+                heaterPwm.SetDuty(s.pwm_ch, duty);
             }
             else
             {
                 // Overvoltage protection - sensor not rated for PWM above 24v
-                heaterPwm.SetDuty(s->pwm_ch, 0);
+                heaterPwm.SetDuty(s.pwm_ch, 0);
             }
         }
 
