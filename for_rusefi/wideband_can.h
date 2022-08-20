@@ -7,6 +7,7 @@
 #define WB_BL_ENTER 0xEF0'0000
 #define WB_MSG_SET_INDEX 0xEF4'0000
 #define WB_MGS_ECU_STATUS 0xEF5'0000
+#define WB_DATA_BASE_ADDR 0x190
 
 namespace wbo
 {
