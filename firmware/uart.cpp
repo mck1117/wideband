@@ -52,12 +52,14 @@ static void UartThread(void*)
         chnWrite(&SD1, (const uint8_t *)printBuffer, writeCount);
         chThdSleepMilliseconds(50);
 
+#if HAL_USE_SPI
         writeCount = chsnprintf(printBuffer, 200,
             "EGT: %d C (int %d C)\r\n",
             (int)getEgtDrivers()[0].temperature,
             (int)getEgtDrivers()[0].cold_joint_temperature);
         chnWrite(&SD1, (const uint8_t *)printBuffer, writeCount);
         chThdSleepMilliseconds(50);
+#endif /* HAL_USE_SPI */
     }
 }
 
