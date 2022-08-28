@@ -111,6 +111,8 @@ void SetAuxDac(int channel, float voltage)
 
 #endif /* AUXOUT_DAC_DEVICE */
 
+#if (defined(AUXOUT_DAC_PWM_DEVICE) || defined(AUXOUT_DAC_DEVICE))
+
 /* TODO: merge with some other communication thread? */
 static THD_WORKING_AREA(waAuxOutThread, 256);
 void AuxOutThread(void*)
@@ -154,7 +156,13 @@ void InitAuxDac()
     SetAuxDac(0, 0.0);
 #endif
 
-#if (defined(AUXOUT_DAC_PWM_DEVICE) || defined(AUXOUT_DAC_DEVICE))
     chThdCreateStatic(waAuxOutThread, sizeof(waAuxOutThread), NORMALPRIO, AuxOutThread, nullptr);
-#endif /* AUXOUT_DAC_PWM_DEVICE) defined(AUXOUT_DAC_DEVICE */
 }
+
+#else /* (AUXOUT_DAC_PWM_DEVICE || AUXOUT_DAC_DEVICE) */
+
+void InitAuxDac()
+{
+}
+
+#endif
