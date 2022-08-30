@@ -4,6 +4,6 @@
 
 #include "../for_rusefi/wideband_can.h"
 
-void SetFault(wbo::Fault fault);
+void SetFault(int ch, wbo::Fault fault);
 bool HasFault();
-wbo::Fault GetCurrentFault();
+wbo::Fault GetCurrentFault(int ch);
