@@ -42,7 +42,7 @@
 /*
  * MCU type, supported types are defined in ./os/hal/platforms/hal_lld.h.
  */
-#define STM32F103xB
+#define STM32F103xE
 
 /*
  * IO pins assignments.
