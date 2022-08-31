@@ -119,27 +119,21 @@ void AuxOutThread(void*)
 {
     while(1)
     {
-#if defined(AUXOUT_DAC_PWM_DEVICE)
         for (int ch = 0; ch < AFR_CHANNELS; ch++)
         {
-            SetAuxDac(ch, GetLambda(ch));
+            float lambda = GetLambda(ch);
+            // todo: make translation configurable
+            if (lambda < 0.7)
+                lambda = 0.7;
+            if (lambda > 1.3)
+                lambda = 1.3;
+
+            // "oil ration" calibration
+            float voltage = 1 - (1.3 - lambda) / 0.6;
+            SetAuxDac(ch, voltage);
         }
 
         chThdSleepMilliseconds(10);
-#else
-    int ch = 0;
-    float lambda = GetLambda(ch);
-    if (lambda < 0.7)
-      lambda = 0.7;
-    if (lambda > 1.3)
-      lambda = 1.3;
-
-    // "oil ration" calibration
-    float voltage = 1 - (1.3 - lambda) / 0.6;
-
-    SetAuxDac(ch, voltage);
-    chThdSleepMilliseconds(50);
-#endif
     }
 }
 
