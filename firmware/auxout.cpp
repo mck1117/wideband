@@ -127,17 +127,18 @@ void AuxOutThread(void*)
 
         chThdSleepMilliseconds(10);
 #else
-    SetAuxDac(0, 0.0);
-    chThdSleepMilliseconds(2000);
+    int ch = 0;
+    float lambda = GetLambda(ch);
+    if (lambda < 0.7)
+      lambda = 0.7;
+    if (lambda > 1.3)
+      lambda = 1.3;
 
-    SetAuxDac(0, 1.0);
-    chThdSleepMilliseconds(2000);
+    // "oil ration" calibration
+    float voltage = 1 - (1.3 - lambda) / 0.6;
 
-    SetAuxDac(0, 2.0);
-    chThdSleepMilliseconds(2000);
-
-    SetAuxDac(0, 3.0);
-    chThdSleepMilliseconds(2000);
+    SetAuxDac(ch, voltage);
+    chThdSleepMilliseconds(50);
 #endif
     }
 }
