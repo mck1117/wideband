@@ -128,7 +128,7 @@ void AuxOutThread(void*)
             if (lambda > 1.3)
                 lambda = 1.3;
 
-            // "oil ration" calibration
+            // https://rusefi.com/forum/viewtopic.php?f=4&t=2410 for now
             float voltage = 1 - (1.3 - lambda) / 0.6;
             SetAuxDac(ch, voltage);
         }
