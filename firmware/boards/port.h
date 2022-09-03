@@ -30,6 +30,7 @@ public:
     {
         return this->Tag == ExpectedTag;
     }
+    void LoadDefaults();
 
     // Actual configuration data
     uint8_t CanIndexOffset = 0;
