@@ -5,11 +5,6 @@
 #include "wideband_config.h"
 #include "thread_controller.h"
 
-#if HAL_USE_SPI
-
-#define MAX31855_THREAD_STACK 	(512)
-#define MAX31855_THREAD_PRIO	(NORMALPRIO + 1)
-
 typedef enum {
 	MAX31855_OK = 0,
 	MAX31855_OPEN_CIRCUIT = 1,
@@ -29,6 +24,14 @@ struct livedata_egt_s {
 		uint8_t pad[16];
 	};
 };
+
+// for all board. in case of no EGT - returns NULL
+const struct livedata_egt_s * getEgtLiveDataStructAddr(const int ch);
+
+#if HAL_USE_SPI
+
+#define MAX31855_THREAD_STACK 	(512)
+#define MAX31855_THREAD_PRIO	(NORMALPRIO + 1)
 
 class Max31855 {
 public:
@@ -60,6 +63,5 @@ private:
 
 void StartEgt();
 Max31855* getEgtDrivers();
-const struct livedata_egt_s * getEgtLiveDataStructAddr(const int ch);
 
 #endif // HAL_USE_SPI

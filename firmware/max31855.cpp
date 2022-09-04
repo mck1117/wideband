@@ -151,4 +151,11 @@ const struct livedata_egt_s * getEgtLiveDataStructAddr(const int ch)
     return NULL;
 }
 
+#else
+
+const struct livedata_egt_s * getEgtLiveDataStructAddr(const int ch)
+{
+	return NULL;
+}
+
 #endif /* HAL_USE_SPI */
