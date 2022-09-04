@@ -27,6 +27,7 @@ void SamplingUpdateLiveData()
         data->pumpCurrentMeasured = GetPumpNominalCurrent(ch);
         data->heaterDuty = GetHeaterDuty(ch);
         data->fault = (uint8_t)GetCurrentFault(ch);
+        data->heaterState = (uint8_t)GetHeaterState(ch);
     }
 
     livedata_common.vbatt = GetInternalBatteryVoltage(0);
