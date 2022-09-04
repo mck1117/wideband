@@ -6,6 +6,7 @@
 #include "pump_dac.h"
 #include "heater_control.h"
 #include "max31855.h"
+#include "fault.h"
 
 #include <rusefi/arrays.h>
 #include <rusefi/fragments.h>
@@ -25,6 +26,7 @@ void SamplingUpdateLiveData()
         data->pumpCurrentTarget = GetPumpCurrent(ch);
         data->pumpCurrentMeasured = GetPumpNominalCurrent(ch);
         data->heaterDuty = GetHeaterDuty(ch);
+        data->fault = (uint8_t)GetCurrentFault(ch);
     }
 
     livedata_common.vbatt = GetInternalBatteryVoltage(0);
