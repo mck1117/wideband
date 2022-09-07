@@ -79,9 +79,7 @@
 	#define EFI_BLUETOOTH_SETUP 0
 #endif
 
-#ifndef EFI_TEXT_LOGGING
-	#define EFI_TEXT_LOGGING 0
-#endif
+tunerstudio_counters_s tsState;
 
 static void printErrorCounters() {
 //	efiPrintf("TunerStudio size=%d / total=%d / errors=%d / H=%d / O=%d / P=%d / B=%d",
@@ -125,101 +123,7 @@ void TunerStudio::handlePageSelectCommand(TsChannelBase *tsChannel, ts_response_
 	sendOkResponse(tsChannel, mode);
 }
 
-#if 0
-const void * getStructAddr(live_data_e structId) {
-	switch (structId) {
-	case LDS_output_channels:
-		return reinterpret_cast<const uint8_t*>(&engine->outputChannels);
-
-	case LDS_high_pressure_fuel_pump:
-#if EFI_HPFP
-		return static_cast<high_pressure_fuel_pump_s*>(&engine->module<HpfpController>().unmock());
-#else
-		return nullptr; // explicit null to confirm that this struct is handled
-#endif // EFI_HPFP
-
-	case LDS_launch_control_state:
-#if EFI_LAUNCH_CONTROL
-		return static_cast<launch_control_state_s*>(&engine->launchController);
-#else
-		return nullptr; // explicit null to confirm that this struct is handled
-#endif // EFI_LAUNCH_CONTROL
-
-	case LDS_injector_model:
-		return static_cast<injector_model_s*>(&engine->module<InjectorModel>().unmock());
-
-	case LDS_boost_control:
-#if EFI_BOOST_CONTROL
-		return static_cast<boost_control_s*>(&engine->boostController);
-#else
-		return nullptr; // explicit null to confirm that this struct is handled
-#endif // EFI_BOOST_CONTROL
-
-	case LDS_ac_control:
-		return static_cast<ac_control_s*>(&engine->module<AcController>().unmock());
-	case LDS_fan_control:
-		return static_cast<fan_control_s*>(&engine->fan1);
-	case LDS_fuel_pump_control:
-		return static_cast<fuel_pump_control_s*>(&engine->module<FuelPumpController>().unmock());
-	case LDS_main_relay:
-		return static_cast<main_relay_s*>(&engine->module<MainRelayController>().unmock());
-	case LDS_engine_state:
-		return static_cast<engine_state_s*>(&engine->engineState);
-	case LDS_tps_accel_state:
-		return static_cast<tps_accel_state_s*>(&engine->tpsAccelEnrichment);
-	case LDS_trigger_central:
-		return static_cast<trigger_central_s*>(&engine->triggerCentral);
-	case LDS_trigger_state:
-#if EFI_SHAFT_POSITION_INPUT
-		return static_cast<trigger_state_s*>(&engine->triggerCentral.triggerState);
-#else
-		return nullptr;
-#endif // EFI_SHAFT_POSITION_INPUT
-	case LDS_wall_fuel_state:
-		return static_cast<wall_fuel_state_s*>(&engine->injectionEvents.elements[0].wallFuel);
-	case LDS_idle_state:
-		return static_cast<idle_state_s*>(&engine->module<IdleController>().unmock());
-	case LDS_ignition_state:
-		return static_cast<ignition_state_s*>(&engine->ignitionState);
-	case LDS_electronic_throttle:
-		// todo: figure out how to handle two units?
-		return nullptr;
-
-//#if EFI_ELECTRONIC_THROTTLE_BODY
-//	case LDS_ETB_PID:
-//		return engine->etbControllers[0]->getPidState();
-//#endif /* EFI_ELECTRONIC_THROTTLE_BODY */
-//
-//#ifndef EFI_IDLE_CONTROL
-//	case LDS_IDLE_PID:
-//		return static_cast<pid_state_s*>(getIdlePid());
-//#endif /* EFI_IDLE_CONTROL */
-	default:
-// huh?		firmwareError(OBD_PCM_Processor_Fault, "getStructAddr not implemented for %d", (int)structId);
-		return nullptr;
-	}
-}
-
-/**
- * Read internal structure for Live Doc
- * This is somewhat similar to read page and somewhat similar to read outputs
- * We can later consider combining this functionality
- */
-static void handleGetStructContent(TsChannelBase* tsChannel, int structId, int size) {
-	tsState.readPageCommandsCounter++;
-
-	const void *addr = getStructAddr((live_data_e)structId);
-	if (addr == nullptr) {
-		// todo: add warning code - unexpected structId
-		return;
-	}
-	tsChannel->sendResponse(TS_CRC, (const uint8_t *)addr, size);
-}
-#endif
-
 bool validateOffsetCount(size_t offset, size_t count, TsChannelBase* tsChannel);
-
-//extern bool rebootForPresetPending;
 
 /**
  * This command is needed to make the whole transfer a bit faster
@@ -546,8 +450,6 @@ void TunerstudioThread::ThreadTask() {
 	}
 }
 
-tunerstudio_counters_s tsState;
-
 void tunerStudioError(TsChannelBase* tsChannel, const char *msg) {
 	tunerStudioDebug(tsChannel, msg);
 	printErrorCounters();
@@ -560,31 +462,6 @@ static void handleGetVersion(TsChannelBase* tsChannel) {
 	chsnprintf(versionBuffer, sizeof(versionBuffer), "rusEFI Wideband Rev2");
 	tsChannel->sendResponse(TS_CRC, (const uint8_t *) versionBuffer, strlen(versionBuffer) + 1);
 }
-
-#if EFI_TEXT_LOGGING
-static void handleGetText(TsChannelBase* tsChannel) {
-	tsState.textCommandCounter++;
-
-	printOverallStatus();
-
-	size_t outputSize;
-	const char* output = swapOutputBuffers(&outputSize);
-
-	tsChannel->writeCrcPacket(TS_RESPONSE_COMMAND_OK, reinterpret_cast<const uint8_t*>(output), outputSize, true);
-}
-#endif // EFI_TEXT_LOGGING
-
-#if 0
-extern CommandHandler console_line_callback;
-void TunerStudio::handleExecuteCommand(TsChannelBase* tsChannel, char *data, int incomingPacketSize) {
-	data[incomingPacketSize] = 0;
-	char *trimmed = efiTrim(data);
-
-	(console_line_callback)(trimmed);
-
-	tsChannel->writeCrcPacket(TS_RESPONSE_COMMAND_OK, nullptr, 0);
-}
-#endif
 
 int TunerStudio::handleCrcCommand(TsChannelBase* tsChannel, char *data, int incomingPacketSize) {
 	(void)incomingPacketSize;
@@ -600,6 +477,7 @@ int TunerStudio::handleCrcCommand(TsChannelBase* tsChannel, char *data, int inco
 	switch(command)
 	{
 	case TS_OUTPUT_COMMAND:
+		tsState.outputChannelsCommandCounter++;
 		cmdOutputChannels(tsChannel, offset, count);
 		break;
 	case TS_HELLO_COMMAND:
@@ -609,30 +487,14 @@ int TunerStudio::handleCrcCommand(TsChannelBase* tsChannel, char *data, int inco
 	case TS_GET_FIRMWARE_VERSION:
 		handleGetVersion(tsChannel);
 		break;
-#if EFI_TEXT_LOGGING
-	case TS_GET_TEXT:
-		handleGetText(tsChannel);
-		break;
-#endif // EFI_TEXT_LOGGING
-#if 0
-	case TS_EXECUTE:
-		handleExecuteCommand(tsChannel, data, incomingPacketSize - 1);
-		break;
-#endif
 	case TS_PAGE_COMMAND:
 		handlePageSelectCommand(tsChannel, TS_CRC);
 		break;
-//	case TS_GET_STRUCT:
-//		handleGetStructContent(tsChannel, offset, count);
-//		break;
 	case TS_CHUNK_WRITE_COMMAND:
 		handleWriteChunkCommand(tsChannel, TS_CRC, offset, count, data + sizeof(TunerStudioWriteChunkRequest));
 		break;
 	case TS_SINGLE_WRITE_COMMAND:
-		{
-			uint8_t value = data[4];
-			handleWriteValueCommand(tsChannel, TS_CRC, offset, value);
-		}
+		handleWriteValueCommand(tsChannel, TS_CRC, offset, data[4]);
 		break;
 	case TS_CRC_CHECK_COMMAND:
 		handleCrc32Check(tsChannel, TS_CRC, offset, count);
@@ -648,34 +510,6 @@ int TunerStudio::handleCrcCommand(TsChannelBase* tsChannel, char *data, int inco
 	case 'T':
 		handleTestCommand(tsChannel);
 		break;
-#if 0
-	case TS_IO_TEST_COMMAND:
-		{
-			uint16_t subsystem = SWAP_UINT16(data16[0]);
-			uint16_t index = SWAP_UINT16(data16[1]);
-
-			if (engineConfiguration->debugMode == DBG_BENCH_TEST) {
-				engine->outputChannels.debugIntField1++;
-				engine->outputChannels.debugIntField2 = subsystem;
-				engine->outputChannels.debugIntField3 = index;
-			}
-
-			executeTSCommand(subsystem, index);
-			sendOkResponse(tsChannel, TS_CRC);
-		}
-		break;
-	case TS_GET_CONFIG_ERROR: {
-		const char* configError = getCriticalErrorMessage();
-#if HW_CHECK_MODE
-		// analog input errors are returned as firmware error in QC mode
-		if (!hasFirmwareError()) {
-			strcpy((char*)configError, "FACTORY_MODE_PLEASE_CONTACT_SUPPORT");
-		}
-#endif // HW_CHECK_MODE
-		tsChannel->sendResponse(TS_CRC, reinterpret_cast<const uint8_t*>(configError), strlen(configError), true);
-		break;
-	}
-#endif
 	default:
 		sendErrorCode(tsChannel, TS_RESPONSE_UNRECOGNIZED_COMMAND);
 		tunerStudioError(tsChannel, "ERROR: ignoring unexpected command");
