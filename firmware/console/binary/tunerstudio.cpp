@@ -235,6 +235,9 @@ void TunerStudio::handleWriteChunkCommand(TsChannelBase* tsChannel, ts_response_
 		return;
 	}
 
+	uint8_t * addr = (uint8_t *) (getWorkingPageAddr() + offset);
+	memcpy(addr, content, count);
+
 	sendOkResponse(tsChannel, mode);
 }
 
