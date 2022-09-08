@@ -134,7 +134,7 @@ int GetConfiguratiuonSize()
     return sizeof(config);
 }
 
-#define TS_SIGNATURE "rusEFI 2022.05.29.wideband_rev2"
+#define TS_SIGNATURE "rusEFI 2022.05.29.wideband_f1"
 
 const char *getTsSignature() {
     return TS_SIGNATURE;
