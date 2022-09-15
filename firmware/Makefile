@@ -152,7 +152,6 @@ CPPSRC = $(ALLCPPSRC) \
           pump_control.cpp \
           max31855.cpp \
           uart.cpp \
-          interpolation.cpp \
           auxout.cpp \
           livedata.cpp \
           console/binary/tunerstudio.cpp \

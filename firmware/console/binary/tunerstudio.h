@@ -26,8 +26,6 @@ typedef struct {
 	int testCommandCounter;
 } tunerstudio_counters_s;
 
-extern tunerstudio_counters_s tsState;
-
 void tunerStudioDebug(TsChannelBase* tsChannel, const char *msg);
 void tunerStudioError(TsChannelBase* tsChannel, const char *msg);
 
