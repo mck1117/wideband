@@ -102,7 +102,7 @@ uint8_t *GetConfiguratiuonPtr()
     return (uint8_t *)&config;
 }
 
-int GetConfiguratiuonSize()
+size_t GetConfiguratiuonSize()
 {
     return sizeof(config);
 }

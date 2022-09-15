@@ -39,12 +39,10 @@ public:
 };
 
 Configuration GetConfiguration();
-uint8_t *GetConfiguratiuonPtr();
-int GetConfiguratiuonSize();
 void SetConfiguration(const Configuration& newConfig);
 
 /* TS stuff */
-void SaveConfiguration();
 uint8_t *GetConfiguratiuonPtr();
-int GetConfiguratiuonSize();
+size_t GetConfiguratiuonSize();
+void SaveConfiguration();
 const char *getTsSignature();
