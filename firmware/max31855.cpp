@@ -122,7 +122,7 @@ void Max31855Thread::ThreadTask() {
 
 	while (true) {
 		for (int ch = 0; ch < EGT_CHANNELS; ch++) {
-		    Max31855 current = max31855[ch];
+		    Max31855 &current = max31855[ch];
 			current.readPacket();
 		}
 
