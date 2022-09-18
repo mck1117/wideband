@@ -44,7 +44,7 @@ int SerialTsChannel::bt_wait_ok(void)
 
 int SerialTsChannel::bt_disconnect(void)
 {
-	write((uint8_t *)"AT+DISC\r\n", 9, true);
+	chprintf((BaseSequentialStream *)m_driver, "AT+DISC\r\n");
 
 	return bt_wait_ok();
 }
@@ -71,7 +71,7 @@ int SerialTsChannel::start(uint32_t baud) {
 					baudIdx = 0;
 				sdStart(m_driver, &cfg);
 
-				write((uint8_t *)"AT\r\n", 4, true);
+				chprintf((BaseSequentialStream *)m_driver, "AT\r\n");
 				if (bt_wait_ok() != 0) {
 					/* try to diconnect in case device already configured and in silence mode */
 					if (bt_disconnect() != 0) {
@@ -106,8 +106,7 @@ int SerialTsChannel::start(uint32_t baud) {
 		done = false;
 		do {
 			/* just a curious */
-			len = chsnprintf(tmp, sizeof(tmp), "AT+VERSION\r\n");
-			write((uint8_t *)tmp, len, true);
+			chprintf((BaseSequentialStream *)m_driver, "AT+VERSION\r\n");
 			len = bt_read_line(tmp, sizeof(tmp));
 			if (len < 0) {
 				/* retrty */
@@ -115,47 +114,41 @@ int SerialTsChannel::start(uint32_t baud) {
 			}
 
 			/* Reset settings to defaults */
-			len = chsnprintf(tmp, sizeof(tmp), "AT+DEFAULT\r\n");
-			write((uint8_t *)tmp, len, true);
+			chprintf((BaseSequentialStream *)m_driver, "AT+DEFAULT\r\n");
 			if (bt_wait_ok() != 0) {
 				/* retrty */
 				continue;
 			}
 
 			/* SPP Broadcast name: up to 18 bytes */
-			len = chsnprintf(tmp, sizeof(tmp), "AT+NAME%s\r\n", "RusEFI WBO x2");
-			write((uint8_t *)tmp, len, true);
+			chprintf((BaseSequentialStream *)m_driver, "AT+NAME%s\r\n", "RusEFI WBO x2");
 			if (bt_wait_ok() != 0) {
 				/* retrty */
 				continue;
 			}
 
 			/* BLE Broadcast name: up to 18 bytes */
-			len = chsnprintf(tmp, sizeof(tmp), "AT+NAMB%s\r\n", "RusEFI WBO x2");
-			write((uint8_t *)tmp, len, true);
+			chprintf((BaseSequentialStream *)m_driver, "AT+NAMB%s\r\n", "RusEFI WBO x2");
 			if (bt_wait_ok() != 0) {
 				/* retrty */
 				continue;
 			}
 
 			/* SPP connection with no password */
-			len = chsnprintf(tmp, sizeof(tmp), "AT+TYPE%d\r\n", 0);
-			write((uint8_t *)tmp, len, true);
+			chprintf((BaseSequentialStream *)m_driver, "AT+TYPE%d\r\n", 0);
 			if (bt_wait_ok() != 0) {
 				/* retrty */
 				continue;
 			}
 
 			/* Disable serial port status output */
-			len = chsnprintf(tmp, sizeof(tmp), "AT+ENLOG%d\r\n", 0);
-			write((uint8_t *)tmp, len, true);
+			chprintf((BaseSequentialStream *)m_driver, "AT+ENLOG%d\r\n", 0);
 			if (bt_wait_ok() != 0) {
 				/* retrty */
 				continue;
 			}
 
-			len = chsnprintf(tmp, sizeof(tmp), "AT+BAUD%d\r\n", baudRateCodes[baudIdx]);
-			write((uint8_t *)tmp, len, true);
+			chprintf((BaseSequentialStream *)m_driver, "AT+BAUD%d\r\n", baudRateCodes[baudIdx]);
 			if (bt_wait_ok() != 0) {
 				/* retrty */
 				continue;
@@ -177,8 +170,7 @@ int SerialTsChannel::start(uint32_t baud) {
 		chThdSleepMilliseconds(10);
 
 		/* now reset BT to apply new settings */
-		len = chsnprintf(tmp, sizeof(tmp), "AT+RESET\r\n", baudRateCodes[baudIdx]);
-		write((uint8_t *)tmp, len, true);
+		chprintf((BaseSequentialStream *)m_driver, "AT+RESET\r\n", baudRateCodes[baudIdx]);
 		if (bt_wait_ok() != 0) {
 			return -1;
 		}
