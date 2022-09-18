@@ -11,9 +11,9 @@
 #if HAL_USE_SERIAL
 
 // JDY-33 has 9: 128000 which we do not
-static const int baudRates[] = 	{		2400,	4800,	9600,	19200,	38400,	57600,	115200 };
-static const int baudRateCodes[] = {	2,		3,		4,		5,		6,		7,		8 };
-static const int btModuleTimeout = TIME_MS2I(100);
+static const unsigned int baudRates[] = 	{	115200, 9600, 	38400,	2400,	4800,	19200,	57600 };
+static const unsigned int baudRateCodes[] = {	8,		4,		6,		2,		3,		5,		7 };
+static const unsigned int btModuleTimeout = TIME_MS2I(100);
 
 int SerialTsChannel::bt_read_line(char *str, size_t max_len)
 {
