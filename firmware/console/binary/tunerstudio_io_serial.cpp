@@ -59,35 +59,36 @@ int SerialTsChannel::start(uint32_t baud) {
 
 	if (1) {
 		/* BT setup */
+		int retry = 3;
+		bool done = false;
 		size_t baudIdx = 0;
 
-//		for (baudIdx = 0; baudIdx < 8; baudIdx++) {
-		while (1) {
-			cfg.speed = baudRates[baudIdx];
-			baudIdx++;
-			if (baudIdx == 8)
-				baudIdx = 0;
-			sdStart(m_driver, &cfg);
+		do {
+			for (baudIdx = 0; baudIdx < 8 && !done; baudIdx++) {
+				cfg.speed = baudRates[baudIdx];
+				baudIdx++;
+				if (baudIdx == 8)
+					baudIdx = 0;
+				sdStart(m_driver, &cfg);
 
-			write((uint8_t *)"AT\r\n", 4, true);
-			if (bt_wait_ok() != 0) {
-				/* try to diconnect in case device already configured and in silence mode */
-				if (bt_disconnect() != 0) {
-					/* try next baud rate */
-					sdStop(m_driver);
-					continue;
+				write((uint8_t *)"AT\r\n", 4, true);
+				if (bt_wait_ok() != 0) {
+					/* try to diconnect in case device already configured and in silence mode */
+					if (bt_disconnect() != 0) {
+						/* try next baud rate */
+						sdStop(m_driver);
+						continue;
+					}
 				}
+				done = true;
+				break;
 			}
+		} while ((!done) && (--retry));
 
-			break;
+		if (retry <= 0) {
+			return -1;
 		}
-#if 0
-		/* BT module already configured for expected baudrate */
-		if (baud == baudRates[baudIdx]) {
-			return 0;
-		}
-#endif
-		/* else do setup */
+
 		/* find expected baudrate */
 		for (baudIdx = 0; baudIdx < 8; baudIdx++) {
 			if (baud == baudRates[baudIdx]) {
@@ -102,10 +103,8 @@ int SerialTsChannel::start(uint32_t baud) {
 		int len;
 		char tmp[64];
 		/* setup */
-		bool done = false;
+		done = false;
 		do {
-			/* TODO: retry counter */
-
 			/* just a curious */
 			len = chsnprintf(tmp, sizeof(tmp), "AT+VERSION\r\n");
 			write((uint8_t *)tmp, len, true);
@@ -164,8 +163,13 @@ int SerialTsChannel::start(uint32_t baud) {
 
 			/* BT module changes baud rate here */
 			done = true;
-		} while (!done);
+		} while ((!done) && (--retry));
 
+		if (retry <= 0) {
+			return -1;
+		}
+
+		/* switch baudrate */
 		sdStop(m_driver);
 		cfg.speed = baud;
 		sdStart(m_driver, &cfg);
@@ -176,7 +180,7 @@ int SerialTsChannel::start(uint32_t baud) {
 		len = chsnprintf(tmp, sizeof(tmp), "AT+RESET\r\n", baudRateCodes[baudIdx]);
 		write((uint8_t *)tmp, len, true);
 		if (bt_wait_ok() != 0) {
-			/* ??? */
+			return -1;
 		}
 
 		/* ready to roll */
