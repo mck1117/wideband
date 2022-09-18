@@ -2,11 +2,52 @@
  * Implementation for hardware-serial TunerStudio ports
  */
 
+#include <string.h>
+
 #include "tunerstudio_io.h"
 #include "hal.h"
+#include "chprintf.h"
 
 #if HAL_USE_SERIAL
-void SerialTsChannel::start(uint32_t baud) {
+
+// JDY-33 has 9: 128000 which we do not
+static const int baudRates[] = 	{		2400,	4800,	9600,	19200,	38400,	57600,	115200 };
+static const int baudRateCodes[] = {	2,		3,		4,		5,		6,		7,		8 };
+static const int btModuleTimeout = TIME_MS2I(100);
+
+int SerialTsChannel::bt_read_line(char *str, size_t max_len)
+{
+	int i = 0;
+
+	/* read until end of line */
+	do {
+		if (readTimeout((uint8_t *)&str[i], 1, btModuleTimeout) != 1)
+			return -1;
+	} while (str[i++] != '\n');
+
+	return i;
+}
+
+int SerialTsChannel::bt_wait_ok(void)
+{
+	/* wait for '+OK\r\n' */
+	char tmp[6];
+	if (readTimeout((uint8_t *)tmp, 5, btModuleTimeout) == 5) {
+		if (strncmp(tmp, "+OK\r\n", 5) == 0)
+			return 0;
+	}
+
+	return -1;
+}
+
+int SerialTsChannel::bt_disconnect(void)
+{
+	write((uint8_t *)"AT+DISC\r\n", 9, true);
+
+	return bt_wait_ok();
+}
+
+int SerialTsChannel::start(uint32_t baud) {
 	SerialConfig cfg = {
 		.speed = baud,
 		.cr1 = 0,
@@ -14,7 +55,135 @@ void SerialTsChannel::start(uint32_t baud) {
 		.cr3 = 0
 	};
 
-	sdStart(m_driver, &cfg);
+	if (1) {
+		/* BT setup */
+		size_t baudIdx = 0;
+
+//		for (baudIdx = 0; baudIdx < 8; baudIdx++) {
+		while (1) {
+			cfg.speed = baudRates[baudIdx];
+			baudIdx++;
+			if (baudIdx == 8)
+				baudIdx = 0;
+			sdStart(m_driver, &cfg);
+
+			write((uint8_t *)"AT\r\n", 4, true);
+			if (bt_wait_ok() != 0) {
+				/* try to diconnect in case device already configured and in silence mode */
+				if (bt_disconnect() != 0) {
+					/* try next baud rate */
+					sdStop(m_driver);
+					continue;
+				}
+			}
+
+			break;
+		}
+#if 0
+		/* BT module already configured for expected baudrate */
+		if (baud == baudRates[baudIdx]) {
+			return 0;
+		}
+#endif
+		/* else do setup */
+		/* find expected baudrate */
+		for (baudIdx = 0; baudIdx < 8; baudIdx++) {
+			if (baud == baudRates[baudIdx]) {
+				break;
+			}
+		}
+		if (baudIdx == 8) {
+			/* unknown baudrate */
+			return -1;
+		}
+
+		int len;
+		char tmp[64];
+		/* setup */
+		bool done = false;
+		do {
+			/* TODO: retry counter */
+
+			/* just a curious */
+			len = chsnprintf(tmp, sizeof(tmp), "AT+VERSION\r\n");
+			write((uint8_t *)tmp, len, true);
+			len = bt_read_line(tmp, sizeof(tmp));
+			if (len < 0) {
+				/* retrty */
+				continue;
+			}
+
+			/* Reset settings to defaults */
+			len = chsnprintf(tmp, sizeof(tmp), "AT+DEFAULT\r\n");
+			write((uint8_t *)tmp, len, true);
+			if (bt_wait_ok() != 0) {
+				/* retrty */
+				continue;
+			}
+
+			/* SPP Broadcast name: up to 18 bytes */
+			len = chsnprintf(tmp, sizeof(tmp), "AT+NAME%s\r\n", "RusEFI WBO x2");
+			write((uint8_t *)tmp, len, true);
+			if (bt_wait_ok() != 0) {
+				/* retrty */
+				continue;
+			}
+
+			/* BLE Broadcast name: up to 18 bytes */
+			len = chsnprintf(tmp, sizeof(tmp), "AT+NAMB%s\r\n", "RusEFI WBO x2");
+			write((uint8_t *)tmp, len, true);
+			if (bt_wait_ok() != 0) {
+				/* retrty */
+				continue;
+			}
+
+			/* SPP connection with no password */
+			len = chsnprintf(tmp, sizeof(tmp), "AT+TYPE%d\r\n", 0);
+			write((uint8_t *)tmp, len, true);
+			if (bt_wait_ok() != 0) {
+				/* retrty */
+				continue;
+			}
+
+			/* Disable serial port status output */
+			len = chsnprintf(tmp, sizeof(tmp), "AT+ENLOG%d\r\n", 0);
+			write((uint8_t *)tmp, len, true);
+			if (bt_wait_ok() != 0) {
+				/* retrty */
+				continue;
+			}
+
+			len = chsnprintf(tmp, sizeof(tmp), "AT+BAUD%d\r\n", baudRateCodes[baudIdx]);
+			write((uint8_t *)tmp, len, true);
+			if (bt_wait_ok() != 0) {
+				/* retrty */
+				continue;
+			}
+
+			/* BT module changes baud rate here */
+			done = true;
+		} while (!done);
+
+		sdStop(m_driver);
+		cfg.speed = baud;
+		sdStart(m_driver, &cfg);
+
+		chThdSleepMilliseconds(10);
+
+		/* now reset BT to apply new settings */
+		len = chsnprintf(tmp, sizeof(tmp), "AT+RESET\r\n", baudRateCodes[baudIdx]);
+		write((uint8_t *)tmp, len, true);
+		if (bt_wait_ok() != 0) {
+			/* ??? */
+		}
+
+		/* ready to roll */
+	} else {
+		/* Direct uart connetion */
+		sdStart(m_driver, &cfg);
+	}
+
+	return 0;
 }
 
 void SerialTsChannel::stop() {
@@ -31,7 +200,7 @@ size_t SerialTsChannel::readTimeout(uint8_t* buffer, size_t size, int timeout) {
 #endif // HAL_USE_SERIAL
 
 #if (HAL_USE_UART == TRUE) && (UART_USE_WAIT == TRUE)
-void UartTsChannel::start(uint32_t baud) {
+int UartTsChannel::start(uint32_t baud) {
 	m_config.txend1_cb 		= NULL;
 	m_config.txend2_cb 		= NULL;
 	m_config.rxend_cb 		= NULL;
@@ -44,6 +213,8 @@ void UartTsChannel::start(uint32_t baud) {
 	m_config.cr3 			= 0;
 
 	uartStart(m_driver, &m_config);
+
+	return 0;
 }
 
 void UartTsChannel::stop() {

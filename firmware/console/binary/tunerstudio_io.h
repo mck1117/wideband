@@ -136,7 +136,7 @@ class SerialTsChannelBase : public TsChannelBase {
 public:
 	SerialTsChannelBase(const char *name) : TsChannelBase(name) {};
 	// Open the serial port with the specified baud rate
-	virtual void start(uint32_t baud) = 0;
+	virtual int start(uint32_t baud) = 0;
 };
 
 #if HAL_USE_SERIAL
@@ -145,13 +145,17 @@ class SerialTsChannel : public SerialTsChannelBase {
 public:
 	SerialTsChannel(SerialDriver& driver) : SerialTsChannelBase("Serial"), m_driver(&driver) { }
 
-	void start(uint32_t baud) override;
+	int start(uint32_t baud) override;
 	void stop() override;
 
 	void write(const uint8_t* buffer, size_t size, bool isEndOfPacket) override;
 	size_t readTimeout(uint8_t* buffer, size_t size, int timeout) override;
 
 private:
+	int bt_read_line(char *str, size_t max_len);
+	int bt_wait_ok(void);
+	int bt_disconnect(void);
+
 	SerialDriver* const m_driver;
 };
 #endif // HAL_USE_SERIAL
@@ -162,7 +166,7 @@ class UartTsChannel : public SerialTsChannelBase {
 public:
 	UartTsChannel(UARTDriver& driver) : SerialTsChannelBase("UART"), m_driver(&driver) { }
 
-	void start(uint32_t baud) override;
+	int start(uint32_t baud) override;
 	void stop() override;
 
 	void write(const uint8_t* buffer, size_t size, bool isEndOfPacket) override;
