@@ -17,10 +17,12 @@ static const unsigned int btModuleTimeout = TIME_MS2I(100);
 
 int SerialTsChannel::bt_read_line(char *str, size_t max_len)
 {
-	int i = 0;
+	size_t i = 0;
 
 	/* read until end of line */
 	do {
+		if (i >= max_len)
+			return -1;
 		if (readTimeout((uint8_t *)&str[i], 1, btModuleTimeout) != 1)
 			return -1;
 	} while (str[i++] != '\n');
