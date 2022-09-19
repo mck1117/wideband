@@ -95,11 +95,11 @@ int InitConfiguration()
     return 0;
 }
 
-Configuration GetConfiguration()
+static Configuration c;
+
+Configuration& GetConfiguration()
 {
     const auto& cfg = __configflash__start__;
-
-    Configuration c;
 
     // If config has been written before, use the stored configuration
     if (cfg.IsValid())

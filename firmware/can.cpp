@@ -100,7 +100,7 @@ void CanRxThread(void*)
         // Check if it's an "index set" message
         else if (frame.DLC == 1 && frame.EID == WB_MSG_SET_INDEX)
         {
-            auto newCfg = GetConfiguration();
+            auto &newCfg = GetConfiguration();
             newCfg.CanIndexOffset = frame.data8[0];
             SetConfiguration(newCfg);
             configuration = GetConfiguration();
