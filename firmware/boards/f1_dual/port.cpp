@@ -113,38 +113,6 @@ AnalogResult AnalogSample()
     };
 }
 
-static struct {
-    uint8_t        pad[128];
-} config;
-
-static Configuration c;
-
-Configuration& GetConfiguration()
-{
-    // TODO: implement me!
-    return c;
-}
-
-void SetConfiguration(const Configuration& newConfig)
-{
-    // TODO: implement me!
-}
-
-/* TS stuff */
-void SaveConfiguration() {
-    // TODO: implement me!
-}
-
-uint8_t *GetConfiguratiuonPtr()
-{
-    return (uint8_t *)&config;
-}
-
-size_t GetConfiguratiuonSize()
-{
-    return sizeof(config);
-}
-
 #define TS_SIGNATURE "rusEFI 2022.05.29.wideband_dual"
 
 const char *getTsSignature() {
