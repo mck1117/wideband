@@ -112,9 +112,3 @@ AnalogResult AnalogSample()
         .VirtualGroundVoltageInt = HALF_VCC,
     };
 }
-
-#define TS_SIGNATURE "rusEFI 2022.05.29.wideband_dual"
-
-const char *getTsSignature() {
-    return TS_SIGNATURE;
-}

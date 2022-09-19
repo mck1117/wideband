@@ -81,3 +81,7 @@ size_t GetConfiguratiuonSize()
 {
     return sizeof(cfg);
 }
+
+const char *getTsSignature() {
+    return TS_SIGNATURE;
+}
