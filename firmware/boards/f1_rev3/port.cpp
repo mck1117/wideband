@@ -108,10 +108,12 @@ int InitConfiguration()
     return 0;
 }
 
-Configuration GetConfiguration()
+static Configuration c;
+
+Configuration& GetConfiguration()
 {
     // TODO: implement me!
-    return {};
+    return c;
 }
 
 void SetConfiguration(const Configuration& newConfig)

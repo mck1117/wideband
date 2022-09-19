@@ -117,10 +117,12 @@ static struct {
     uint8_t        pad[128];
 } config;
 
-Configuration GetConfiguration()
+static Configuration c;
+
+Configuration& GetConfiguration()
 {
     // TODO: implement me!
-    return {};
+    return c;
 }
 
 void SetConfiguration(const Configuration& newConfig)

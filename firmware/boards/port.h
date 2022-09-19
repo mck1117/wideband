@@ -38,7 +38,7 @@ public:
     uint8_t pad[128 - 1 - 4];
 };
 
-Configuration GetConfiguration();
+Configuration& GetConfiguration();
 void SetConfiguration(const Configuration& newConfig);
 
 /* TS stuff */
