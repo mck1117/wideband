@@ -30,6 +30,7 @@ public:
     {
         return this->Tag == ExpectedTag;
     }
+    void LoadDefaults();
 
     // Actual configuration data
     uint8_t CanIndexOffset = 0;
@@ -38,6 +39,7 @@ public:
     uint8_t pad[128 - 1 - 4];
 };
 
+int InitConfiguration();
 Configuration& GetConfiguration();
 void SetConfiguration(const Configuration& newConfig);
 

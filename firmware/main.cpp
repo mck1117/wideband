@@ -11,6 +11,7 @@
 #include "io_pins.h"
 #include "auxout.h"
 #include "max31855.h"
+#include "port.h"
 
 #include "wideband_config.h"
 
@@ -22,6 +23,9 @@ using namespace wbo;
 int main() {
     halInit();
     chSysInit();
+
+    // Load configuration
+    InitConfiguration();
 
     // Fire up all of our threads
     StartSampling();
