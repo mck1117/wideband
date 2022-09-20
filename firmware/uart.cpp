@@ -62,7 +62,7 @@ static void UartThread(void*)
             size_t writeCount = chsnprintf(printBuffer, 200,
                 "EGT[%d]: %d C (int %d C)\r\n",
                 (int)getEgtDrivers()[ch].temperature,
-                (int)getEgtDrivers()[ch].cold_joint_temperature);
+                (int)getEgtDrivers()[ch].coldJunctionTemperature);
             chnWrite(&SD1, (const uint8_t *)printBuffer, writeCount);
         }
 #endif /* HAL_USE_SPI */
