@@ -28,7 +28,7 @@ struct livedata_egt_s {
 // for all board. in case of no EGT - returns NULL
 const struct livedata_egt_s * getEgtLiveDataStructAddr(const int ch);
 
-#if HAL_USE_SPI
+#if (EGT_CHANNELS > 0)
 
 #define MAX31855_THREAD_STACK 	(512)
 #define MAX31855_THREAD_PRIO	(NORMALPRIO + 1)
@@ -64,4 +64,4 @@ private:
 void StartEgt();
 Max31855* getEgtDrivers();
 
-#endif // HAL_USE_SPI
+#endif // (EGT_CHANNELS > 0)
