@@ -153,7 +153,7 @@ const struct livedata_egt_s * getEgtLiveDataStructAddr(const int ch)
 
 #else
 
-const struct livedata_egt_s * getEgtLiveDataStructAddr(const int ch)
+const struct livedata_egt_s * getEgtLiveDataStructAddr(const int)
 {
 	return NULL;
 }
