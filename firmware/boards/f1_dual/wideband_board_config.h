@@ -7,9 +7,6 @@
 #define AFR_CHANNELS 2
 #define EGT_CHANNELS 2
 
-// UART used for debug
-#define UART_DEBUG
-
 // Fundamental board constants
 #define VCC_VOLTS (3.3f)
 #define HALF_VCC (VCC_VOLTS / 2)
