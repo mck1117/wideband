@@ -57,7 +57,7 @@ static void UartThread(void*)
             chnWrite(&SD1, (const uint8_t *)printBuffer, writeCount);
         }
 
-#if HAL_USE_SPI
+#if (EGT_CHANNELS > 0)
         for (ch = 0; ch < EGT_CHANNELS; ch++) {
             size_t writeCount = chsnprintf(printBuffer, 200,
                 "EGT[%d]: %d C (int %d C)\r\n",
@@ -65,7 +65,7 @@ static void UartThread(void*)
                 (int)getEgtDrivers()[ch].coldJunctionTemperature);
             chnWrite(&SD1, (const uint8_t *)printBuffer, writeCount);
         }
-#endif /* HAL_USE_SPI */
+#endif /* EGT_CHANNELS > 0 */
 
         chThdSleepMilliseconds(100);
     }

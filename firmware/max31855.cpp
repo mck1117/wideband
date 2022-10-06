@@ -7,7 +7,7 @@
 
 #include "max31855.h"
 
-#if HAL_USE_SPI
+#if (EGT_CHANNELS > 0)
 
 static SPIConfig spi_config[2] =
 {
@@ -153,9 +153,9 @@ const struct livedata_egt_s * getEgtLiveDataStructAddr(const int ch)
 
 #else
 
-const struct livedata_egt_s * getEgtLiveDataStructAddr(const int ch)
+const struct livedata_egt_s * getEgtLiveDataStructAddr(const int)
 {
 	return NULL;
 }
 
-#endif /* HAL_USE_SPI */
+#endif /* EGT_CHANNELS > 0 */

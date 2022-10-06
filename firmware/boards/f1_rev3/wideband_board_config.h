@@ -48,8 +48,5 @@
 // *******************************
 //   TunerStudio Primary Port
 // *******************************
-//#define TS_PRIMARY_SERIAL_PORT	SD1
-//#define TS_PRIMARY_BAUDRATE		115200
-
-// UART used for debug
-#define UART_DEBUG
+#define TS_PRIMARY_SERIAL_PORT	SD1
+#define TS_PRIMARY_BAUDRATE		115200
