@@ -14,7 +14,7 @@ using namespace wbo;
 
 // 400khz / 1024 = 390hz PWM
 static Pwm heaterPwm(HEATER_PWM_DEVICE);
-PWMConfig heaterPwmConfig = {
+static const PWMConfig heaterPwmConfig = {
     400'000,
     1024,
     nullptr,
