@@ -33,10 +33,18 @@ public:
     void LoadDefaults();
 
     // Actual configuration data
-    uint8_t CanIndexOffset = 0;
+    union {
+        struct {
+            uint8_t CanIndexOffset = 0;
+            // AUX0 and AUX1 curves
+            float auxOutBins[2][8];
+            float auxOutValues[2][8];
+            uint8_t auxInput[2];
+        } __attribute__((packed));
 
-    // pad to 128 bytes
-    uint8_t pad[128 - 1 - 4];
+        // pad to 256 bytes including tag
+        uint8_t pad[256 - 4];
+    };
 };
 
 int InitConfiguration();
