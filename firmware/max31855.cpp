@@ -144,7 +144,8 @@ Max31855* getEgtDrivers() {
     return instances;
 }
 
-const struct livedata_egt_s * getEgtLiveDataStructAddr(const int ch)
+template<>
+const livedata_egt_s* getLiveData(size_t ch)
 {
     if (ch < EGT_CHANNELS)
         return &getEgtDrivers()[ch].livedata;
@@ -153,9 +154,10 @@ const struct livedata_egt_s * getEgtLiveDataStructAddr(const int ch)
 
 #else
 
-const struct livedata_egt_s * getEgtLiveDataStructAddr(const int)
+template<>
+const livedata_egt_s* getLiveData(size_t)
 {
-	return NULL;
+	return nullptr;
 }
 
 #endif /* EGT_CHANNELS > 0 */
