@@ -20,7 +20,7 @@ class ThreadController
 private:
     THD_WORKING_AREA(m_threadstack, TStackSize);
     const tprio_t m_prio;
-	bool m_isStarted = false;
+    bool m_isStarted = false;
 
     /**
      * The OS can only call a function with a single void* param.  We have
@@ -45,8 +45,8 @@ protected:
 
 public:
     ThreadController(const char* name, tprio_t priority)
-		: m_prio(priority)
-		, m_name(name)
+        : m_prio(priority)
+        , m_name(name)
     {
     }
 
@@ -55,13 +55,15 @@ public:
      */
     void Start()
     {
-		if (m_isStarted) {
-			//warning(CUSTOM_OBD_6003, "Tried to start thread %s but it was already running", m_name);
-			return;
-		}
+        if (m_isStarted) {
+            //warning(CUSTOM_OBD_6003, "Tried to start thread %s but it was already running", m_name);
+            return;
+        }
 
         m_thread = chThdCreateStatic(m_threadstack, sizeof(m_threadstack), m_prio, StaticThreadTaskAdapter, this);
-		m_thread->name = m_name;
-		m_isStarted = true;
+#if CH_CFG_USE_REGISTRY
+        m_thread->name = m_name;
+#endif // CH_CFG_USE_REGISTRY
+        m_isStarted = true;
     }
 };
