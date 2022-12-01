@@ -46,11 +46,11 @@ const struct livedata_afr_s * getAfrLiveDataStructAddr(const int ch)
 }
 
 static const FragmentEntry fragments[] = {
-    getCommonLiveDataStructAddr(),
-    getAfrLiveDataStructAddr(0),
-    getAfrLiveDataStructAddr(1),
-    getEgtLiveDataStructAddr(0),
-    getEgtLiveDataStructAddr(1)
+    decl_frag<livedata_common_s>{},
+    decl_frag<livedata_afr_s, 0>{},
+    decl_frag<livedata_afr_s, 1>{},
+    decl_frag<livedata_egt_s, 0>{},
+    decl_frag<livedata_egt_s, 1>{},
 };
 
 FragmentList getFragments() {
