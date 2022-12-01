@@ -2,6 +2,8 @@
 
 #include <stdint.h>
 
+#include <rusefi/fragments.h>
+
 #include "wideband_config.h"
 
 /* +0 offset */
@@ -34,7 +36,3 @@ struct livedata_afr_s {
 
 /* update functions */
 void SamplingUpdateLiveData();
-
-/* access functions */
-const struct livedata_common_s * getCommonLiveDataStructAddr();
-const struct livedata_afr_s * getAfrLiveDataStructAddr(const int ch);

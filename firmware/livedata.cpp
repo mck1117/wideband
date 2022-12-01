@@ -33,24 +33,29 @@ void SamplingUpdateLiveData()
     livedata_common.vbatt = GetInternalBatteryVoltage(0);
 }
 
-const livedata_common_s * getCommonLiveDataStructAddr()
+template<>
+const livedata_common_s* getLiveData(size_t)
 {
     return &livedata_common;
 }
 
-const struct livedata_afr_s * getAfrLiveDataStructAddr(const int ch)
+template<>
+const struct livedata_afr_s * getLiveData(size_t ch)
 {
     if (ch < AFR_CHANNELS)
+    {
         return &livedata_afr[ch];
-    return NULL;
+    }
+
+    return nullptr;
 }
 
 static const FragmentEntry fragments[] = {
-    getCommonLiveDataStructAddr(),
-    getAfrLiveDataStructAddr(0),
-    getAfrLiveDataStructAddr(1),
-    getEgtLiveDataStructAddr(0),
-    getEgtLiveDataStructAddr(1)
+    decl_frag<livedata_common_s>{},
+    decl_frag<livedata_afr_s, 0>{},
+    decl_frag<livedata_afr_s, 1>{},
+    decl_frag<livedata_egt_s, 0>{},
+    decl_frag<livedata_egt_s, 1>{},
 };
 
 FragmentList getFragments() {
