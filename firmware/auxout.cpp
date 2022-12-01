@@ -1,11 +1,16 @@
 #include "pwm.h"
 #include "lambda_conversion.h"
+#include "port.h"
+#include "io_pins.h"
 
 #include "wideband_config.h"
+
+#include "max31855.h"
 
 #include "hal.h"
 
 #include <rusefi/math.h>
+#include <rusefi/interpolation.h>
 
 #ifdef AUXOUT_DAC_PWM_DEVICE
 
@@ -113,23 +118,39 @@ void SetAuxDac(int channel, float voltage)
 
 #if (defined(AUXOUT_DAC_PWM_DEVICE) || defined(AUXOUT_DAC_DEVICE))
 
+static float AuxGetInputSignal(int sel)
+{
+    switch (sel)
+    {
+        case 0:
+        case 1:
+            return GetLambda(sel);
+#if HAL_USE_SPI
+        case 2:
+        case 3:
+            return getEgtDrivers()[sel - 2].temperature;
+#endif
+        default:
+            return 0.0;
+
+    }
+    return 0.0;
+}
+
 /* TODO: merge with some other communication thread? */
 static THD_WORKING_AREA(waAuxOutThread, 256);
 void AuxOutThread(void*)
 {
+    const auto& cfg = GetConfiguration();
+
     while(1)
     {
         for (int ch = 0; ch < AFR_CHANNELS; ch++)
         {
-            float lambda = GetLambda(ch);
-            // todo: make translation configurable
-            if (lambda < 0.7)
-                lambda = 0.7;
-            if (lambda > 1.3)
-                lambda = 1.3;
+            auto cfg = GetConfiguration();
+            float input = AuxGetInputSignal(cfg.auxInput[ch]);
+            float voltage = interpolate2d(input, cfg.auxOutBins[ch], cfg.auxOutValues[ch]);
 
-            // https://rusefi.com/forum/viewtopic.php?f=4&t=2410 for now
-            float voltage = 1 - (1.3 - lambda) / 0.6;
             SetAuxDac(ch, voltage);
         }
 
