@@ -13,7 +13,7 @@ public:
     Pwm(PWMDriver& driver);
 
     void Start();
-    void Start(PWMConfig& config);
+    void Start(const PWMConfig& config);
     void SetDuty(int channel, float duty);
     float GetLastDuty(int channel);
 

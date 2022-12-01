@@ -7,7 +7,7 @@
 #include "hal.h"
 
 // 48MHz / 1024 = 46.8khz PWM
-PWMConfig pumpDacConfig = {
+static const PWMConfig pumpDacConfig = {
     48'000'000,
     1024,
     nullptr,

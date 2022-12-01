@@ -31,7 +31,7 @@ void Pwm::Start()
     Start(config);
 }
 
-void Pwm::Start(PWMConfig& config)
+void Pwm::Start(const PWMConfig& config)
 {
     m_counterFrequency = config.frequency;
     m_counterPeriod = config.period;
