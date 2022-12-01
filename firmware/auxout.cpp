@@ -16,7 +16,7 @@
 
 // Rev2 low pass filter cut frequency is about 21Hz (sic!)
 // 48Mhz / (2 ^ 12) ~= 12 KHz
-PWMConfig auxPwmConfig = {
+static const PWMConfig auxPwmConfig = {
     48'000'000,
     1 << 12,
     nullptr,

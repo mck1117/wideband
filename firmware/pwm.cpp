@@ -11,7 +11,7 @@ Pwm::Pwm(PWMDriver& driver)
 
 void Pwm::Start()
 {
-    PWMConfig config = {
+    static const PWMConfig config = {
         m_counterFrequency,
         m_counterPeriod,
         nullptr,
