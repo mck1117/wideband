@@ -7,8 +7,17 @@
 #include "tunerstudio_io.h"
 #include "hal.h"
 #include "chprintf.h"
+#include "wideband_config.h"
 
 #if HAL_USE_SERIAL
+
+#ifndef BT_SERIAL_OVER_JDY33
+	#define BT_SERIAL_OVER_JDY33	FALSE
+#endif
+
+#ifndef BT_BROADCAST_NAME
+	#define BT_BROADCAST_NAME		"RusEFI WBO"
+#endif
 
 // JDY-33 has 9: 128000 which we do not
 static const unsigned int baudRates[] = 	{	115200, 9600, 	38400,	2400,	4800,	19200,	57600 };
@@ -57,8 +66,8 @@ int SerialTsChannel::start(uint32_t baud) {
 		.cr3 = 0
 	};
 
-	if (1) {
-		/* BT setup */
+	if (BT_SERIAL_OVER_JDY33) {
+		/* try BT setup */
 		int retry = 3;
 		bool done = false;
 		size_t baudIdx = 0;
@@ -121,14 +130,14 @@ int SerialTsChannel::start(uint32_t baud) {
 			}
 
 			/* SPP Broadcast name: up to 18 bytes */
-			chprintf((BaseSequentialStream *)m_driver, "AT+NAME%s\r\n", "RusEFI WBO x2");
+			chprintf((BaseSequentialStream *)m_driver, "AT+NAME%s\r\n", BT_BROADCAST_NAME);
 			if (bt_wait_ok() != 0) {
 				/* retrty */
 				continue;
 			}
 
 			/* BLE Broadcast name: up to 18 bytes */
-			chprintf((BaseSequentialStream *)m_driver, "AT+NAMB%s\r\n", "RusEFI WBO x2");
+			chprintf((BaseSequentialStream *)m_driver, "AT+NAMB%s\r\n", BT_BROADCAST_NAME " BLE");
 			if (bt_wait_ok() != 0) {
 				/* retrty */
 				continue;

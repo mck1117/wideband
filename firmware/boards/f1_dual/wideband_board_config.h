@@ -65,3 +65,8 @@
 //   MAX31855 spi port
 // *******************************
 #define EGT_SPI_DRIVER			(&SPID1)
+
+// Serial connection over BT module
+// enable BT module setup attempt
+#define BT_SERIAL_OVER_JDY33	TRUE
+#define BT_BROADCAST_NAME		"RusEFI WBO x2"
