@@ -2,6 +2,10 @@
 
 #include <stdint.h>
 
+#include <rusefi/fragments.h>
+
+#include "wideband_config.h"
+
 /* +0 offset */
 struct livedata_common_s {
 	union {
@@ -23,14 +27,12 @@ struct livedata_afr_s {
 			float pumpCurrentTarget;
 			float pumpCurrentMeasured;
 			float heaterDuty;
-		};
+			uint8_t fault; // See wbo::Fault
+			uint8_t heaterState;
+		} __attribute__((packed));
 		uint8_t pad[32];
 	};
 };
 
 /* update functions */
 void SamplingUpdateLiveData();
-
-/* access functions */
-const struct livedata_common_s * getCommonLiveDataStructAddr();
-const struct livedata_afr_s * getAfrLiveDataStructAddr();

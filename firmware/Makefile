@@ -120,6 +120,8 @@ include $(CHIBIOS)/os/hal/osal/rt-nil/osal.mk
 include $(CHIBIOS)/os/rt/rt.mk
 # Other files (optional).
 include $(CHIBIOS)/os/hal/lib/streams/streams.mk
+include $(CHIBIOS)/os/various/cpp_wrappers/chcpp.mk
+include $(CHIBIOS)/os/hal/lib/complex/mfs/hal_mfs.mk
 
 # include board.mk that sets per-board options
 include $(BOARDDIR)/board.mk
@@ -148,8 +150,8 @@ CPPSRC = $(ALLCPPSRC) \
           heater_control.cpp \
           pid.cpp \
           pump_control.cpp \
+          max31855.cpp \
           uart.cpp \
-          interpolation.cpp \
           auxout.cpp \
           livedata.cpp \
           console/binary/tunerstudio.cpp \

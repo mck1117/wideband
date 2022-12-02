@@ -100,7 +100,7 @@ void CanRxThread(void*)
         // Check if it's an "index set" message
         else if (frame.DLC == 1 && frame.EID == WB_MSG_SET_INDEX)
         {
-            auto newCfg = GetConfiguration();
+            auto &newCfg = GetConfiguration();
             newCfg.CanIndexOffset = frame.data8[0];
             SetConfiguration(newCfg);
             configuration = GetConfiguration();
@@ -130,8 +130,9 @@ void InitCan()
 
 void SendRusefiFormat(uint8_t idx)
 {
-    auto baseAddress = 0x190 + 2 * idx;
-    auto esr = GetSensorInternalResistance();
+    auto baseAddress = WB_DATA_BASE_ADDR + 2 * idx;
+    /* TODO: */
+    int ch = 0;
 
     {
         CanTxTyped<wbo::StandardData> frame(baseAddress + 0);
@@ -139,19 +140,21 @@ void SendRusefiFormat(uint8_t idx)
         // The same header is imported by the ECU and checked against this data in the frame
         frame.get().Version = RUSEFI_WIDEBAND_VERSION;
 
-        uint16_t lambda = GetLambda() * 10000;
+        uint16_t lambda = GetLambda(ch) * 10000;
         frame.get().Lambda = lambda;
-        frame.get().TemperatureC = GetSensorTemperature();
-        frame.get().Valid = IsRunningClosedLoop() ? 0x01 : 0x00;
+        frame.get().TemperatureC = GetSensorTemperature(ch);
+        frame.get().Valid = IsRunningClosedLoop(ch) ? 0x01 : 0x00;
     }
 
     {
+        auto esr = GetSensorInternalResistance(ch);
+
         CanTxTyped<wbo::DiagData> frame(baseAddress + 1);
 
         frame.get().Esr = esr;
-        frame.get().NernstDc = GetNernstDc() * 1000;
-        frame.get().PumpDuty = GetPumpOutputDuty() * 255;
-        frame.get().Status = GetCurrentFault();
-        frame.get().HeaterDuty = GetHeaterDuty() * 255;
+        frame.get().NernstDc = GetNernstDc(ch) * 1000;
+        frame.get().PumpDuty = GetPumpOutputDuty(ch) * 255;
+        frame.get().Status = GetCurrentFault(ch);
+        frame.get().HeaterDuty = GetHeaterDuty(ch) * 255;
     }
 }

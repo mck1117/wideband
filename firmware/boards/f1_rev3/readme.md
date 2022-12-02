@@ -1,0 +1,1 @@
+Firmware for https://github.com/rusefi/rusefi-hardware/tree/main/wideband-F103 hardware

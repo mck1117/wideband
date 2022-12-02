@@ -7,6 +7,7 @@
 #define WB_BL_ENTER 0xEF0'0000
 #define WB_MSG_SET_INDEX 0xEF4'0000
 #define WB_MGS_ECU_STATUS 0xEF5'0000
+#define WB_DATA_BASE_ADDR 0x190
 
 namespace wbo
 {
@@ -18,6 +19,7 @@ enum class Fault : uint8_t
     SensorDidntHeat = 3,
     SensorOverheat = 4,
     SensorUnderheat = 5,
+    SensorNoHeatSupply = 6,
 };
 
 struct StandardData
@@ -54,6 +56,8 @@ static const char* describeFault(Fault fault) {
             return "Sensor overheat";
         case Fault::SensorUnderheat:
             return "Sensor underheat";
+        case Fault::SensorNoHeatSupply:
+            return "Sensor no heat supply";
     }
 
     return "Unknown";

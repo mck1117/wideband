@@ -38,7 +38,6 @@ void TunerStudio::cmdOutputChannels(TsChannelBase* tsChannel, uint16_t offset, u
 //		return;
 //	}
 
-	tsState.outputChannelsCommandCounter++;
 	tsChannel->assertPacketSize(count, false);
 	// this method is invoked too often to print any debug information
 	uint8_t * scratchBuffer = (uint8_t *)tsChannel->scratchBuffer;

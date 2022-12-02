@@ -90,11 +90,16 @@ uint8_t readSelPin(ioportid_t port, iopadid_t pad)
 
 extern Configuration __configflash__start__;
 
-Configuration GetConfiguration()
+int InitConfiguration()
+{
+    return 0;
+}
+
+static Configuration c;
+
+Configuration& GetConfiguration()
 {
     const auto& cfg = __configflash__start__;
-
-    Configuration c;
 
     // If config has been written before, use the stored configuration
     if (cfg.IsValid())

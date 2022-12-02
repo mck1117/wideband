@@ -2,9 +2,6 @@
 
 #include <cstring>
 
-// manualy rotate mailboxes on GD32
-static int can1_mailbox = 1;
-
 CanTxMessage::CanTxMessage(uint32_t eid, uint8_t dlc, bool isExtended) {
     m_frame.IDE = isExtended ? CAN_IDE_EXT : CAN_IDE_STD;
     m_frame.EID = eid;
@@ -15,14 +12,7 @@ CanTxMessage::CanTxMessage(uint32_t eid, uint8_t dlc, bool isExtended) {
 
 CanTxMessage::~CanTxMessage() {
     // 100 ms timeout
-    canTransmitTimeout(&CAND1, can1_mailbox, &m_frame, TIME_MS2I(100));
-
-    // GD32 workaround: rotate mailboxes
-    // Does not affect STM32 devices
-    can1_mailbox++;
-    if (can1_mailbox == CAN_TX_MAILBOXES) {
-        can1_mailbox = 1;
-    }
+    canTransmitTimeout(&CAND1, CAN_ANY_MAILBOX, &m_frame, TIME_MS2I(100));
 }
 
 uint8_t& CanTxMessage::operator[](size_t index) {

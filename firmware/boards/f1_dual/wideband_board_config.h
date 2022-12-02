@@ -1,10 +1,11 @@
 #pragma once
 
+// TS settings
+#define TS_SIGNATURE "rusEFI 2022.05.29.wideband_dual"
+
 // This board implements two channels
 #define AFR_CHANNELS 2
-
-// UART used for debug
-#define UART_DEBUG
+#define EGT_CHANNELS 2
 
 // Fundamental board constants
 #define VCC_VOLTS (3.3f)
@@ -48,9 +49,19 @@
 #define AUXOUT_GAIN         ((82.0 + 160.0) / 160.0)
 
 // *******************************
+// With heater constantly on we
+// are not able to measure Vbatt
+// through Heater-
+// *******************************
+#define HEATER_MAX_DUTY		(0.85)
+
+// *******************************
 //   TunerStudio Primary Port
 // *******************************
-//#define TS_PRIMARY_UART_PORT	UARTD1
-//#define TS_PRIMARY_BAUDRATE		38400
 #define TS_PRIMARY_SERIAL_PORT	SD1
 #define TS_PRIMARY_BAUDRATE		115200
+
+// *******************************
+//   MAX31855 spi port
+// *******************************
+#define EGT_SPI_DRIVER			(&SPID1)

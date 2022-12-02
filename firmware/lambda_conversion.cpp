@@ -22,9 +22,9 @@ static float GetPhi(float pumpCurrent)
     return gain * pumpCurrent + 0.99559f;
 }
 
-float GetLambda()
+float GetLambda(int ch)
 {
-    float pumpCurrent = GetPumpNominalCurrent();
+    float pumpCurrent = GetPumpNominalCurrent(ch);
 
     // Lambda is reciprocal of phi
     return 1 / GetPhi(pumpCurrent);

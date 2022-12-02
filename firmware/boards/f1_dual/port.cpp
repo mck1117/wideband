@@ -112,39 +112,3 @@ AnalogResult AnalogSample()
         .VirtualGroundVoltageInt = HALF_VCC,
     };
 }
-
-static struct {
-    uint8_t        pad[128];
-} config;
-
-Configuration GetConfiguration()
-{
-    // TODO: implement me!
-    return {};
-}
-
-void SetConfiguration(const Configuration& newConfig)
-{
-    // TODO: implement me!
-}
-
-/* TS stuff */
-void SaveConfiguration() {
-    // TODO: implement me!
-}
-
-uint8_t *GetConfiguratiuonPtr()
-{
-    return (uint8_t *)&config;
-}
-
-int GetConfiguratiuonSize()
-{
-    return sizeof(config);
-}
-
-#define TS_SIGNATURE "rusEFI 2022.05.29.wideband_rev2"
-
-const char *getTsSignature() {
-    return TS_SIGNATURE;
-}

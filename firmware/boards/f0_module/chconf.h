@@ -178,7 +178,7 @@
  * @note    The default is @p TRUE.
  */
 #if !defined(CH_CFG_USE_REGISTRY)
-#define CH_CFG_USE_REGISTRY                 TRUE
+#define CH_CFG_USE_REGISTRY                 FALSE
 #endif
 
 /**
@@ -189,7 +189,7 @@
  * @note    The default is @p TRUE.
  */
 #if !defined(CH_CFG_USE_WAITEXIT)
-#define CH_CFG_USE_WAITEXIT                 TRUE
+#define CH_CFG_USE_WAITEXIT                 FALSE
 #endif
 
 /**
@@ -199,7 +199,7 @@
  * @note    The default is @p TRUE.
  */
 #if !defined(CH_CFG_USE_SEMAPHORES)
-#define CH_CFG_USE_SEMAPHORES               TRUE
+#define CH_CFG_USE_SEMAPHORES               FALSE
 #endif
 
 /**
@@ -222,7 +222,7 @@
  * @note    The default is @p TRUE.
  */
 #if !defined(CH_CFG_USE_MUTEXES)
-#define CH_CFG_USE_MUTEXES                  TRUE
+#define CH_CFG_USE_MUTEXES                  FALSE
 #endif
 
 /**
@@ -246,7 +246,7 @@
  * @note    Requires @p CH_CFG_USE_MUTEXES.
  */
 #if !defined(CH_CFG_USE_CONDVARS)
-#define CH_CFG_USE_CONDVARS                 TRUE
+#define CH_CFG_USE_CONDVARS                 FALSE
 #endif
 
 /**
@@ -291,7 +291,7 @@
  * @note    The default is @p TRUE.
  */
 #if !defined(CH_CFG_USE_MESSAGES)
-#define CH_CFG_USE_MESSAGES                 TRUE
+#define CH_CFG_USE_MESSAGES                 FALSE
 #endif
 
 /**
@@ -317,7 +317,7 @@
  * @note    Requires @p CH_CFG_USE_HEAP and/or @p CH_CFG_USE_MEMPOOLS.
  */
 #if !defined(CH_CFG_USE_DYNAMIC)
-#define CH_CFG_USE_DYNAMIC                  TRUE
+#define CH_CFG_USE_DYNAMIC                  FALSE
 #endif
 
 /** @} */
@@ -338,7 +338,7 @@
  * @note    Requires @p CH_CFG_USE_SEMAPHORES.
  */
 #if !defined(CH_CFG_USE_MAILBOXES)
-#define CH_CFG_USE_MAILBOXES                TRUE
+#define CH_CFG_USE_MAILBOXES                FALSE
 #endif
 
 /**
@@ -349,7 +349,7 @@
  * @note    The default is @p TRUE.
  */
 #if !defined(CH_CFG_USE_MEMCORE)
-#define CH_CFG_USE_MEMCORE                  TRUE
+#define CH_CFG_USE_MEMCORE                  FALSE
 #endif
 
 /**
@@ -378,7 +378,7 @@
  * @note    Mutexes are recommended.
  */
 #if !defined(CH_CFG_USE_HEAP)
-#define CH_CFG_USE_HEAP                     TRUE
+#define CH_CFG_USE_HEAP                     FALSE
 #endif
 
 /**

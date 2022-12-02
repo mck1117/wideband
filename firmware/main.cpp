@@ -10,6 +10,10 @@
 #include "uart.h"
 #include "io_pins.h"
 #include "auxout.h"
+#include "max31855.h"
+#include "port.h"
+
+#include "wideband_config.h"
 
 using namespace wbo;
 
@@ -20,22 +24,28 @@ int main() {
     halInit();
     chSysInit();
 
+    // Load configuration
+    InitConfiguration();
+
     // Fire up all of our threads
     StartSampling();
     InitPumpDac();
     StartHeaterControl();
     StartPumpControl();
-
-#ifdef AUXOUT_DAC_PWM_DEVICE
     InitAuxDac();
-#endif
 
     InitCan();
     InitUart();
 
+#if (EGT_CHANNELS > 0)
+    StartEgt();
+#endif
+
     while(true)
     {
-        auto fault = GetCurrentFault();
+        /* TODO: show error for all AFR channels */
+        /* TODO: show EGT errors */
+        auto fault = GetCurrentFault(0);
 
         if (fault == Fault::None)
         {
@@ -46,7 +56,7 @@ int main() {
             palTogglePad(LED_GREEN_PORT, LED_GREEN_PIN);
 
             // Slow blink if closed loop, fast if not
-            chThdSleepMilliseconds(IsRunningClosedLoop() ? 700 : 50);
+            chThdSleepMilliseconds(IsRunningClosedLoop(0) ? 700 : 50);
         }
         else
         {
