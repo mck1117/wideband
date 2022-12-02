@@ -10,7 +10,7 @@
 
 static adcsample_t adcBuffer[ADC_CHANNEL_COUNT * ADC_OVERSAMPLE];
 
-ADCConversionGroup convGroup =
+const ADCConversionGroup convGroup =
 {
     .circular = false,
     .num_channels = ADC_CHANNEL_COUNT,
