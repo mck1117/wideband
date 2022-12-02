@@ -97,7 +97,7 @@ int InitConfiguration()
 
 static Configuration c;
 
-Configuration& GetConfiguration()
+Configuration* GetConfiguration()
 {
     const auto& cfg = __configflash__start__;
 
@@ -129,10 +129,10 @@ Configuration& GetConfiguration()
         default: break;
     }
 
-    return c;
+    return &c;
 }
 
-void SetConfiguration(const Configuration& newConfig)
+void SetConfiguration()
 {
     // erase config page
     Flash::ErasePage(31);
@@ -140,7 +140,7 @@ void SetConfiguration(const Configuration& newConfig)
     // Copy data to flash
     Flash::Write(
         reinterpret_cast<flashaddr_t>(&__configflash__start__),
-        reinterpret_cast<const uint8_t*>(&newConfig),
+        reinterpret_cast<const uint8_t*>(&c),
         sizeof(Configuration)
     );
 }

@@ -48,8 +48,8 @@ public:
 };
 
 int InitConfiguration();
-Configuration& GetConfiguration();
-void SetConfiguration(const Configuration& newConfig);
+Configuration* GetConfiguration();
+void SetConfiguration();
 
 /* TS stuff */
 uint8_t *GetConfiguratiuonPtr();

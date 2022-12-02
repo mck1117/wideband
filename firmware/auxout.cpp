@@ -141,15 +141,15 @@ static float AuxGetInputSignal(int sel)
 static THD_WORKING_AREA(waAuxOutThread, 256);
 void AuxOutThread(void*)
 {
-    const auto& cfg = GetConfiguration();
+    const auto cfg = GetConfiguration();
 
     while(1)
     {
         for (int ch = 0; ch < AFR_CHANNELS; ch++)
         {
             auto cfg = GetConfiguration();
-            float input = AuxGetInputSignal(cfg.auxInput[ch]);
-            float voltage = interpolate2d(input, cfg.auxOutBins[ch], cfg.auxOutValues[ch]);
+            float input = AuxGetInputSignal(cfg->auxInput[ch]);
+            float voltage = interpolate2d(input, cfg->auxOutBins[ch], cfg->auxOutValues[ch]);
 
             SetAuxDac(ch, voltage);
         }

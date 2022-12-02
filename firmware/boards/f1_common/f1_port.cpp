@@ -52,17 +52,13 @@ int InitConfiguration()
     return 0;
 }
 
-static Configuration c;
-
-Configuration& GetConfiguration()
+Configuration* GetConfiguration()
 {
-    return cfg;
+    return &cfg;
 }
 
-void SetConfiguration(const Configuration& newConfig)
+void SetConfiguration()
 {
-    cfg = newConfig;
-
     SaveConfiguration();
 }
 

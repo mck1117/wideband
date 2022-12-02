@@ -12,14 +12,14 @@
 // this same header is imported by rusEFI to get struct layouts and firmware version
 #include "../for_rusefi/wideband_can.h"
 
-Configuration configuration;
+static Configuration* configuration;
 
 static THD_WORKING_AREA(waCanTxThread, 256);
 void CanTxThread(void*)
 {
     while(1)
     {
-        SendRusefiFormat(configuration.CanIndexOffset);
+        SendRusefiFormat(configuration->CanIndexOffset);
 
         chThdSleepMilliseconds(10);
     }
@@ -100,10 +100,9 @@ void CanRxThread(void*)
         // Check if it's an "index set" message
         else if (frame.DLC == 1 && frame.EID == WB_MSG_SET_INDEX)
         {
-            auto &newCfg = GetConfiguration();
-            newCfg.CanIndexOffset = frame.data8[0];
-            SetConfiguration(newCfg);
             configuration = GetConfiguration();
+            configuration->CanIndexOffset = frame.data8[0];
+            SetConfiguration();
             SendAck();
         }
     }
