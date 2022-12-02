@@ -28,6 +28,11 @@
 #ifndef CHCONF_H
 #define CHCONF_H
 
+#ifndef __ASSEMBLER__
+// HACK: some compilers have a problem with syscalls_cpp.cpp not being able to find pid_t
+typedef int pid_t;
+#endif
+
 #define _CHIBIOS_RT_CONF_
 #define _CHIBIOS_RT_CONF_VER_7_0_
 
