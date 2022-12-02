@@ -24,6 +24,18 @@
             "svdFile": "${workspaceRoot}/firmware/cmsis-svd/data/STMicro/STM32F042x.svd",
             "servertype": "openocd",
             "configFiles": ["interface/stlink.cfg", "target/stm32f0x.cfg"]
+        },
+        {
+            "name": "Debug F1",
+            "type": "cortex-debug",
+            "request": "launch",
+            "cwd": "${workspaceFolder}/firmware/",
+            "executable": "${workspaceRoot}/firmware/build/wideband.elf",
+            "device": "STM32F103CB",
+            "v1": false,
+            "svdFile": "${workspaceRoot}/firmware/cmsis-svd/data/STMicro/STM32F103xx.svd",
+            "servertype": "openocd",
+            "configFiles": ["interface/stlink.cfg", "target/stm32f1x.cfg"]
         }
     ]
 }

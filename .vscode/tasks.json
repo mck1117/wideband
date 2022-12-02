@@ -43,9 +43,22 @@
             }
         },
         {
-            "label": "Build Dave's Board",
+            "label": "Build F1 Dual",
             "type": "shell",
-            "command": "make -j8 BOARD=f1_dave",
+            "command": "make -j8 BOARD=f1_dual",
+            "options": {
+                "cwd": "${workspaceRoot}/firmware"
+            },
+            "problemMatcher": [],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "Build F1 Single r3",
+            "type": "shell",
+            "command": "make -j8 BOARD=f1_rev3",
             "options": {
                 "cwd": "${workspaceRoot}/firmware"
             },
