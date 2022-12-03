@@ -183,7 +183,7 @@ typedef int pid_t;
  * @note    The default is @p TRUE.
  */
 #if !defined(CH_CFG_USE_REGISTRY)
-#define CH_CFG_USE_REGISTRY                 FALSE
+#define CH_CFG_USE_REGISTRY                 TRUE
 #endif
 
 /**
@@ -204,7 +204,7 @@ typedef int pid_t;
  * @note    The default is @p TRUE.
  */
 #if !defined(CH_CFG_USE_SEMAPHORES)
-#define CH_CFG_USE_SEMAPHORES               FALSE
+#define CH_CFG_USE_SEMAPHORES               TRUE
 #endif
 
 /**
@@ -227,7 +227,7 @@ typedef int pid_t;
  * @note    The default is @p TRUE.
  */
 #if !defined(CH_CFG_USE_MUTEXES)
-#define CH_CFG_USE_MUTEXES                  FALSE
+#define CH_CFG_USE_MUTEXES                  TRUE
 #endif
 
 /**
@@ -251,7 +251,7 @@ typedef int pid_t;
  * @note    Requires @p CH_CFG_USE_MUTEXES.
  */
 #if !defined(CH_CFG_USE_CONDVARS)
-#define CH_CFG_USE_CONDVARS                 FALSE
+#define CH_CFG_USE_CONDVARS                 TRUE
 #endif
 
 /**
@@ -296,7 +296,7 @@ typedef int pid_t;
  * @note    The default is @p TRUE.
  */
 #if !defined(CH_CFG_USE_MESSAGES)
-#define CH_CFG_USE_MESSAGES                 FALSE
+#define CH_CFG_USE_MESSAGES                 TRUE
 #endif
 
 /**
@@ -322,7 +322,7 @@ typedef int pid_t;
  * @note    Requires @p CH_CFG_USE_HEAP and/or @p CH_CFG_USE_MEMPOOLS.
  */
 #if !defined(CH_CFG_USE_DYNAMIC)
-#define CH_CFG_USE_DYNAMIC                  FALSE
+#define CH_CFG_USE_DYNAMIC                  TRUE
 #endif
 
 /** @} */
@@ -343,7 +343,7 @@ typedef int pid_t;
  * @note    Requires @p CH_CFG_USE_SEMAPHORES.
  */
 #if !defined(CH_CFG_USE_MAILBOXES)
-#define CH_CFG_USE_MAILBOXES                FALSE
+#define CH_CFG_USE_MAILBOXES                TRUE
 #endif
 
 /**
@@ -354,7 +354,7 @@ typedef int pid_t;
  * @note    The default is @p TRUE.
  */
 #if !defined(CH_CFG_USE_MEMCORE)
-#define CH_CFG_USE_MEMCORE                  FALSE
+#define CH_CFG_USE_MEMCORE                  TRUE
 #endif
 
 /**
@@ -383,7 +383,7 @@ typedef int pid_t;
  * @note    Mutexes are recommended.
  */
 #if !defined(CH_CFG_USE_HEAP)
-#define CH_CFG_USE_HEAP                     FALSE
+#define CH_CFG_USE_HEAP                     TRUE
 #endif
 
 /**
