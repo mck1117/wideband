@@ -118,48 +118,48 @@ int SerialTsChannel::start(uint32_t baud) {
 			chprintf((BaseSequentialStream *)m_driver, "AT+VERSION\r\n");
 			len = bt_read_line(tmp, sizeof(tmp));
 			if (len < 0) {
-				/* retrty */
+				/* retry */
 				continue;
 			}
 
 			/* Reset settings to defaults */
 			chprintf((BaseSequentialStream *)m_driver, "AT+DEFAULT\r\n");
 			if (bt_wait_ok() != 0) {
-				/* retrty */
+				/* retry */
 				continue;
 			}
 
 			/* SPP Broadcast name: up to 18 bytes */
 			chprintf((BaseSequentialStream *)m_driver, "AT+NAME%s\r\n", BT_BROADCAST_NAME);
 			if (bt_wait_ok() != 0) {
-				/* retrty */
+				/* retry */
 				continue;
 			}
 
 			/* BLE Broadcast name: up to 18 bytes */
 			chprintf((BaseSequentialStream *)m_driver, "AT+NAMB%s\r\n", BT_BROADCAST_NAME " BLE");
 			if (bt_wait_ok() != 0) {
-				/* retrty */
+				/* retry */
 				continue;
 			}
 
 			/* SPP connection with no password */
 			chprintf((BaseSequentialStream *)m_driver, "AT+TYPE%d\r\n", 0);
 			if (bt_wait_ok() != 0) {
-				/* retrty */
+				/* retry */
 				continue;
 			}
 
 			/* Disable serial port status output */
 			chprintf((BaseSequentialStream *)m_driver, "AT+ENLOG%d\r\n", 0);
 			if (bt_wait_ok() != 0) {
-				/* retrty */
+				/* retry */
 				continue;
 			}
 
 			chprintf((BaseSequentialStream *)m_driver, "AT+BAUD%d\r\n", baudRateCodes[baudIdx]);
 			if (bt_wait_ok() != 0) {
-				/* retrty */
+				/* retry */
 				continue;
 			}
 

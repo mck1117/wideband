@@ -92,7 +92,7 @@
  * PA15 - SPI_CS2                   (output pushpull, 2 MHz)
  */
 #define VAL_GPIOACRL            0x00000BB0      /*  PA7...PA0 */
-#define VAL_GPIOACRH            0x288B88B2      /* PA15...PA8 */
+#define VAL_GPIOACRH            0x288B8892      /* PA15...PA8 */
 #define VAL_GPIOAODR            0x0000FFFF
 
 /*

@@ -11,7 +11,8 @@
             "v1": false,
             "svdFile": "${workspaceRoot}/firmware/cmsis-svd/data/STMicro/STM32F042x.svd",
             "servertype": "openocd",
-            "configFiles": ["interface/stlink.cfg", "target/stm32f0x.cfg"]
+            "configFiles": ["interface/stlink.cfg", "target/stm32f0x.cfg"],
+            "rtos": "auto"
         },
         {
             "name": "Debug F042 (bootloader)",
@@ -23,7 +24,8 @@
             "v1": false,
             "svdFile": "${workspaceRoot}/firmware/cmsis-svd/data/STMicro/STM32F042x.svd",
             "servertype": "openocd",
-            "configFiles": ["interface/stlink.cfg", "target/stm32f0x.cfg"]
+            "configFiles": ["interface/stlink.cfg", "target/stm32f0x.cfg"],
+            "rtos": "auto"
         },
         {
             "name": "Debug F1",
@@ -35,7 +37,8 @@
             "v1": false,
             "svdFile": "${workspaceRoot}/firmware/cmsis-svd/data/STMicro/STM32F103xx.svd",
             "servertype": "openocd",
-            "configFiles": ["interface/stlink.cfg", "target/stm32f1x.cfg"]
+            "configFiles": ["interface/stlink.cfg", "target/stm32f1x.cfg"],
+            "rtos": "auto"
         }
     ]
 }
