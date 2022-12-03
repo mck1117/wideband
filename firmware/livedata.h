@@ -10,7 +10,6 @@
 struct livedata_common_s {
 	union {
 		struct {
-			uint32_t test;
 			float vbatt;
 		};
 		uint8_t pad0[32];

@@ -18,6 +18,12 @@ struct AnalogResult
 
 AnalogResult AnalogSample();
 
+enum class SensorType : uint8_t {
+    LSU49 = 0,
+    LSU42 = 1,
+    LSUADV = 2,
+};
+
 class Configuration {
 private:
     // Increment this any time the configuration format changes
@@ -40,6 +46,8 @@ public:
             float auxOutBins[2][8];
             float auxOutValues[2][8];
             uint8_t auxInput[2];
+
+            SensorType sensorType;
         } __attribute__((packed));
 
         // pad to 256 bytes including tag
