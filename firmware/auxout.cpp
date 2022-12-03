@@ -21,10 +21,11 @@ static const PWMConfig auxPwmConfig = {
     1 << 12,
     nullptr,
     {
-        {PWM_OUTPUT_ACTIVE_HIGH | PWM_COMPLEMENTARY_OUTPUT_ACTIVE_HIGH, nullptr},
-        {PWM_OUTPUT_ACTIVE_HIGH | PWM_COMPLEMENTARY_OUTPUT_ACTIVE_HIGH, nullptr},
-        {PWM_OUTPUT_ACTIVE_HIGH | PWM_COMPLEMENTARY_OUTPUT_ACTIVE_HIGH, nullptr},
-        {PWM_OUTPUT_ACTIVE_HIGH | PWM_COMPLEMENTARY_OUTPUT_ACTIVE_HIGH, nullptr}
+        // TODO: do any boards use the "primary" outputs instead of the "complementary" outputs?
+        {/*PWM_OUTPUT_ACTIVE_HIGH |*/ PWM_COMPLEMENTARY_OUTPUT_ACTIVE_HIGH, nullptr},
+        {/*PWM_OUTPUT_ACTIVE_HIGH |*/ PWM_COMPLEMENTARY_OUTPUT_ACTIVE_HIGH, nullptr},
+        {/*PWM_OUTPUT_ACTIVE_HIGH |*/ PWM_COMPLEMENTARY_OUTPUT_ACTIVE_HIGH, nullptr},
+        {/*PWM_OUTPUT_ACTIVE_HIGH |*/ PWM_COMPLEMENTARY_OUTPUT_ACTIVE_HIGH, nullptr}
     },
     0,
     0,
