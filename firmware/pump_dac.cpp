@@ -7,8 +7,9 @@
 #include "hal.h"
 
 // 48MHz / 1024 = 46.8khz PWM
+// 64MHz / 1024 = 62.5khz PWM
 static const PWMConfig pumpDacConfig = {
-    48'000'000,
+    STM32_SYSCLK,
     1024,
     nullptr,
     {
