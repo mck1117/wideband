@@ -109,7 +109,7 @@
  * PB12 - Nernsr_4.2_esr_drive      (digital input, no pull) - keep high-Z after power on
  * PB13..PB15 - unused
  */
-#define VAL_GPIOBCRL            0x8A888200      /*  PB7...PB0 */
+#define VAL_GPIOBCRL            0x8B888200      /*  PB7...PB0 */
 #define VAL_GPIOBCRH            0x88843488      /* PB15...PB8 */
 #define VAL_GPIOBODR            0x0000FFFF
 
