@@ -10,7 +10,7 @@
 void sendErrorCode(TsChannelBase *tsChannel, uint8_t code);
 
 size_t getTunerStudioPageSize() {
-	return GetConfiguratiuonSize();
+	return GetConfigurationSize();
 }
 
 // Validate whether the specified offset and count would cause an overrun in the tune.

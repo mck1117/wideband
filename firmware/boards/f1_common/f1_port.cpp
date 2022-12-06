@@ -34,7 +34,7 @@ void Configuration::LoadDefaults()
 
 int InitConfiguration()
 {
-    size_t size = GetConfiguratiuonSize();
+    size_t size = GetConfigurationSize();
 
     /* Starting EFL driver.*/
     eflStart(&EFLD1, NULL);
@@ -44,7 +44,7 @@ int InitConfiguration()
     mfsStart(&mfs1, &mfscfg1);
 
     mfs_error_t err = mfsReadRecord(&mfs1, MFS_CONFIGURATION_RECORD_ID, &size, GetConfiguratiuonPtr());
-    if ((err != MFS_NO_ERROR) || (size != GetConfiguratiuonSize() || !cfg.IsValid())) {
+    if ((err != MFS_NO_ERROR) || (size != GetConfigurationSize() || !cfg.IsValid())) {
         /* load defaults */
         cfg.LoadDefaults();
     }
@@ -65,7 +65,7 @@ void SetConfiguration()
 /* TS stuff */
 void SaveConfiguration() {
     /* TODO: handle error */
-    mfsWriteRecord(&mfs1, MFS_CONFIGURATION_RECORD_ID, GetConfiguratiuonSize(), GetConfiguratiuonPtr());
+    mfsWriteRecord(&mfs1, MFS_CONFIGURATION_RECORD_ID, GetConfigurationSize(), GetConfiguratiuonPtr());
 }
 
 uint8_t *GetConfiguratiuonPtr()
@@ -73,7 +73,7 @@ uint8_t *GetConfiguratiuonPtr()
     return (uint8_t *)&cfg;
 }
 
-size_t GetConfiguratiuonSize()
+size_t GetConfigurationSize()
 {
     return sizeof(cfg);
 }
