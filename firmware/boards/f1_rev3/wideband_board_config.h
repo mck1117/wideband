@@ -1,7 +1,7 @@
 #pragma once
 
 // TS settings
-#define TS_SIGNATURE "rusEFI 2022\.12\.06\.wideband_f1"
+#define TS_SIGNATURE "rusEFI 2022.12.06.wideband_f1"
 
 // Fundamental board constants
 #define VCC_VOLTS (3.3f)
