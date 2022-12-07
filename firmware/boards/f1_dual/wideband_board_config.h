@@ -68,5 +68,5 @@
 
 // Serial connection over BT module
 // enable BT module setup attempt
-#define BT_SERIAL_OVER_JDY33	FALSE
+#define BT_SERIAL_OVER_JDY33	TRUE
 #define BT_BROADCAST_NAME		"RusEFI WBO x2"
