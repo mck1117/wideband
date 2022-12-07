@@ -1,7 +1,7 @@
 #pragma once
 
 // TS settings
-#define TS_SIGNATURE "rusEFI 2022.12.02.wideband_dual"
+#define TS_SIGNATURE "rusEFI 2022\.12\.06\.wideband_dual"
 
 // This board implements two channels
 #define AFR_CHANNELS 2
@@ -68,5 +68,5 @@
 
 // Serial connection over BT module
 // enable BT module setup attempt
-#define BT_SERIAL_OVER_JDY33	TRUE
+#define BT_SERIAL_OVER_JDY33	FALSE
 #define BT_BROADCAST_NAME		"RusEFI WBO x2"

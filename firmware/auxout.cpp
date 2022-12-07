@@ -120,23 +120,29 @@ void SetAuxDac(int channel, float voltage)
 
 #if (defined(AUXOUT_DAC_PWM_DEVICE) || defined(AUXOUT_DAC_DEVICE))
 
-static float AuxGetInputSignal(int sel)
+static float AuxGetInputSignal(AuxOutputMode sel)
 {
     switch (sel)
     {
-        case 0:
-        case 1:
-            return GetLambda(sel);
+        case AuxOutputMode::Afr0:
+            return 14.7f * GetLambda(0);
+        case AuxOutputMode::Afr1:
+            return 14.7f * GetLambda(1);
+        case AuxOutputMode::Lambda0:
+            return GetLambda(0);
+        case AuxOutputMode::Lambda1:
+            return GetLambda(1);
 #if HAL_USE_SPI
-        case 2:
-        case 3:
-            return getEgtDrivers()[sel - 2].temperature;
+        case AuxOutputMode::Egt0:
+            return getEgtDrivers()[0].temperature;
+        case AuxOutputMode::Egt1:
+            return getEgtDrivers()[1].temperature;
 #endif
         default:
-            return 0.0;
-
+            return 0;
     }
-    return 0.0;
+
+    return 0;
 }
 
 /* TODO: merge with some other communication thread? */
@@ -150,7 +156,7 @@ void AuxOutThread(void*)
         for (int ch = 0; ch < AFR_CHANNELS; ch++)
         {
             auto cfg = GetConfiguration();
-            float input = AuxGetInputSignal(cfg->auxInput[ch]);
+            float input = AuxGetInputSignal(cfg->auxOutputSource[ch]);
             float voltage = interpolate2d(input, cfg->auxOutBins[ch], cfg->auxOutValues[ch]);
 
             SetAuxDac(ch, voltage);

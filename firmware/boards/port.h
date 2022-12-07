@@ -24,6 +24,15 @@ enum class SensorType : uint8_t {
     LSUADV = 2,
 };
 
+enum class AuxOutputMode : uint8_t {
+    Afr0 = 0,
+    Afr1 = 1,
+    Lambda0 = 2,
+    Lambda1 = 3,
+    Egt0 = 4,
+    Egt1 = 5,
+};
+
 class Configuration {
 private:
     // Increment this any time the configuration format changes
@@ -45,7 +54,7 @@ public:
             // AUX0 and AUX1 curves
             float auxOutBins[2][8];
             float auxOutValues[2][8];
-            uint8_t auxInput[2];
+            AuxOutputMode auxOutputSource[2];
 
             SensorType sensorType;
         } __attribute__((packed));

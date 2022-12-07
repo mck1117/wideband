@@ -20,7 +20,8 @@ struct livedata_common_s {
 struct livedata_afr_s {
 	union {
 		struct {
-			float afr;
+			// lambda also displayed by TS as AFR, same data with different scale factor
+			float lambda;
 			float temperature;
 			float nernstVoltage;
 			float pumpCurrentTarget;
