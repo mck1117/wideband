@@ -22,7 +22,7 @@ struct measure_results {
 static struct measure_results results[AFR_CHANNELS];
 
 // Last point is approximated by the greatest measurable sensor resistance
-static const float lsu49TempBins[]   = {   80, 150, 200, 250, 300, 350, 400, 450, 550, 650, 800, 1000, 1200, 2500, 5000 };
+static const float lsu49TempBins[]   = {   80, 150, 200, 250, 300, 350, 400, 450, 550, 650, 800, 1000, 1200, 2500, 4500 };
 static const float lsu49TempValues[] = { 1030, 890, 840, 805, 780, 760, 745, 730, 705, 685, 665,  640,  630,  565,  500 };
 
 constexpr float f_abs(float x)
