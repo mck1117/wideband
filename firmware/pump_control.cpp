@@ -26,6 +26,8 @@ static struct pump_control_state state[AFR_CHANNELS] =
 static THD_WORKING_AREA(waPumpThread, 256);
 static void PumpThread(void*)
 {
+    chRegSetThreadName("Pump");
+
     while(true)
     {
         for (int ch = 0; ch < AFR_CHANNELS; ch++)

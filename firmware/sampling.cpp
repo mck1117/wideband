@@ -37,6 +37,8 @@ static void SamplingThread(void*)
     float r_2[AFR_CHANNELS] = {0};
     float r_3[AFR_CHANNELS] = {0};
 
+    chRegSetThreadName("Sampling");
+
     /* GD32: Insert 20us delay after ADC enable */
     chThdSleepMilliseconds(1);
 

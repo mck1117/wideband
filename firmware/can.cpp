@@ -17,6 +17,8 @@ static Configuration* configuration;
 static THD_WORKING_AREA(waCanTxThread, 256);
 void CanTxThread(void*)
 {
+    chRegSetThreadName("CAN Tx");
+
     while(1)
     {
         SendRusefiFormat(configuration->CanIndexOffset);
@@ -45,6 +47,8 @@ static float remoteBatteryVoltage = 0;
 static THD_WORKING_AREA(waCanRxThread, 512);
 void CanRxThread(void*)
 {
+    chRegSetThreadName("CAN Rx");
+
     while(1)
     {
         CANRxFrame frame;
