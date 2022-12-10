@@ -183,7 +183,7 @@ typedef int pid_t;
  * @note    The default is @p TRUE.
  */
 #if !defined(CH_CFG_USE_REGISTRY)
-#define CH_CFG_USE_REGISTRY                 FALSE
+#define CH_CFG_USE_REGISTRY                 TRUE
 #endif
 
 /**
