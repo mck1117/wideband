@@ -196,6 +196,8 @@ static void HeaterThread(void*)
 {
     int ch;
 
+    chRegSetThreadName("Heater");
+
     // Wait for temperature sensing to stabilize so we don't
     // immediately think we overshot the target temperature
     chThdSleepMilliseconds(1000);

@@ -151,6 +151,8 @@ void AuxOutThread(void*)
 {
     const auto cfg = GetConfiguration();
 
+    chRegSetThreadName("Aux out");
+
     while(1)
     {
         for (int ch = 0; ch < AFR_CHANNELS; ch++)

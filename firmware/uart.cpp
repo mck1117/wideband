@@ -28,6 +28,8 @@ static char printBuffer[200];
 static THD_WORKING_AREA(waUartThread, 512);
 static void UartThread(void*)
 {
+    chRegSetThreadName("UART debug");
+
     // in UART_DEBUG mode we only support Serial - this file name here has a bit of a confusing naming
     sdStart(&SD1, &cfg);
 
