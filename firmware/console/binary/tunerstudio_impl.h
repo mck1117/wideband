@@ -35,6 +35,11 @@ public:
 	void handleCrc32Check(TsChannelBase *tsChannel, ts_response_format_e mode, uint16_t offset, uint16_t count);
 	void handleWriteValueCommand(TsChannelBase* tsChannel, ts_response_format_e mode, uint16_t offset, uint8_t value);
 	void handlePageReadCommand(TsChannelBase* tsChannel, ts_response_format_e mode, uint16_t offset, uint16_t count);
+	// Scatter mode support
+	void handleScatteredReadCommand(TsChannelBase* tsChannel);
+	void handleScatterListWriteCommand(TsChannelBase* tsChannel, uint16_t offset, uint16_t count, void *content);
+	void handleScatterListReadCommand(TsChannelBase* tsChannel, uint16_t offset, uint16_t count);
+	void handleScatterListCrc32Check(TsChannelBase *tsChannel, uint16_t offset, uint16_t count);
 
 private:
 	void sendErrorCode(TsChannelBase* tsChannel, uint8_t code);

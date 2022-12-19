@@ -205,6 +205,7 @@ static bool isKnownCommand(char command) {
 	return command == TS_HELLO_COMMAND || command == TS_READ_COMMAND || command == TS_OUTPUT_COMMAND
 			|| command == TS_BURN_COMMAND
 			|| command == TS_CHUNK_WRITE_COMMAND
+			|| command == TS_GET_SCATTERED_GET_COMMAND
 			|| command == TS_CRC_CHECK_COMMAND
 			|| command == TS_GET_FIRMWARE_VERSION;
 }
@@ -464,6 +465,9 @@ int TunerStudio::handleCrcCommand(TsChannelBase* tsChannel, char *data, size_t i
 	/* commands with no arguments */
 	switch(command)
 	{
+	case TS_GET_SCATTERED_GET_COMMAND:
+		handleScatteredReadCommand(tsChannel);
+		break;
 	case TS_HELLO_COMMAND:
 		tunerStudioDebug(tsChannel, "got Query command");
 		handleQueryCommand(tsChannel, TS_CRC);
@@ -503,14 +507,22 @@ int TunerStudio::handleCrcCommand(TsChannelBase* tsChannel, char *data, size_t i
 		cmdOutputChannels(tsChannel, header->offset, header->count);
 		break;
 	case TS_CHUNK_WRITE_COMMAND:
-		handleWriteChunkCommand(tsChannel, TS_CRC, header->offset, header->count, data + sizeof(TunerStudioDataPacketHeader));
-		break;
+		if (header->page == 0)
+			handleWriteChunkCommand(tsChannel, TS_CRC, header->offset, header->count, data + sizeof(TunerStudioDataPacketHeader));
+		else
+			handleScatterListWriteCommand(tsChannel, header->offset, header->count, data + sizeof(TunerStudioDataPacketHeader));
 		break;
 	case TS_CRC_CHECK_COMMAND:
-		handleCrc32Check(tsChannel, TS_CRC, header->offset, header->count);
+		if (header->page == 0)
+			handleCrc32Check(tsChannel, TS_CRC, header->offset, header->count);
+		else
+			handleScatterListCrc32Check(tsChannel, header->offset, header->count);
 		break;
 	case TS_READ_COMMAND:
-		handlePageReadCommand(tsChannel, TS_CRC, header->offset, header->count);
+		if (header->page == 0)
+			handlePageReadCommand(tsChannel, TS_CRC, header->offset, header->count);
+		else
+			handleScatterListReadCommand(tsChannel, header->offset, header->count);
 		break;
 	default:
 		sendErrorCode(tsChannel, TS_RESPONSE_UNRECOGNIZED_COMMAND);
