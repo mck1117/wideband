@@ -456,10 +456,44 @@ static void handleGetVersion(TsChannelBase* tsChannel) {
 }
 
 int TunerStudio::handleCrcCommand(TsChannelBase* tsChannel, char *data, int incomingPacketSize) {
+	bool handled = true;
 	(void)incomingPacketSize;
 
 	char command = data[0];
 	data++;
+
+	/* commands with no arguments */
+	switch(command)
+	{
+	case TS_HELLO_COMMAND:
+		tunerStudioDebug(tsChannel, "got Query command");
+		handleQueryCommand(tsChannel, TS_CRC);
+		break;
+	case TS_GET_FIRMWARE_VERSION:
+		handleGetVersion(tsChannel);
+		break;
+	case TS_BURN_COMMAND:
+		handleBurnCommand(tsChannel, TS_CRC);
+		break;
+	case TS_TEST_COMMAND:
+		[[fallthrough]];
+	case 'T':
+		handleTestCommand(tsChannel);
+		break;
+	default:
+		/* noone of simple commands */
+		handled = false;
+	}
+
+	if (handled)
+		return true;
+
+	/* check if we can extract offset and count */
+	if (incomingPacketSize < 5) {
+		sendErrorCode(tsChannel, TS_RESPONSE_UNDERRUN);
+		tunerStudioError(tsChannel, "ERROR: underrun");
+		return false;
+	}
 
 	const uint16_t* data16 = reinterpret_cast<uint16_t*>(data);
 
@@ -472,13 +506,6 @@ int TunerStudio::handleCrcCommand(TsChannelBase* tsChannel, char *data, int inco
 		tsState.outputChannelsCommandCounter++;
 		cmdOutputChannels(tsChannel, offset, count);
 		break;
-	case TS_HELLO_COMMAND:
-		tunerStudioDebug(tsChannel, "got Query command");
-		handleQueryCommand(tsChannel, TS_CRC);
-		break;
-	case TS_GET_FIRMWARE_VERSION:
-		handleGetVersion(tsChannel);
-		break;
 	case TS_CHUNK_WRITE_COMMAND:
 		handleWriteChunkCommand(tsChannel, TS_CRC, offset, count, data + sizeof(TunerStudioWriteChunkRequest));
 		break;
@@ -486,16 +513,9 @@ int TunerStudio::handleCrcCommand(TsChannelBase* tsChannel, char *data, int inco
 	case TS_CRC_CHECK_COMMAND:
 		handleCrc32Check(tsChannel, TS_CRC, offset, count);
 		break;
-	case TS_BURN_COMMAND:
-		handleBurnCommand(tsChannel, TS_CRC);
-		break;
+
 	case TS_READ_COMMAND:
 		handlePageReadCommand(tsChannel, TS_CRC, offset, count);
-		break;
-	case TS_TEST_COMMAND:
-		[[fallthrough]];
-	case 'T':
-		handleTestCommand(tsChannel);
 		break;
 	default:
 		sendErrorCode(tsChannel, TS_RESPONSE_UNRECOGNIZED_COMMAND);
