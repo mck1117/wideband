@@ -455,12 +455,11 @@ static void handleGetVersion(TsChannelBase* tsChannel) {
 	tsChannel->sendResponse(TS_CRC, (const uint8_t *) versionBuffer, strlen(versionBuffer) + 1);
 }
 
-int TunerStudio::handleCrcCommand(TsChannelBase* tsChannel, char *data, int incomingPacketSize) {
+int TunerStudio::handleCrcCommand(TsChannelBase* tsChannel, char *data, size_t incomingPacketSize) {
 	bool handled = true;
 	(void)incomingPacketSize;
 
 	char command = data[0];
-	data++;
 
 	/* commands with no arguments */
 	switch(command)
@@ -489,33 +488,29 @@ int TunerStudio::handleCrcCommand(TsChannelBase* tsChannel, char *data, int inco
 		return true;
 
 	/* check if we can extract offset and count */
-	if (incomingPacketSize < 5) {
+	if (incomingPacketSize < sizeof(TunerStudioDataPacketHeader)) {
 		sendErrorCode(tsChannel, TS_RESPONSE_UNDERRUN);
 		tunerStudioError(tsChannel, "ERROR: underrun");
 		return false;
 	}
 
-	const uint16_t* data16 = reinterpret_cast<uint16_t*>(data);
-
-	uint16_t offset = data16[0];
-	uint16_t count = data16[1];
+	const TunerStudioDataPacketHeader* header = reinterpret_cast<TunerStudioDataPacketHeader*>(data);
 
 	switch(command)
 	{
 	case TS_OUTPUT_COMMAND:
 		tsState.outputChannelsCommandCounter++;
-		cmdOutputChannels(tsChannel, offset, count);
+		cmdOutputChannels(tsChannel, header->offset, header->count);
 		break;
 	case TS_CHUNK_WRITE_COMMAND:
-		handleWriteChunkCommand(tsChannel, TS_CRC, offset, count, data + sizeof(TunerStudioWriteChunkRequest));
+		handleWriteChunkCommand(tsChannel, TS_CRC, header->offset, header->count, data + sizeof(TunerStudioDataPacketHeader));
 		break;
 		break;
 	case TS_CRC_CHECK_COMMAND:
-		handleCrc32Check(tsChannel, TS_CRC, offset, count);
+		handleCrc32Check(tsChannel, TS_CRC, header->offset, header->count);
 		break;
-
 	case TS_READ_COMMAND:
-		handlePageReadCommand(tsChannel, TS_CRC, offset, count);
+		handlePageReadCommand(tsChannel, TS_CRC, header->offset, header->count);
 		break;
 	default:
 		sendErrorCode(tsChannel, TS_RESPONSE_UNRECOGNIZED_COMMAND);

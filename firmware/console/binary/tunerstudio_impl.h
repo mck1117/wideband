@@ -23,7 +23,7 @@ protected:
 
 class TunerStudio : public TunerStudioBase {
 public:
-	int handleCrcCommand(TsChannelBase* tsChannel, char *data, int incomingPacketSize);
+	int handleCrcCommand(TsChannelBase* tsChannel, char *data, size_t incomingPacketSize);
 	bool handlePlainCommand(TsChannelBase* tsChannel, uint8_t command);
 
 	void cmdOutputChannels(TsChannelBase* tsChannel, uint16_t offset, uint16_t count) override;
