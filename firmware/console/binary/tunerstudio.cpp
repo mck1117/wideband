@@ -123,7 +123,17 @@ void TunerStudio::handlePageSelectCommand(TsChannelBase *tsChannel, ts_response_
 	sendOkResponse(tsChannel, mode);
 }
 
-bool validateOffsetCount(size_t offset, size_t count, TsChannelBase* tsChannel);
+size_t getTunerStudioPageSize() {
+	return GetConfigurationSize();
+}
+
+// Validate whether the specified offset and count would cause an overrun in the tune.
+// Returns true if offset and count are in valid range
+bool validateOffsetCount(size_t offset, size_t count) {
+	if (offset + count > getTunerStudioPageSize())
+		return false;
+	return true;
+}
 
 /**
  * This command is needed to make the whole transfer a bit faster
@@ -135,7 +145,9 @@ void TunerStudio::handleWriteChunkCommand(TsChannelBase* tsChannel, ts_response_
 
 	tsState.writeChunkCommandCounter++;
 
-	if (validateOffsetCount(offset, count, tsChannel)) {
+	if (!validateOffsetCount(offset, count)) {
+		tunerStudioError(tsChannel, "ERROR: out of range");
+		sendErrorCode(tsChannel, TS_RESPONSE_OUT_OF_RANGE);
 		return;
 	}
 
@@ -149,7 +161,9 @@ void TunerStudio::handleCrc32Check(TsChannelBase *tsChannel, ts_response_format_
 	tsState.crc32CheckCommandCounter++;
 
 	// Ensure we are reading from in bounds
-	if (validateOffsetCount(offset, count, tsChannel)) {
+	if (!validateOffsetCount(offset, count)) {
+		tunerStudioError(tsChannel, "ERROR: out of range");
+		sendErrorCode(tsChannel, TS_RESPONSE_OUT_OF_RANGE);
 		return;
 	}
 
@@ -162,7 +176,9 @@ void TunerStudio::handleCrc32Check(TsChannelBase *tsChannel, ts_response_format_
 void TunerStudio::handlePageReadCommand(TsChannelBase* tsChannel, ts_response_format_e mode, uint16_t offset, uint16_t count) {
 	tsState.readPageCommandsCounter++;
 
-	if (validateOffsetCount(offset, count, tsChannel)) {
+	if (!validateOffsetCount(offset, count)) {
+		tunerStudioError(tsChannel, "ERROR: out of range");
+		sendErrorCode(tsChannel, TS_RESPONSE_OUT_OF_RANGE);
 		return;
 	}
 
