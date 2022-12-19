@@ -61,8 +61,6 @@
 #define TS_CRC_CHECK_COMMAND 'k'
 #define TS_CRC_CHECK_COMMAND_char k
 #define TS_FILE_VERSION 20210312
-#define TS_GET_CONFIG_ERROR 'e'
-#define TS_GET_CONFIG_ERROR_char e
 #define TS_GET_FIRMWARE_VERSION 'V'
 #define TS_GET_FIRMWARE_VERSION_char V
 #define TS_GET_LOGGER_GET_BUFFER 'L'
@@ -75,8 +73,6 @@
 #define TS_ONLINE_PROTOCOL_char z
 #define TS_OUTPUT_COMMAND 'O'
 #define TS_OUTPUT_COMMAND_char O
-#define TS_PAGE_COMMAND 'P'
-#define TS_PAGE_COMMAND_char P
 #define TS_PROTOCOL "001"
 #define TS_QUERY_COMMAND 'Q'
 #define TS_QUERY_COMMAND_char Q

@@ -85,8 +85,8 @@ static void printErrorCounters() {
 //	efiPrintf("TunerStudio size=%d / total=%d / errors=%d / H=%d / O=%d / P=%d / B=%d",
 //			sizeof(engine->outputChannels), tsState.totalCounter, tsState.errorCounter, tsState.queryCommandCounter,
 //			tsState.outputChannelsCommandCounter, tsState.readPageCommandsCounter, tsState.burnCommandCounter);
-//	efiPrintf("TunerStudio W=%d / C=%d / P=%d", tsState.writeValueCommandCounter,
-//			tsState.writeChunkCommandCounter, tsState.pageCommandCounter);
+//	efiPrintf("TunerStudio W=%d / C=%d", tsState.writeValueCommandCounter,
+//			tsState.writeChunkCommandCounter);
 }
 
 /* TunerStudio repeats connection attempts at ~1Hz rate.
@@ -115,12 +115,6 @@ void sendErrorCode(TsChannelBase *tsChannel, uint8_t code) {
 
 void TunerStudio::sendErrorCode(TsChannelBase* tsChannel, uint8_t code) {
 	::sendErrorCode(tsChannel, code);
-}
-
-void TunerStudio::handlePageSelectCommand(TsChannelBase *tsChannel, ts_response_format_e mode) {
-	tsState.pageCommandCounter++;
-
-	sendOkResponse(tsChannel, mode);
 }
 
 size_t getTunerStudioPageSize() {
@@ -209,11 +203,10 @@ static void handleBurnCommand(TsChannelBase* tsChannel, ts_response_format_e mod
 
 static bool isKnownCommand(char command) {
 	return command == TS_HELLO_COMMAND || command == TS_READ_COMMAND || command == TS_OUTPUT_COMMAND
-			|| command == TS_PAGE_COMMAND || command == TS_BURN_COMMAND
+			|| command == TS_BURN_COMMAND
 			|| command == TS_CHUNK_WRITE_COMMAND
 			|| command == TS_CRC_CHECK_COMMAND
-			|| command == TS_GET_FIRMWARE_VERSION
-			|| command == TS_GET_CONFIG_ERROR;
+			|| command == TS_GET_FIRMWARE_VERSION;
 }
 
 /**
@@ -484,9 +477,6 @@ int TunerStudio::handleCrcCommand(TsChannelBase* tsChannel, char *data, int inco
 		break;
 	case TS_GET_FIRMWARE_VERSION:
 		handleGetVersion(tsChannel);
-		break;
-	case TS_PAGE_COMMAND:
-		handlePageSelectCommand(tsChannel, TS_CRC);
 		break;
 	case TS_CHUNK_WRITE_COMMAND:
 		handleWriteChunkCommand(tsChannel, TS_CRC, offset, count, data + sizeof(TunerStudioWriteChunkRequest));
