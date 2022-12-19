@@ -159,24 +159,6 @@ void TunerStudio::handleCrc32Check(TsChannelBase *tsChannel, ts_response_format_
 	tsChannel->sendResponse(mode, (const uint8_t *) &crc, 4);
 }
 
-/**
- * 'Write' command receives a single value at a given offset
- * @note Writing values one by one is pretty slow
- */
-void TunerStudio::handleWriteValueCommand(TsChannelBase* tsChannel, ts_response_format_e mode, uint16_t offset, uint8_t value) {
-	(void)tsChannel;
-	(void)mode;
-	(void)value;
-
-	tsState.writeValueCommandCounter++;
-
-	tunerStudioDebug(tsChannel, "got W (Write)"); // we can get a lot of these
-
-	if (validateOffsetCount(offset, 1, tsChannel)) {
-		return;
-	}
-}
-
 void TunerStudio::handlePageReadCommand(TsChannelBase* tsChannel, ts_response_format_e mode, uint16_t offset, uint16_t count) {
 	tsState.readPageCommandsCounter++;
 
@@ -211,7 +193,7 @@ static void handleBurnCommand(TsChannelBase* tsChannel, ts_response_format_e mod
 
 static bool isKnownCommand(char command) {
 	return command == TS_HELLO_COMMAND || command == TS_READ_COMMAND || command == TS_OUTPUT_COMMAND
-			|| command == TS_PAGE_COMMAND || command == TS_BURN_COMMAND || command == TS_SINGLE_WRITE_COMMAND
+			|| command == TS_PAGE_COMMAND || command == TS_BURN_COMMAND
 			|| command == TS_CHUNK_WRITE_COMMAND
 			|| command == TS_CRC_CHECK_COMMAND
 			|| command == TS_GET_FIRMWARE_VERSION
@@ -493,8 +475,6 @@ int TunerStudio::handleCrcCommand(TsChannelBase* tsChannel, char *data, int inco
 	case TS_CHUNK_WRITE_COMMAND:
 		handleWriteChunkCommand(tsChannel, TS_CRC, offset, count, data + sizeof(TunerStudioWriteChunkRequest));
 		break;
-	case TS_SINGLE_WRITE_COMMAND:
-		handleWriteValueCommand(tsChannel, TS_CRC, offset, data[4]);
 		break;
 	case TS_CRC_CHECK_COMMAND:
 		handleCrc32Check(tsChannel, TS_CRC, offset, count);
