@@ -223,7 +223,8 @@ static void handleTestCommand(TsChannelBase* tsChannel) {
 	 * extension of the protocol to simplify troubleshooting
 	 */
 	tunerStudioDebug(tsChannel, "got T (Test)");
-	tsChannel->write((const uint8_t*)VCS_VERSION, sizeof(VCS_VERSION));
+	chsnprintf(testOutputBuffer, sizeof(testOutputBuffer),  VCS_VERSION "\r\n");
+	tsChannel->write((const uint8_t*)testOutputBuffer, strlen(testOutputBuffer));
 
 	chsnprintf(testOutputBuffer, sizeof(testOutputBuffer),  __DATE__ "\r\n");
 	tsChannel->write((const uint8_t*)testOutputBuffer, strlen(testOutputBuffer));
