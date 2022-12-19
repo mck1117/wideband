@@ -35,6 +35,7 @@ void startTunerStudioConnectivity(void);
 
 typedef struct {
 	uint8_t cmd;
+	uint16_t page;
 	uint16_t offset;
 	uint16_t count;
 } __attribute__((packed)) TunerStudioDataPacketHeader;

@@ -487,7 +487,7 @@ int TunerStudio::handleCrcCommand(TsChannelBase* tsChannel, char *data, size_t i
 	if (handled)
 		return true;
 
-	/* check if we can extract offset and count */
+	/* check if we can extract page, offset and count */
 	if (incomingPacketSize < sizeof(TunerStudioDataPacketHeader)) {
 		sendErrorCode(tsChannel, TS_RESPONSE_UNDERRUN);
 		tunerStudioError(tsChannel, "ERROR: underrun");
