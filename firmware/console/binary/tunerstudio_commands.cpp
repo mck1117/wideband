@@ -50,7 +50,16 @@ void TunerStudio::handleScatteredReadCommand(TsChannelBase* tsChannel) {
 	size_t count = 0;
 	uint8_t *buffer = (uint8_t *)tsChannel->scratchBuffer + 3;	/* reserve 3 bytes for header */
 
-	for (int i = 0; i < HIGH_SPEED_COUNT; i++) {
+#ifdef HIGH_SPEED_OPTIMIZED
+	for (size_t i = 0; i < highSpeedChunks; i++) {
+		if (highSpeedPtrs[i])
+			memcpy(buffer + count, highSpeedPtrs[i], highSpeedSizes[i]);
+		else
+			memset(buffer + count, 0, highSpeedSizes[i]);
+		count += highSpeedSizes[i];
+	}
+#else
+	for (size_t i = 0; i < HIGH_SPEED_COUNT; i++) {
 		int packed = highSpeedOffsets[i];
 		int type = packed >> 13;
 
@@ -63,6 +72,7 @@ void TunerStudio::handleScatteredReadCommand(TsChannelBase* tsChannel) {
 		copyRange(buffer + count, getFragments(), offset, size);
 		count += size;
 	}
+#endif
 	tsChannel->crcAndWriteBuffer(TS_RESPONSE_OK, count);
 }
 
@@ -70,6 +80,38 @@ void TunerStudio::handleScatterListWriteCommand(TsChannelBase* tsChannel, uint16
 {
 	uint8_t * addr = (uint8_t *)highSpeedOffsets + offset;
 	memcpy(addr, content, count);
+
+#ifdef HIGH_SPEED_OPTIMIZED
+	highSpeedChunks = 0;
+	/* translate to CPU pointers */
+	for (int i = 0; i < HIGH_SPEED_COUNT; i++) {
+		int packed = highSpeedOffsets[i];
+		int type = packed >> 13;
+
+		if (type == 0)
+			continue;
+
+		int size = 1 << (type - 1);
+		int offset = packed & 0x1FFF;
+
+		uint8_t *ptr = getRangePtr(getFragments(), offset, size);
+
+		if (highSpeedChunks == 0) {
+			highSpeedPtrs[highSpeedChunks] = ptr;
+			highSpeedSizes[highSpeedChunks] = size;
+			highSpeedChunks++;
+		} else {
+			if (highSpeedPtrs[highSpeedChunks - 1] + highSpeedSizes[highSpeedChunks - 1] == ptr) {
+				/* unite */
+				highSpeedSizes[highSpeedChunks - 1] += size;
+			} else {
+				highSpeedPtrs[highSpeedChunks] = ptr;
+				highSpeedSizes[highSpeedChunks] = size;
+				highSpeedChunks++;
+			}
+		}
+	}
+#endif
 
 	sendOkResponse(tsChannel, TS_CRC);
 }

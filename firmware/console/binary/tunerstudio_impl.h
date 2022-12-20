@@ -9,6 +9,8 @@
 
 #define HIGH_SPEED_COUNT 32
 
+#define HIGH_SPEED_OPTIMIZED
+
 struct TsChannelBase;
 
 typedef enum {
@@ -48,4 +50,9 @@ private:
 
 	bool validateScatterOffsetCount(size_t offset, size_t count);
 	uint16_t highSpeedOffsets[HIGH_SPEED_COUNT];
+#ifdef HIGH_SPEED_OPTIMIZED
+	uint8_t *highSpeedPtrs[HIGH_SPEED_COUNT];
+	size_t highSpeedSizes[HIGH_SPEED_COUNT];
+	size_t highSpeedChunks;
+#endif
 };
