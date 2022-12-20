@@ -16,8 +16,6 @@ void sendOkResponse(TsChannelBase *tsChannel, ts_response_format_e mode);
 
 FragmentList getFragments();
 
-uint16_t highSpeedOffsets[HIGH_SPEED_COUNT];
-
 /**
  * @brief 'Output' command sends out a snapshot of current values
  * Gauges refresh
@@ -42,7 +40,7 @@ void TunerStudio::cmdOutputChannels(TsChannelBase* tsChannel, uint16_t offset, u
 
 // Validate whether the specified offset and count would cause an overrun in the tune.
 // Returns true if offset and count are in valid range
-static bool validateScatterOffsetCount(size_t offset, size_t count) {
+bool TunerStudio::validateScatterOffsetCount(size_t offset, size_t count) {
 	if (offset + count > sizeof(highSpeedOffsets))
 		return false;
 	return true;

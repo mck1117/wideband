@@ -7,6 +7,8 @@
 #include <cstdint>
 #include <cstddef>
 
+#define HIGH_SPEED_COUNT 32
+
 struct TsChannelBase;
 
 typedef enum {
@@ -43,4 +45,7 @@ public:
 
 private:
 	void sendErrorCode(TsChannelBase* tsChannel, uint8_t code);
+
+	bool validateScatterOffsetCount(size_t offset, size_t count);
+	uint16_t highSpeedOffsets[HIGH_SPEED_COUNT];
 };

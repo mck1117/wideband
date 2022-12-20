@@ -38,8 +38,6 @@
 #define TS_RESPONSE_UNDERRUN 0x80
 #define TS_RESPONSE_UNRECOGNIZED_COMMAND 0x83
 
-#define HIGH_SPEED_COUNT 32
-
 class TsChannelBase {
 public:
 	TsChannelBase(const char *name);
