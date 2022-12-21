@@ -47,18 +47,20 @@ bool TunerStudio::validateScatterOffsetCount(size_t offset, size_t count) {
 }
 
 void TunerStudio::handleScatteredReadCommand(TsChannelBase* tsChannel) {
+#ifdef HIGH_SPEED_OPTIMIZED
+	uint8_t *buffer = (uint8_t *)tsChannel->scratchBuffer;
+	tsChannel->writeHeader(TS_RESPONSE_OK, highSpeedTotalSize);
+	for (size_t i = 0; i < highSpeedChunks; i++) {
+		chDbgAssert(NULL != highSpeedPtrs[i], "NULL pointer in scatter list");
+		// copy to temp buffer to avoid changes before transmission, couse it can affect CRC
+		memcpy(buffer, highSpeedPtrs[i], highSpeedSizes[i]);
+		tsChannel->writeBody(buffer, highSpeedSizes[i]);
+	}
+	tsChannel->writeTail();
+#else
 	size_t count = 0;
 	uint8_t *buffer = (uint8_t *)tsChannel->scratchBuffer + 3;	/* reserve 3 bytes for header */
 
-#ifdef HIGH_SPEED_OPTIMIZED
-	for (size_t i = 0; i < highSpeedChunks; i++) {
-		if (highSpeedPtrs[i])
-			memcpy(buffer + count, highSpeedPtrs[i], highSpeedSizes[i]);
-		else
-			memset(buffer + count, 0, highSpeedSizes[i]);
-		count += highSpeedSizes[i];
-	}
-#else
 	for (size_t i = 0; i < HIGH_SPEED_COUNT; i++) {
 		int packed = highSpeedOffsets[i];
 		int type = packed >> 13;
@@ -72,8 +74,8 @@ void TunerStudio::handleScatteredReadCommand(TsChannelBase* tsChannel) {
 		copyRange(buffer + count, getFragments(), offset, size);
 		count += size;
 	}
-#endif
 	tsChannel->crcAndWriteBuffer(TS_RESPONSE_OK, count);
+#endif
 }
 
 void TunerStudio::handleScatterListWriteCommand(TsChannelBase* tsChannel, uint16_t offset, uint16_t count, void *content)
@@ -83,6 +85,7 @@ void TunerStudio::handleScatterListWriteCommand(TsChannelBase* tsChannel, uint16
 
 #ifdef HIGH_SPEED_OPTIMIZED
 	highSpeedChunks = 0;
+	highSpeedTotalSize = 0;
 	/* translate to CPU pointers */
 	for (int i = 0; i < HIGH_SPEED_COUNT; i++) {
 		int packed = highSpeedOffsets[i];
@@ -93,23 +96,27 @@ void TunerStudio::handleScatterListWriteCommand(TsChannelBase* tsChannel, uint16
 
 		int size = 1 << (type - 1);
 		int offset = packed & 0x1FFF;
+		highSpeedTotalSize += size;
 
-		uint8_t *ptr = getRangePtr(getFragments(), offset, size);
+		uint8_t *ptr;
 
-		if (highSpeedChunks == 0) {
-			highSpeedPtrs[highSpeedChunks] = ptr;
-			highSpeedSizes[highSpeedChunks] = size;
-			highSpeedChunks++;
-		} else {
-			if (highSpeedPtrs[highSpeedChunks - 1] + highSpeedSizes[highSpeedChunks - 1] == ptr) {
-				/* unite */
-				highSpeedSizes[highSpeedChunks - 1] += size;
-			} else {
+		do {
+			size_t availSize = getRangePtr(&ptr, getFragments(), offset, size);
+
+			/* note: no need to check ptr for NULL */
+			if ((highSpeedChunks == 0) ||	/* first chunk */
+				((highSpeedChunks > 0) &&
+				 (highSpeedPtrs[highSpeedChunks - 1] + highSpeedSizes[highSpeedChunks - 1] != ptr))) /* or not contiguous chunks */ {
 				highSpeedPtrs[highSpeedChunks] = ptr;
 				highSpeedSizes[highSpeedChunks] = size;
 				highSpeedChunks++;
+			} else {
+				/* unite */
+				highSpeedSizes[highSpeedChunks - 1] += size;
 			}
-		}
+		size -= availSize;
+		offset += availSize;
+		} while (size);
 	}
 #endif
 

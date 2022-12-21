@@ -70,8 +70,16 @@ public:
 	void crcAndWriteBuffer(uint8_t responseCode, size_t size);
 	void copyAndWriteSmallCrcPacket(uint8_t responseCode, const uint8_t* buf, size_t size);
 
+	int writeHeader(uint8_t responseCode, size_t size);
+	int writeBody(uint8_t *buffer, size_t size);
+	int writeTail(void);
+
 private:
 	void writeCrcPacketLarge(uint8_t responseCode, const uint8_t* buf, size_t size);
+	// CRC accumulator
+	uint32_t crcAcc;
+	// total size expected
+	size_t packetSize;
 };
 
 // This class represents a channel for a physical async serial poart

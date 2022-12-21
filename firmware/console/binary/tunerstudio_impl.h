@@ -54,5 +54,6 @@ private:
 	uint8_t *highSpeedPtrs[HIGH_SPEED_COUNT];
 	size_t highSpeedSizes[HIGH_SPEED_COUNT];
 	size_t highSpeedChunks;
+	size_t highSpeedTotalSize;
 #endif
 };

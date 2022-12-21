@@ -56,6 +56,56 @@ void TsChannelBase::crcAndWriteBuffer(uint8_t responseCode, size_t size) {
 	flush();
 }
 
+int TsChannelBase::writeHeader(uint8_t responseCode, size_t size)
+{
+	uint8_t buffer[3];
+
+	// Index 0/1 = packet size (big endian)
+	*(uint16_t*)buffer = SWAP_UINT16(size + 1);
+	// Index 2 = response code
+	buffer[2] = responseCode;
+
+	// start calculating CRC
+	// CRC is computed on the responseCode and payload but not length
+	crcAcc = crc32(&buffer[2], sizeof(buffer) - 2);
+	// save packet size
+	packetSize = size; 	/* + 3 bytes for head + 4 bytes of CRC */
+
+	// Write to the underlying stream
+	write(buffer, sizeof(buffer), false);
+
+	return sizeof(buffer);
+}
+
+int TsChannelBase::writeBody(uint8_t *buffer, size_t size)
+{
+	chDbgAssert(size <= packetSize, "writeBody packet size is more than provided in header");
+	// append CRC
+	crcAcc = crc32inc(buffer, crcAcc, size);
+	// adjust packet size
+	packetSize -= size;
+
+	// Write to the underlying stream
+	write(buffer, size, false);
+
+	return size;
+}
+
+int TsChannelBase::writeTail(void)
+{
+	chDbgAssert(0 == packetSize, "writeTail unexpecded packet end");
+
+	uint8_t buffer[4];
+
+	// Place the CRC at the end
+	*(uint32_t*)buffer = SWAP_UINT32(crcAcc);
+
+	// Write to the underlying stream
+	write(buffer, sizeof(buffer), true);
+
+	return sizeof(buffer);
+}
+
 void TsChannelBase::writeCrcPacketLarge(uint8_t responseCode, const uint8_t* buf, size_t size) {
 	uint8_t headerBuffer[3];
 	uint8_t crcBuffer[4];
