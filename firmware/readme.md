@@ -2,4 +2,4 @@
 
 # Implementation Details
 
-Main logic is executed at around a 1KHz frequency, driven by carefully selected ADC settings.
+Main logic is executed at a few KHz frequency (Bosch spec is 1-4KHz), driven by carefully selected ADC settings.
