@@ -179,7 +179,7 @@ int SerialTsChannel::start(uint32_t baud) {
 		chThdSleepMilliseconds(10);
 
 		/* now reset BT to apply new settings */
-		chprintf((BaseSequentialStream *)m_driver, "AT+RESET\r\n", baudRateCodes[baudIdx]);
+		chprintf((BaseSequentialStream *)m_driver, "AT+RESET\r\n");
 		if (bt_wait_ok() != 0) {
 			return -1;
 		}
