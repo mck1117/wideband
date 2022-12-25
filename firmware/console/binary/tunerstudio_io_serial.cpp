@@ -95,7 +95,7 @@ int SerialTsChannel::start(uint32_t baud) {
 		} while ((!done) && (--retry));
 
 		if (retry <= 0) {
-			return -1;
+			goto error;
 		}
 
 		/* find expected baudrate */
@@ -106,7 +106,7 @@ int SerialTsChannel::start(uint32_t baud) {
 		}
 		if (baudIdx == 8) {
 			/* unknown baudrate */
-			return -1;
+			goto error;
 		}
 
 		int len;
@@ -168,7 +168,7 @@ int SerialTsChannel::start(uint32_t baud) {
 		} while ((!done) && (--retry));
 
 		if (retry <= 0) {
-			return -1;
+			goto error;
 		}
 
 		/* switch baudrate */
@@ -181,7 +181,7 @@ int SerialTsChannel::start(uint32_t baud) {
 		/* now reset BT to apply new settings */
 		chprintf((BaseSequentialStream *)m_driver, "AT+RESET\r\n");
 		if (bt_wait_ok() != 0) {
-			return -1;
+			goto error;
 		}
 
 		/* ready to roll */
@@ -191,6 +191,13 @@ int SerialTsChannel::start(uint32_t baud) {
 	}
 
 	return 0;
+
+error:
+	/* set default baudrate and wait for direct uart connection */
+	cfg.speed = baud;
+	sdStart(m_driver, &cfg);
+
+	return -1;
 }
 
 void SerialTsChannel::stop() {
