@@ -164,7 +164,7 @@ CPPSRC = $(ALLCPPSRC) \
 ASMSRC = $(ALLASMSRC)
 
 # List ASM with preprocessor source files here.
-ASMXSRC = $(ALLXASMSRC)
+ASMXSRC = $(ALLXASMSRC) main_hardfault_asm.S
 
 # Inclusion directories.
 INCDIR = $(CONFDIR) \
