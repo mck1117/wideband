@@ -16,8 +16,6 @@ typedef struct {
 	int outputChannelsCommandCounter;
 	int readPageCommandsCounter;
 	int burnCommandCounter;
-	int pageCommandCounter;
-	int writeValueCommandCounter;
 	int crc32CheckCommandCounter;
 	int writeChunkCommandCounter;
 	int errorCounter;
@@ -36,9 +34,11 @@ void requestBurn(void);
 void startTunerStudioConnectivity(void);
 
 typedef struct {
-	short int offset;
-	short int count;
-} TunerStudioWriteChunkRequest;
+	uint8_t cmd;
+	uint16_t page;
+	uint16_t offset;
+	uint16_t count;
+} __attribute__((packed)) TunerStudioDataPacketHeader;
 
 #define CONNECTIVITY_THREAD_STACK 	(512)
 #define CONNECTIVITY_THREAD_PRIO	(NORMALPRIO + 1)

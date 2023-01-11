@@ -85,8 +85,8 @@ static void printErrorCounters() {
 //	efiPrintf("TunerStudio size=%d / total=%d / errors=%d / H=%d / O=%d / P=%d / B=%d",
 //			sizeof(engine->outputChannels), tsState.totalCounter, tsState.errorCounter, tsState.queryCommandCounter,
 //			tsState.outputChannelsCommandCounter, tsState.readPageCommandsCounter, tsState.burnCommandCounter);
-//	efiPrintf("TunerStudio W=%d / C=%d / P=%d", tsState.writeValueCommandCounter,
-//			tsState.writeChunkCommandCounter, tsState.pageCommandCounter);
+//	efiPrintf("TunerStudio W=%d / C=%d", tsState.writeValueCommandCounter,
+//			tsState.writeChunkCommandCounter);
 }
 
 /* TunerStudio repeats connection attempts at ~1Hz rate.
@@ -117,13 +117,17 @@ void TunerStudio::sendErrorCode(TsChannelBase* tsChannel, uint8_t code) {
 	::sendErrorCode(tsChannel, code);
 }
 
-void TunerStudio::handlePageSelectCommand(TsChannelBase *tsChannel, ts_response_format_e mode) {
-	tsState.pageCommandCounter++;
-
-	sendOkResponse(tsChannel, mode);
+size_t getTunerStudioPageSize() {
+	return GetConfigurationSize();
 }
 
-bool validateOffsetCount(size_t offset, size_t count, TsChannelBase* tsChannel);
+// Validate whether the specified offset and count would cause an overrun in the tune.
+// Returns true if offset and count are in valid range
+bool validateOffsetCount(size_t offset, size_t count) {
+	if (offset + count > getTunerStudioPageSize())
+		return false;
+	return true;
+}
 
 /**
  * This command is needed to make the whole transfer a bit faster
@@ -135,7 +139,9 @@ void TunerStudio::handleWriteChunkCommand(TsChannelBase* tsChannel, ts_response_
 
 	tsState.writeChunkCommandCounter++;
 
-	if (validateOffsetCount(offset, count, tsChannel)) {
+	if (!validateOffsetCount(offset, count)) {
+		tunerStudioError(tsChannel, "ERROR: out of range");
+		sendErrorCode(tsChannel, TS_RESPONSE_OUT_OF_RANGE);
 		return;
 	}
 
@@ -149,7 +155,9 @@ void TunerStudio::handleCrc32Check(TsChannelBase *tsChannel, ts_response_format_
 	tsState.crc32CheckCommandCounter++;
 
 	// Ensure we are reading from in bounds
-	if (validateOffsetCount(offset, count, tsChannel)) {
+	if (!validateOffsetCount(offset, count)) {
+		tunerStudioError(tsChannel, "ERROR: out of range");
+		sendErrorCode(tsChannel, TS_RESPONSE_OUT_OF_RANGE);
 		return;
 	}
 
@@ -159,28 +167,12 @@ void TunerStudio::handleCrc32Check(TsChannelBase *tsChannel, ts_response_format_
 	tsChannel->sendResponse(mode, (const uint8_t *) &crc, 4);
 }
 
-/**
- * 'Write' command receives a single value at a given offset
- * @note Writing values one by one is pretty slow
- */
-void TunerStudio::handleWriteValueCommand(TsChannelBase* tsChannel, ts_response_format_e mode, uint16_t offset, uint8_t value) {
-	(void)tsChannel;
-	(void)mode;
-	(void)value;
-
-	tsState.writeValueCommandCounter++;
-
-	tunerStudioDebug(tsChannel, "got W (Write)"); // we can get a lot of these
-
-	if (validateOffsetCount(offset, 1, tsChannel)) {
-		return;
-	}
-}
-
 void TunerStudio::handlePageReadCommand(TsChannelBase* tsChannel, ts_response_format_e mode, uint16_t offset, uint16_t count) {
 	tsState.readPageCommandsCounter++;
 
-	if (validateOffsetCount(offset, count, tsChannel)) {
+	if (!validateOffsetCount(offset, count)) {
+		tunerStudioError(tsChannel, "ERROR: out of range");
+		sendErrorCode(tsChannel, TS_RESPONSE_OUT_OF_RANGE);
 		return;
 	}
 
@@ -211,11 +203,11 @@ static void handleBurnCommand(TsChannelBase* tsChannel, ts_response_format_e mod
 
 static bool isKnownCommand(char command) {
 	return command == TS_HELLO_COMMAND || command == TS_READ_COMMAND || command == TS_OUTPUT_COMMAND
-			|| command == TS_PAGE_COMMAND || command == TS_BURN_COMMAND || command == TS_SINGLE_WRITE_COMMAND
+			|| command == TS_BURN_COMMAND
 			|| command == TS_CHUNK_WRITE_COMMAND
+			|| command == TS_GET_SCATTERED_GET_COMMAND
 			|| command == TS_CRC_CHECK_COMMAND
-			|| command == TS_GET_FIRMWARE_VERSION
-			|| command == TS_GET_CONFIG_ERROR;
+			|| command == TS_GET_FIRMWARE_VERSION;
 }
 
 /**
@@ -232,7 +224,8 @@ static void handleTestCommand(TsChannelBase* tsChannel) {
 	 * extension of the protocol to simplify troubleshooting
 	 */
 	tunerStudioDebug(tsChannel, "got T (Test)");
-	tsChannel->write((const uint8_t*)VCS_VERSION, sizeof(VCS_VERSION));
+	chsnprintf(testOutputBuffer, sizeof(testOutputBuffer),  VCS_VERSION "\r\n");
+	tsChannel->write((const uint8_t*)testOutputBuffer, strlen(testOutputBuffer));
 
 	chsnprintf(testOutputBuffer, sizeof(testOutputBuffer),  __DATE__ "\r\n");
 	tsChannel->write((const uint8_t*)testOutputBuffer, strlen(testOutputBuffer));
@@ -463,22 +456,17 @@ static void handleGetVersion(TsChannelBase* tsChannel) {
 	tsChannel->sendResponse(TS_CRC, (const uint8_t *) versionBuffer, strlen(versionBuffer) + 1);
 }
 
-int TunerStudio::handleCrcCommand(TsChannelBase* tsChannel, char *data, int incomingPacketSize) {
+int TunerStudio::handleCrcCommand(TsChannelBase* tsChannel, char *data, size_t incomingPacketSize) {
+	bool handled = true;
 	(void)incomingPacketSize;
 
 	char command = data[0];
-	data++;
 
-	const uint16_t* data16 = reinterpret_cast<uint16_t*>(data);
-
-	uint16_t offset = data16[0];
-	uint16_t count = data16[1];
-
+	/* commands with no arguments */
 	switch(command)
 	{
-	case TS_OUTPUT_COMMAND:
-		tsState.outputChannelsCommandCounter++;
-		cmdOutputChannels(tsChannel, offset, count);
+	case TS_GET_SCATTERED_GET_COMMAND:
+		handleScatteredReadCommand(tsChannel);
 		break;
 	case TS_HELLO_COMMAND:
 		tunerStudioDebug(tsChannel, "got Query command");
@@ -487,28 +475,54 @@ int TunerStudio::handleCrcCommand(TsChannelBase* tsChannel, char *data, int inco
 	case TS_GET_FIRMWARE_VERSION:
 		handleGetVersion(tsChannel);
 		break;
-	case TS_PAGE_COMMAND:
-		handlePageSelectCommand(tsChannel, TS_CRC);
-		break;
-	case TS_CHUNK_WRITE_COMMAND:
-		handleWriteChunkCommand(tsChannel, TS_CRC, offset, count, data + sizeof(TunerStudioWriteChunkRequest));
-		break;
-	case TS_SINGLE_WRITE_COMMAND:
-		handleWriteValueCommand(tsChannel, TS_CRC, offset, data[4]);
-		break;
-	case TS_CRC_CHECK_COMMAND:
-		handleCrc32Check(tsChannel, TS_CRC, offset, count);
-		break;
 	case TS_BURN_COMMAND:
 		handleBurnCommand(tsChannel, TS_CRC);
-		break;
-	case TS_READ_COMMAND:
-		handlePageReadCommand(tsChannel, TS_CRC, offset, count);
 		break;
 	case TS_TEST_COMMAND:
 		[[fallthrough]];
 	case 'T':
 		handleTestCommand(tsChannel);
+		break;
+	default:
+		/* noone of simple commands */
+		handled = false;
+	}
+
+	if (handled)
+		return true;
+
+	/* check if we can extract page, offset and count */
+	if (incomingPacketSize < sizeof(TunerStudioDataPacketHeader)) {
+		sendErrorCode(tsChannel, TS_RESPONSE_UNDERRUN);
+		tunerStudioError(tsChannel, "ERROR: underrun");
+		return false;
+	}
+
+	const TunerStudioDataPacketHeader* header = reinterpret_cast<TunerStudioDataPacketHeader*>(data);
+
+	switch(command)
+	{
+	case TS_OUTPUT_COMMAND:
+		tsState.outputChannelsCommandCounter++;
+		cmdOutputChannels(tsChannel, header->offset, header->count);
+		break;
+	case TS_CHUNK_WRITE_COMMAND:
+		if (header->page == 0)
+			handleWriteChunkCommand(tsChannel, TS_CRC, header->offset, header->count, data + sizeof(TunerStudioDataPacketHeader));
+		else
+			handleScatterListWriteCommand(tsChannel, header->offset, header->count, data + sizeof(TunerStudioDataPacketHeader));
+		break;
+	case TS_CRC_CHECK_COMMAND:
+		if (header->page == 0)
+			handleCrc32Check(tsChannel, TS_CRC, header->offset, header->count);
+		else
+			handleScatterListCrc32Check(tsChannel, header->offset, header->count);
+		break;
+	case TS_READ_COMMAND:
+		if (header->page == 0)
+			handlePageReadCommand(tsChannel, TS_CRC, header->offset, header->count);
+		else
+			handleScatterListReadCommand(tsChannel, header->offset, header->count);
 		break;
 	default:
 		sendErrorCode(tsChannel, TS_RESPONSE_UNRECOGNIZED_COMMAND);
