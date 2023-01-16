@@ -100,6 +100,7 @@ extern "C" void HardFault_Handler_C(void* sp) {
 	//Interrupt status register: Which interrupt have we encountered, e.g. HardFault?
 	FaultType faultType = (FaultType)__get_IPSR();
 	(void)faultType;
+#if (__CORTEX_M > 0)
 	//For HardFault/BusFault this is the address that was accessed causing the error
 	uint32_t faultAddress = SCB->BFAR;
 
@@ -115,6 +116,7 @@ extern "C" void HardFault_Handler_C(void* sp) {
 	(void)isFaultOnUnstacking;
 	(void)isFaultOnStacking;
 	(void)isFaultAddressValid;
+#endif
 
 	//Cause debugger to stop. Ignored if no debugger is attached
 	bkpt();
@@ -130,6 +132,7 @@ extern "C" void UsageFault_Handler_C(void* sp) {
 	//Interrupt status register: Which interrupt have we encountered, e.g. HardFault?
 	FaultType faultType = (FaultType)__get_IPSR();
 	(void)faultType;
+#if (__CORTEX_M > 0)
 	//Flags about hardfault / busfault
 	//See http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.dui0552a/Cihdjcfc.html for reference
 	bool isUndefinedInstructionFault = ((SCB->CFSR >> SCB_CFSR_USGFAULTSR_Pos) & (1 << 0) ? true : false);
@@ -144,6 +147,7 @@ extern "C" void UsageFault_Handler_C(void* sp) {
 	(void)isNoCoprocessorFault;
 	(void)isUnalignedAccessFault;
 	(void)isDivideByZeroFault;
+#endif
 
 	bkpt();
 	NVIC_SystemReset();
@@ -158,6 +162,7 @@ extern "C" void MemManage_Handler_C(void* sp) {
 	//Interrupt status register: Which interrupt have we encountered, e.g. HardFault?
 	FaultType faultType = (FaultType)__get_IPSR();
 	(void)faultType;
+#if (__CORTEX_M > 0)
 	//For HardFault/BusFault this is the address that was accessed causing the error
 	uint32_t faultAddress = SCB->MMFAR;
 
@@ -173,6 +178,7 @@ extern "C" void MemManage_Handler_C(void* sp) {
 	(void)isExceptionUnstackingFault;
 	(void)isExceptionStackingFault;
 	(void)isFaultAddressValid;
+#endif
 
 	bkpt();
 	NVIC_SystemReset();
