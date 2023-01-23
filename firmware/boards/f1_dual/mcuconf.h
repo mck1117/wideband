@@ -35,7 +35,8 @@
 
 /*
  * HAL driver system settings.
- * Main clock runs at 64MHz, impossible to run maximum rated 72 using HSI due to PLL limitations
+ * TL,DR: we run at 48MHz.
+ * It's not possible to run at 72 on HSI because of the PLL's limited configuration options, so 48MHz right now.
  */
 #define STM32_NO_INIT                       FALSE
 #define STM32_HSI_ENABLED                   TRUE
@@ -45,11 +46,11 @@
 #define STM32_SW                            STM32_SW_PLL
 #define STM32_PLLSRC                        STM32_PLLSRC_HSI
 #define STM32_PLLXTPRE                      STM32_PLLXTPRE_DIV1
-#define STM32_PLLMUL_VALUE                  16
+#define STM32_PLLMUL_VALUE                  12
 #define STM32_HPRE                          STM32_HPRE_DIV1
 #define STM32_PPRE1                         STM32_PPRE1_DIV2
 #define STM32_PPRE2                         STM32_PPRE2_DIV1
-#define STM32_ADCPRE                        STM32_ADCPRE_DIV6
+#define STM32_ADCPRE                        STM32_ADCPRE_DIV4
 #define STM32_USB_CLOCK_REQUIRED            TRUE
 #define STM32_USBPRE                        STM32_USBPRE_DIV1
 #define STM32_MCOSEL                        STM32_MCOSEL_NOCLOCK
