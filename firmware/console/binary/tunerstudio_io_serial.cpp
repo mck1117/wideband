@@ -20,8 +20,9 @@
 #endif
 
 // JDY-33 has 9: 128000 which we do not
-static const unsigned int baudRates[] = 	{	115200, 9600, 	38400,	2400,	4800,	19200,	57600 };
-static const unsigned int baudRateCodes[] = {	8,		4,		6,		2,		3,		5,		7 };
+#define N_BAUDRATES	7
+static const unsigned int baudRates[N_BAUDRATES] = 	{	115200, 9600, 	38400,	2400,	4800,	19200,	57600 };
+static const unsigned int baudRateCodes[N_BAUDRATES] = {8,		4,		6,		2,		3,		5,		7 };
 static const unsigned int btModuleTimeout = TIME_MS2I(100);
 
 int SerialTsChannel::bt_read_line(char *str, size_t max_len)
@@ -71,14 +72,11 @@ int SerialTsChannel::start(uint32_t baud) {
 		/* try BT setup */
 		int retry = 3;
 		bool done = false;
-		size_t baudIdx = 0;
+		size_t baudIdx;
 
 		do {
-			for (baudIdx = 0; baudIdx < 8 && !done; baudIdx++) {
+			for (baudIdx = 0; baudIdx < N_BAUDRATES && !done; baudIdx++) {
 				cfg.speed = baudRates[baudIdx];
-				baudIdx++;
-				if (baudIdx == 8)
-					baudIdx = 0;
 				sdStart(m_driver, &cfg);
 
 				chprintf((BaseSequentialStream *)m_driver, "AT\r\n");
@@ -101,12 +99,12 @@ int SerialTsChannel::start(uint32_t baud) {
 
 		if (ret == 0) {
 			/* find expected baudrate */
-			for (baudIdx = 0; baudIdx < 8; baudIdx++) {
+			for (baudIdx = 0; baudIdx < N_BAUDRATES; baudIdx++) {
 				if (baud == baudRates[baudIdx]) {
 					break;
 				}
 			}
-			if (baudIdx == 8) {
+			if (baudIdx == N_BAUDRATES) {
 				/* unknown baudrate */
 				ret = -2;
 			}
@@ -176,19 +174,24 @@ int SerialTsChannel::start(uint32_t baud) {
 			}
 		}
 
-		if (ret == 0) {
-			/* switch baudrate */
+		/* switch to new baudrate? */
+		if (cfg.speed != baud) {
 			sdStop(m_driver);
-			cfg.speed = baud;
-			sdStart(m_driver, &cfg);
 
-			chThdSleepMilliseconds(10);
+			if (ret == 0) {
+				/* switch baudrate */
+				cfg.speed = baud;
+				sdStart(m_driver, &cfg);
 
-			/* now reset BT to apply new settings */
-			chprintf((BaseSequentialStream *)m_driver, "AT+RESET\r\n");
-			if (bt_wait_ok() != 0) {
-				ret = -4;
+				chThdSleepMilliseconds(10);
 			}
+		}
+
+		/* now reset BT to apply new settings */
+		chprintf((BaseSequentialStream *)m_driver, "AT+RESET\r\n");
+		if (bt_wait_ok() != 0) {
+			sdStop(m_driver);
+			ret = -4;
 		}
 	} else {
 		/* Direct uart connetion */
