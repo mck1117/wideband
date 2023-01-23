@@ -59,6 +59,7 @@ int SerialTsChannel::bt_disconnect(void)
 }
 
 int SerialTsChannel::start(uint32_t baud) {
+	int ret = 0;
 	SerialConfig cfg = {
 		.speed = baud,
 		.cr1 = 0,
@@ -95,109 +96,112 @@ int SerialTsChannel::start(uint32_t baud) {
 		} while ((!done) && (--retry));
 
 		if (retry <= 0) {
-			goto error;
+			ret = -1;
 		}
 
-		/* find expected baudrate */
-		for (baudIdx = 0; baudIdx < 8; baudIdx++) {
-			if (baud == baudRates[baudIdx]) {
-				break;
+		if (ret == 0) {
+			/* find expected baudrate */
+			for (baudIdx = 0; baudIdx < 8; baudIdx++) {
+				if (baud == baudRates[baudIdx]) {
+					break;
+				}
+			}
+			if (baudIdx == 8) {
+				/* unknown baudrate */
+				ret = -2;
 			}
 		}
-		if (baudIdx == 8) {
-			/* unknown baudrate */
-			goto error;
+
+		if (ret == 0) {
+			int len;
+			char tmp[64];
+			/* setup */
+			done = false;
+			do {
+				/* just a curious */
+				chprintf((BaseSequentialStream *)m_driver, "AT+VERSION\r\n");
+				len = bt_read_line(tmp, sizeof(tmp));
+				if (len < 0) {
+					/* retry */
+					continue;
+				}
+
+				/* Reset settings to defaults */
+				chprintf((BaseSequentialStream *)m_driver, "AT+DEFAULT\r\n");
+				if (bt_wait_ok() != 0) {
+					/* retry */
+					continue;
+				}
+
+				/* SPP Broadcast name: up to 18 bytes */
+				chprintf((BaseSequentialStream *)m_driver, "AT+NAME%s\r\n", BT_BROADCAST_NAME);
+				if (bt_wait_ok() != 0) {
+					/* retry */
+					continue;
+				}
+
+				/* BLE Broadcast name: up to 18 bytes */
+				chprintf((BaseSequentialStream *)m_driver, "AT+NAMB%s\r\n", BT_BROADCAST_NAME " BLE");
+				if (bt_wait_ok() != 0) {
+					/* retry */
+					continue;
+				}
+
+				/* SPP connection with no password */
+				chprintf((BaseSequentialStream *)m_driver, "AT+TYPE%d\r\n", 0);
+				if (bt_wait_ok() != 0) {
+					/* retry */
+					continue;
+				}
+
+				/* Disable serial port status output */
+				chprintf((BaseSequentialStream *)m_driver, "AT+ENLOG%d\r\n", 0);
+				if (bt_wait_ok() != 0) {
+					/* retry */
+					continue;
+				}
+
+				chprintf((BaseSequentialStream *)m_driver, "AT+BAUD%d\r\n", baudRateCodes[baudIdx]);
+				if (bt_wait_ok() != 0) {
+					/* retry */
+					continue;
+				}
+
+				/* BT module changes baud rate here */
+				done = true;
+			} while ((!done) && (--retry));
+
+			if (retry <= 0) {
+				ret = -3;
+			}
 		}
 
-		int len;
-		char tmp[64];
-		/* setup */
-		done = false;
-		do {
-			/* just a curious */
-			chprintf((BaseSequentialStream *)m_driver, "AT+VERSION\r\n");
-			len = bt_read_line(tmp, sizeof(tmp));
-			if (len < 0) {
-				/* retry */
-				continue;
-			}
+		if (ret == 0) {
+			/* switch baudrate */
+			sdStop(m_driver);
+			cfg.speed = baud;
+			sdStart(m_driver, &cfg);
 
-			/* Reset settings to defaults */
-			chprintf((BaseSequentialStream *)m_driver, "AT+DEFAULT\r\n");
+			chThdSleepMilliseconds(10);
+
+			/* now reset BT to apply new settings */
+			chprintf((BaseSequentialStream *)m_driver, "AT+RESET\r\n");
 			if (bt_wait_ok() != 0) {
-				/* retry */
-				continue;
+				ret = -4;
 			}
-
-			/* SPP Broadcast name: up to 18 bytes */
-			chprintf((BaseSequentialStream *)m_driver, "AT+NAME%s\r\n", BT_BROADCAST_NAME);
-			if (bt_wait_ok() != 0) {
-				/* retry */
-				continue;
-			}
-
-			/* BLE Broadcast name: up to 18 bytes */
-			chprintf((BaseSequentialStream *)m_driver, "AT+NAMB%s\r\n", BT_BROADCAST_NAME " BLE");
-			if (bt_wait_ok() != 0) {
-				/* retry */
-				continue;
-			}
-
-			/* SPP connection with no password */
-			chprintf((BaseSequentialStream *)m_driver, "AT+TYPE%d\r\n", 0);
-			if (bt_wait_ok() != 0) {
-				/* retry */
-				continue;
-			}
-
-			/* Disable serial port status output */
-			chprintf((BaseSequentialStream *)m_driver, "AT+ENLOG%d\r\n", 0);
-			if (bt_wait_ok() != 0) {
-				/* retry */
-				continue;
-			}
-
-			chprintf((BaseSequentialStream *)m_driver, "AT+BAUD%d\r\n", baudRateCodes[baudIdx]);
-			if (bt_wait_ok() != 0) {
-				/* retry */
-				continue;
-			}
-
-			/* BT module changes baud rate here */
-			done = true;
-		} while ((!done) && (--retry));
-
-		if (retry <= 0) {
-			goto error;
 		}
-
-		/* switch baudrate */
-		sdStop(m_driver);
-		cfg.speed = baud;
-		sdStart(m_driver, &cfg);
-
-		chThdSleepMilliseconds(10);
-
-		/* now reset BT to apply new settings */
-		chprintf((BaseSequentialStream *)m_driver, "AT+RESET\r\n");
-		if (bt_wait_ok() != 0) {
-			goto error;
-		}
-
-		/* ready to roll */
 	} else {
 		/* Direct uart connetion */
 		sdStart(m_driver, &cfg);
 	}
 
-	return 0;
+	if (ret < 0) {
+		/* set requested baudrate and wait for direct uart connection */
+		cfg.speed = baud;
+		sdStart(m_driver, &cfg);
+	}
 
-error:
-	/* set default baudrate and wait for direct uart connection */
-	cfg.speed = baud;
-	sdStart(m_driver, &cfg);
-
-	return -1;
+	return ret;
 }
 
 void SerialTsChannel::stop() {
