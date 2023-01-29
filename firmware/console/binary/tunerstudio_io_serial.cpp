@@ -4,6 +4,7 @@
 
 #include <string.h>
 
+#include "rusefi/arrays.h"
 #include "tunerstudio_io.h"
 #include "hal.h"
 #include "chprintf.h"
@@ -20,9 +21,10 @@
 #endif
 
 // JDY-33 has 9: 128000 which we do not
-#define N_BAUDRATES	7
-static const unsigned int baudRates[N_BAUDRATES] = 	{	115200, 9600, 	38400,	2400,	4800,	19200,	57600 };
-static const unsigned int baudRateCodes[N_BAUDRATES] = {8,		4,		6,		2,		3,		5,		7 };
+static const unsigned int baudRates[] = 	{	115200, 9600, 	38400,	2400,	4800,	19200,	57600 };
+static const unsigned int baudRateCodes[] = {8,		4,		6,		2,		3,		5,		7 };
+static_assert(efi::size(baudRates) == efi::size(baudRateCodes));
+
 static const unsigned int btModuleTimeout = TIME_MS2I(100);
 
 int SerialTsChannel::bt_read_line(char *str, size_t max_len)
@@ -75,7 +77,7 @@ int SerialTsChannel::start(uint32_t baud) {
 		size_t baudIdx;
 
 		do {
-			for (baudIdx = 0; baudIdx < N_BAUDRATES && !done; baudIdx++) {
+			for (baudIdx = 0; baudIdx < efi::size(baudRates) && !done; baudIdx++) {
 				cfg.speed = baudRates[baudIdx];
 				sdStart(m_driver, &cfg);
 
@@ -99,12 +101,12 @@ int SerialTsChannel::start(uint32_t baud) {
 
 		if (ret == 0) {
 			/* find expected baudrate */
-			for (baudIdx = 0; baudIdx < N_BAUDRATES; baudIdx++) {
+			for (baudIdx = 0; baudIdx < efi::size(baudRates); baudIdx++) {
 				if (baud == baudRates[baudIdx]) {
 					break;
 				}
 			}
-			if (baudIdx == N_BAUDRATES) {
+			if (baudIdx == efi::size(baudRates)) {
 				/* unknown baudrate */
 				ret = -2;
 			}
