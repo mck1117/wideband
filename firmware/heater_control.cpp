@@ -18,26 +18,32 @@ struct sensorHeaterParams {
     uint16_t underheatESR;
 };
 
-static const struct sensorHeaterParams heaterParams[] = {
-    [(int)SensorType::LSU49] = {
-        //LSU4.9
+static const struct sensorHeaterParams heaterParams49 = {
         .closedLoopThresholdESR = LSU49_HEATER_CLOSED_LOOP_THRESHOLD_ESR,
         .targetESR = LSU49_HEATER_TARGET_ESR,
         .overheatESR = LSU49_HEATER_OVERHEAT_ESR,
         .underheatESR = LSU49_HEATER_UNDERHEAT_ESR,
-    },
-    [(int)SensorType::LSU42] = {
-        //LSU4.2
+    };
+static const struct sensorHeaterParams heaterParams42 = {
         .closedLoopThresholdESR = LSU42_HEATER_CLOSED_LOOP_THRESHOLD_ESR,
         .targetESR = LSU42_HEATER_TARGET_ESR,
         .overheatESR = LSU42_HEATER_OVERHEAT_ESR,
         .underheatESR = LSU42_HEATER_UNDERHEAT_ESR,
-    },
-    [(int)SensorType::LSUADV] = {
-        //LSU_ADV
+    };
+static const struct sensorHeaterParams heaterParamsAdv = {
         //TODO
+    };
+
+static const sensorHeaterParams *getHeaterParams(SensorType type) {
+    switch (type) {
+        case SensorType::LSU49:
+            return &heaterParams49;
+        case SensorType::LSU42:
+            return &heaterParams42;
+        case SensorType::LSUADV:
+            return &heaterParamsAdv;
     }
-};
+}
 
 using namespace wbo;
 
@@ -233,7 +239,7 @@ static void HeaterThread(void*)
     chThdSleepMilliseconds(1000);
 
     // Get sensor type and settings
-    heater = &heaterParams[(int)GetSensorType()];
+    heater = getHeaterParams(GetSensorType());
 
     while (true)
     {
