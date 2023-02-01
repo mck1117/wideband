@@ -230,7 +230,7 @@ static float GetVoltageForState(struct heater_state &s, float heaterEsr)
 static THD_WORKING_AREA(waHeaterThread, 256);
 static void HeaterThread(void*)
 {
-    int ch;
+    int i;
 
     chRegSetThreadName("Heater");
 
@@ -245,16 +245,16 @@ static void HeaterThread(void*)
     {
         auto heaterAllowState = GetHeaterAllowed();
 
-        for (ch = 0; ch < AFR_CHANNELS; ch++) {
-            heater_state &s = state[ch];
+        for (i = 0; i < AFR_CHANNELS; i++) {
+            heater_state &s = state[i];
 
             // Read sensor state
-            float heaterEsr = GetSensorInternalResistance(ch);
+            float heaterEsr = GetSensorInternalResistance(s.ch);
 
             // If we haven't heard from rusEFI, use the internally sensed 
             // battery voltage instead of voltage over CAN.
             float batteryVoltage = heaterAllowState == HeaterAllow::Unknown
-                                        ? GetInternalBatteryVoltage(ch)
+                                        ? GetInternalBatteryVoltage(s.ch)
                                         : GetRemoteBatteryVoltage();
 
             // Run the state machine
