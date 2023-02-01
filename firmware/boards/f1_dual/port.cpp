@@ -89,13 +89,16 @@ AnalogResult AnalogSample()
 
     adcConvert(&ADCD1, &convGroup, adcBuffer, ADC_OVERSAMPLE);
 
-    if ((l_heater) && (!palReadPad(L_HEATER_PORT, L_HEATER_PIN)))
+    bool l_heater_new = !palReadPad(L_HEATER_PORT, L_HEATER_PIN);
+    bool r_heater_new = !palReadPad(R_HEATER_PORT, R_HEATER_PIN);
+
+    if (l_heater && l_heater_new)
     {
         float vbatt_raw = GetMaxSample(adcBuffer, 6) / BATTERY_INPUT_DIVIDER;
         l_vbatt = BATTERY_FILTER_ALPHA * vbatt_raw + (1.0 - BATTERY_FILTER_ALPHA) * l_vbatt;
     }
 
-    if ((r_heater) && (!palReadPad(R_HEATER_PORT, R_HEATER_PIN)))
+    if (r_heater && r_heater_new)
     {
         float vbatt_raw = GetMaxSample(adcBuffer, 7) / BATTERY_INPUT_DIVIDER;
         r_vbatt = BATTERY_FILTER_ALPHA * vbatt_raw + (1.0 - BATTERY_FILTER_ALPHA) * r_vbatt;
