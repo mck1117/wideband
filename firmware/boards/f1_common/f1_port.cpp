@@ -81,3 +81,16 @@ size_t GetConfigurationSize()
 const char *getTsSignature() {
     return TS_SIGNATURE;
 }
+
+SensorType GetSensorType()
+{
+    /* TODO: load from settings */
+#if defined(BOARD_SENSOR_LSU42)
+    return SensorType::LSU42;
+#elif defined(BOARD_SENSOR_LSUADV)
+    return SensorType::LSUADV;
+#else
+    /* default is LSU4.9 */
+    return SensorType::LSU49;
+#endif
+}

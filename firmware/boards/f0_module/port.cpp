@@ -144,3 +144,8 @@ void SetConfiguration()
         sizeof(Configuration)
     );
 }
+
+SensorType GetSensorType()
+{
+    return SensorType::LSU49;
+}

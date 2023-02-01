@@ -4,11 +4,46 @@
 #include "ch.h"
 #include "hal.h"
 
+#include "port.h"
 #include "fault.h"
 #include "pwm.h"
 #include "sampling.h"
 #include "pid.h"
 #include "can.h"
+
+struct sensorHeaterParams {
+    uint16_t closedLoopThresholdESR;
+    uint16_t targetESR;
+    uint16_t overheatESR;
+    uint16_t underheatESR;
+};
+
+static const struct sensorHeaterParams heaterParams49 = {
+        .closedLoopThresholdESR = LSU49_HEATER_CLOSED_LOOP_THRESHOLD_ESR,
+        .targetESR = LSU49_HEATER_TARGET_ESR,
+        .overheatESR = LSU49_HEATER_OVERHEAT_ESR,
+        .underheatESR = LSU49_HEATER_UNDERHEAT_ESR,
+    };
+static const struct sensorHeaterParams heaterParams42 = {
+        .closedLoopThresholdESR = LSU42_HEATER_CLOSED_LOOP_THRESHOLD_ESR,
+        .targetESR = LSU42_HEATER_TARGET_ESR,
+        .overheatESR = LSU42_HEATER_OVERHEAT_ESR,
+        .underheatESR = LSU42_HEATER_UNDERHEAT_ESR,
+    };
+static const struct sensorHeaterParams heaterParamsAdv = {
+        //TODO
+    };
+
+static const sensorHeaterParams *getHeaterParams(SensorType type) {
+    switch (type) {
+        case SensorType::LSU49:
+            return &heaterParams49;
+        case SensorType::LSU42:
+            return &heaterParams42;
+        case SensorType::LSUADV:
+            return &heaterParamsAdv;
+    }
+}
 
 using namespace wbo;
 
@@ -33,6 +68,7 @@ static const PWMConfig heaterPwmConfig = {
 
 static constexpr int preheatTimeCounter = HEATER_PREHEAT_TIME / HEATER_CONTROL_PERIOD;
 static constexpr int batteryStabTimeCounter = HEATER_BATTERY_STAB_TIME / HEATER_CONTROL_PERIOD;
+static const struct sensorHeaterParams *heater;
 
 struct heater_state {
     Pid heaterPid;
@@ -113,7 +149,7 @@ static HeaterState GetNextState(struct heater_state &s, HeaterAllow heaterAllowS
             s.timeCounter--;
 
             // If preheat timeout, or sensor is already hot (engine running?)
-            if (s.timeCounter <= 0 || sensorEsr < HEATER_CLOSED_LOOP_THRESHOLD_ESR)
+            if (s.timeCounter <= 0 || sensorEsr < heater->closedLoopThresholdESR)
             {
                 // If enough time has elapsed, start the ramp
                 // Start the ramp at 4 volts
@@ -128,7 +164,7 @@ static HeaterState GetNextState(struct heater_state &s, HeaterAllow heaterAllowS
             // Stay in preheat - wait for time to elapse
             break;
         case HeaterState::WarmupRamp:
-            if (sensorEsr < HEATER_CLOSED_LOOP_THRESHOLD_ESR)
+            if (sensorEsr < heater->closedLoopThresholdESR)
             {
                 return HeaterState::ClosedLoop;
             }
@@ -143,12 +179,12 @@ static HeaterState GetNextState(struct heater_state &s, HeaterAllow heaterAllowS
             break;
         case HeaterState::ClosedLoop:
             // Check that the sensor's ESR is acceptable for normal operation
-            if (sensorEsr < HEATER_OVERHEAT_ESR)
+            if (sensorEsr < heater->overheatESR)
             {
                 SetFault(s.ch, Fault::SensorOverheat);
                 return HeaterState::Stopped;
             }
-            else if (sensorEsr > HEATER_UNDERHEAT_ESR)
+            else if (sensorEsr > heater->underheatESR)
             {
                 SetFault(s.ch, Fault::SensorUnderheat);
                 return HeaterState::Stopped;
@@ -181,7 +217,7 @@ static float GetVoltageForState(struct heater_state &s, float heaterEsr)
         case HeaterState::ClosedLoop:
             // "nominal" heater voltage is 7.5v, so apply correction around that point (instead of relying on integrator so much)
             // Negated because lower resistance -> hotter
-            return 7.5f - s.heaterPid.GetOutput(HEATER_TARGET_ESR, heaterEsr);
+            return 7.5f - s.heaterPid.GetOutput(heater->targetESR, heaterEsr);
         case HeaterState::Stopped:
             // Something has gone wrong, turn off the heater.
             return 0;
@@ -201,6 +237,9 @@ static void HeaterThread(void*)
     // Wait for temperature sensing to stabilize so we don't
     // immediately think we overshot the target temperature
     chThdSleepMilliseconds(1000);
+
+    // Get sensor type and settings
+    heater = getHeaterParams(GetSensorType());
 
     while (true)
     {

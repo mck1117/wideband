@@ -39,6 +39,7 @@ static void SamplingThread(void*)
 
     chRegSetThreadName("Sampling");
 
+
     /* GD32: Insert 20us delay after ADC enable */
     chThdSleepMilliseconds(1);
 
