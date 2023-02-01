@@ -21,7 +21,7 @@ void SamplingUpdateLiveData()
         volatile struct livedata_afr_s *data = &livedata_afr[ch];
 
         data->lambda = GetLambda(ch);
-        data->temperature = GetSensorTemperature(ch);
+        data->temperature = GetSensorTemperature(ch) * 10;
         data->nernstDc = GetNernstDc(ch) * 1000;
         data->nernstAc = GetNernstAc(ch) * 1000;
         data->pumpCurrentTarget = GetPumpCurrent(ch);
