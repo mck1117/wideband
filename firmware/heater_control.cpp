@@ -42,6 +42,7 @@ HeaterState HeaterControllerBase::GetNextState(HeaterState currentState, HeaterA
         if (batteryVoltage < HEATER_BATTETY_OFF_VOLTAGE)
         {
             batteryStabTime = batteryStabTimeCounter;
+            return HeaterState::NoHeaterSupply;
         }
         // measured voltage is high enougth to auto-start heating, wait some time to stabilize
         if ((batteryVoltage > HEATER_BATTERY_ON_VOLTAGE) && (batteryStabTime > 0))
@@ -143,8 +144,10 @@ float HeaterControllerBase::GetVoltageForState(HeaterState state, float sensorEs
             // TODO: heater PID should operate on temperature, not ESR
             return 7.5f - heaterPid.GetOutput(m_targetEsr, sensorEsr);
         case HeaterState::Stopped:
-        case HeaterState::NoHeaterSupply:
             // Something has gone wrong, turn off the heater.
+            return 0;
+        case HeaterState::NoHeaterSupply:
+            // No/too low heater supply - disable output
             return 0;
     }
 
