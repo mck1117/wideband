@@ -130,6 +130,7 @@ static HeaterState GetNextState(struct heater_state &s, HeaterAllow heaterAllowS
         if (batteryVoltage < HEATER_BATTETY_OFF_VOLTAGE)
         {
             s.batteryStabTime = batteryStabTimeCounter;
+            return HeaterState::NoHeaterSupply;
         }
         // measured voltage is high enougth to auto-start heating, wait some time to stabilize
         if ((batteryVoltage > HEATER_BATTERY_ON_VOLTAGE) && (s.batteryStabTime > 0))
@@ -223,6 +224,9 @@ static float GetVoltageForState(struct heater_state &s, float heaterEsr)
             return 7.5f - s.heaterPid.GetOutput(heater->targetESR, heaterEsr);
         case HeaterState::Stopped:
             // Something has gone wrong, turn off the heater.
+            return 0;
+        case HeaterState::NoHeaterSupply:
+            // No/too low heater supply - disable output
             return 0;
     }
 
