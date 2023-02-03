@@ -72,7 +72,7 @@
         (number "6" (effects (font (size 1.27 1.27))))
       )
       (pin input line (at -15.24 -6.35 0) (length 2.54)
-        (name "nRESET" (effects (font (size 1.27 1.27))))
+        (name "VBatt_Sense" (effects (font (size 1.27 1.27))))
         (number "7" (effects (font (size 1.27 1.27))))
       )
       (pin input line (at -15.24 -8.89 0) (length 2.54)
