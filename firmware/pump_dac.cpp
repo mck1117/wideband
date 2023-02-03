@@ -75,7 +75,7 @@ void SetPumpCurrentTarget(int ch, int32_t microampere)
 
 float GetPumpOutputDuty(int ch)
 {
-    return pumpDac.GetLastDuty(ch);
+    return pumpDac.GetLastDuty(pumpDacPwmCh[ch]);
 }
 
 float GetPumpCurrent(int ch)
