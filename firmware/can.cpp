@@ -21,7 +21,9 @@ void CanTxThread(void*)
 
     while(1)
     {
-        SendRusefiFormat(configuration->CanIndexOffset);
+        for (int ch = 0; ch < AFR_CHANNELS; ch++) {
+            SendRusefiFormat(ch);
+        }
 
         chThdSleepMilliseconds(10);
     }
@@ -131,11 +133,9 @@ void InitCan()
     chThdCreateStatic(waCanRxThread, sizeof(waCanRxThread), NORMALPRIO - 4, CanRxThread, nullptr);
 }
 
-void SendRusefiFormat(uint8_t idx)
+void SendRusefiFormat(uint8_t ch)
 {
-    auto baseAddress = WB_DATA_BASE_ADDR + 2 * idx;
-    /* TODO: */
-    int ch = 0;
+    auto baseAddress = WB_DATA_BASE_ADDR + 2 * (ch + configuration->CanIndexOffset);
 
     {
         CanTxTyped<wbo::StandardData> frame(baseAddress + 0);
