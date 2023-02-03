@@ -1,3 +1,4 @@
 (sym_lib_table
   (lib (name "wideband_controller-rescue")(type "Legacy")(uri "${KIPRJMOD}/wideband_controller-rescue.lib")(options "")(descr ""))
+  (lib (name "wideband_module")(type "KiCad")(uri "${KIPRJMOD}/wideband_module.kicad_sym")(options "")(descr ""))
 )

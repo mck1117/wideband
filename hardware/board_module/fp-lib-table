@@ -1,0 +1,3 @@
+(fp_lib_table
+  (lib (name "wideband_module")(type "KiCad")(uri "${KIPRJMOD}/wideband_module.pretty")(options "")(descr ""))
+)
