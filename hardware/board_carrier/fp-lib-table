@@ -1,4 +1,5 @@
 (fp_lib_table
-  (lib (name mx120)(type KiCad)(uri ${KIPRJMOD}/mx120.pretty)(options "")(descr ""))
-  (lib (name rusefi)(type KiCad)(uri ${KIPRJMOD}/../kicad-libraries/rusefi_lib.pretty)(options "")(descr ""))
+  (lib (name "mx120")(type "KiCad")(uri "${KIPRJMOD}/mx120.pretty")(options "")(descr ""))
+  (lib (name "rusefi")(type "KiCad")(uri "${KIPRJMOD}/../kicad-libraries/rusefi_lib.pretty")(options "")(descr ""))
+  (lib (name "wideband_module")(type "KiCad")(uri "${KIPRJMOD}/../board_module/wideband_module.pretty")(options "")(descr ""))
 )
