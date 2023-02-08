@@ -12,6 +12,7 @@
 #include "auxout.h"
 #include "max31855.h"
 #include "port.h"
+#include "tunerstudio.h"
 
 #include "wideband_config.h"
 
@@ -35,6 +36,8 @@ int main() {
     StartHeaterControl();
     StartPumpControl();
     InitAuxDac();
+
+    startTunerStudioConnectivity();
 
     InitCan();
     InitUart();
