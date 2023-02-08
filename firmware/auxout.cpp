@@ -157,7 +157,6 @@ void AuxOutThread(void*)
     {
         for (int ch = 0; ch < AFR_CHANNELS; ch++)
         {
-            auto cfg = GetConfiguration();
             float input = AuxGetInputSignal(cfg->auxOutputSource[ch]);
             float voltage = interpolate2d(input, cfg->auxOutBins[ch], cfg->auxOutValues[ch]);
 
