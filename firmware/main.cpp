@@ -111,6 +111,7 @@ extern "C" void HardFault_Handler_C(void* sp) {
 	bool isFaultOnUnstacking = ((SCB->CFSR >> SCB_CFSR_BUSFAULTSR_Pos) & (1 << 3) ? true : false);
 	bool isFaultOnStacking = ((SCB->CFSR >> SCB_CFSR_BUSFAULTSR_Pos) & (1 << 4) ? true : false);
 	bool isFaultAddressValid = ((SCB->CFSR >> SCB_CFSR_BUSFAULTSR_Pos) & (1 << 7) ? true : false);
+	(void)faultAddress;
 	(void)isFaultPrecise;
 	(void)isFaultImprecise;
 	(void)isFaultOnUnstacking;
