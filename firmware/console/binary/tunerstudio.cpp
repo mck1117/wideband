@@ -92,6 +92,7 @@ static void printErrorCounters() {
 /* TunerStudio repeats connection attempts at ~1Hz rate.
  * So first char receive timeout should be less than 1s */
 #define TS_COMMUNICATION_TIMEOUT	TIME_MS2I(500)	//0.5 Sec
+#define TS_BT_COMMUNICATION_TIMEOUT TIME_MS2I(30 * 1000) // 30 Sec
 
 void tunerStudioDebug(TsChannelBase* tsChannel, const char *msg) {
 	(void)tsChannel;
@@ -426,6 +427,8 @@ static int tsProcessOne(TsChannelBase* tsChannel) {
 }
 
 void TunerstudioThread::ThreadTask() {
+	bool btInitAttempted = false;
+	sysinterval_t btTimeout = 0;
 	auto channel = setupChannel();
 
 	// No channel configured for this thread, cancel.
@@ -437,7 +440,17 @@ void TunerstudioThread::ThreadTask() {
 	while (true) {
 		if (tsProcessOne(channel) == 0) {
 			//onDataArrived(true);
+			btTimeout = 0;
 		} else {
+			btTimeout += TS_COMMUNICATION_TIMEOUT;
+
+			if ((btTimeout >= TS_BT_COMMUNICATION_TIMEOUT) &&
+				(btInitAttempted == false)) {
+				// Try to init BT module
+				channel->reStart();
+				// Try this only once
+				btInitAttempted = true;
+			}
 			//onDataArrived(false);
 		}
 	}

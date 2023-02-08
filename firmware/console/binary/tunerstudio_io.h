@@ -49,6 +49,7 @@ public:
 	virtual void flush() { }
 	virtual bool isConfigured() const { return true; }
 	virtual bool isReady() const { return true; }
+	virtual int reStart() { }
 	virtual void stop() { }
 
 	// Base functions that use the above virtual implementation
@@ -96,7 +97,10 @@ class SerialTsChannel : public SerialTsChannelBase {
 public:
 	SerialTsChannel(SerialDriver& driver) : SerialTsChannelBase("Serial"), m_driver(&driver) { }
 
-	int start(uint32_t baud) override;
+	int start(uint32_t newBaud) override;
+	// Close and open serial ports with specified baud rate
+	// Also will do BT module setup if BT is enabled
+	int reStart() override;
 	void stop() override;
 
 	void write(const uint8_t* buffer, size_t size, bool isEndOfPacket) override;
@@ -107,6 +111,7 @@ private:
 	int bt_wait_ok(void);
 	int bt_disconnect(void);
 
+	uint32_t baud;
 	SerialDriver* const m_driver;
 };
 #endif // HAL_USE_SERIAL
@@ -117,7 +122,8 @@ class UartTsChannel : public SerialTsChannelBase {
 public:
 	UartTsChannel(UARTDriver& driver) : SerialTsChannelBase("UART"), m_driver(&driver) { }
 
-	int start(uint32_t baud) override;
+	int start(uint32_t newBaud) override;
+	int reStart() override;
 	void stop() override;
 
 	void write(const uint8_t* buffer, size_t size, bool isEndOfPacket) override;

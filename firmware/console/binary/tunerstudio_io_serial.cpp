@@ -61,7 +61,23 @@ int SerialTsChannel::bt_disconnect(void)
 	return bt_wait_ok();
 }
 
-int SerialTsChannel::start(uint32_t baud) {
+int SerialTsChannel::start(uint32_t newBaud) {
+	SerialConfig cfg = {
+		.speed = newBaud,
+		.cr1 = 0,
+		.cr2 = USART_CR2_STOP1_BITS | USART_CR2_LINEN,
+		.cr3 = 0
+	};
+
+	baud = newBaud;
+
+	sdStart(m_driver, &cfg);
+
+	return 0;
+}
+
+/* this will also try to reinit BT module */
+int SerialTsChannel::reStart() {
 	int ret = 0;
 	SerialConfig cfg = {
 		.speed = baud,
@@ -69,6 +85,9 @@ int SerialTsChannel::start(uint32_t baud) {
 		.cr2 = USART_CR2_STOP1_BITS | USART_CR2_LINEN,
 		.cr3 = 0
 	};
+
+	/* Stop first */
+	sdStop(m_driver);
 
 	if (BT_SERIAL_OVER_JDY33) {
 		/* try BT setup */
@@ -200,12 +219,6 @@ int SerialTsChannel::start(uint32_t baud) {
 		sdStart(m_driver, &cfg);
 	}
 
-	if (ret < 0) {
-		/* set requested baudrate and wait for direct uart connection */
-		cfg.speed = baud;
-		sdStart(m_driver, &cfg);
-	}
-
 	return ret;
 }
 
@@ -223,14 +236,14 @@ size_t SerialTsChannel::readTimeout(uint8_t* buffer, size_t size, int timeout) {
 #endif // HAL_USE_SERIAL
 
 #if (HAL_USE_UART == TRUE) && (UART_USE_WAIT == TRUE)
-int UartTsChannel::start(uint32_t baud) {
+int UartTsChannel::start(uint32_t newBaud) {
 	m_config.txend1_cb 		= NULL;
 	m_config.txend2_cb 		= NULL;
 	m_config.rxend_cb 		= NULL;
 	m_config.rxchar_cb		= NULL;
 	m_config.rxerr_cb		= NULL;
 	m_config.timeout_cb		= NULL;
-	m_config.speed 			= baud;
+	m_config.speed 			= newBaud;
 	m_config.cr1 			= 0;
 	m_config.cr2 			= 0/*USART_CR2_STOP1_BITS*/ | USART_CR2_LINEN;
 	m_config.cr3 			= 0;
@@ -238,6 +251,12 @@ int UartTsChannel::start(uint32_t baud) {
 	uartStart(m_driver, &m_config);
 
 	return 0;
+}
+
+int UartTsChannel::reStart() {
+	stop();
+	/* TODO: add BT setup? */
+	start(baud);
 }
 
 void UartTsChannel::stop() {
