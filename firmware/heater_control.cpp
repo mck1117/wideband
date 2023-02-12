@@ -194,7 +194,10 @@ static HeaterState GetNextState(struct heater_state &s, HeaterAllow heaterAllowS
             }
 
             break;
-        case HeaterState::Stopped: break;
+        case HeaterState::Stopped:
+        case HeaterState::NoHeaterSupply:
+            /* nop */
+            break;
     }
 
     return s.heaterState;
@@ -337,6 +340,8 @@ const char* describeHeaterState(HeaterState state)
             return "ClosedLoop";
         case HeaterState::Stopped:
             return "Stopped";
+        case HeaterState::NoHeaterSupply:
+            return "NoHeaterSupply";
     }
 
     return "Unknown";
