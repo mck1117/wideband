@@ -126,7 +126,16 @@ float GetSensorTemperature(int ch)
         return 0;
     }
 
-    return interpolate2d(esr, lsu49TempBins, lsu49TempValues);
+    switch (GetSensorType()) {
+        case SensorType::LSU49:
+            return interpolate2d(esr, lsu49TempBins, lsu49TempValues);
+        case SensorType::LSU42:
+            return interpolate2d(esr, lsu42TempBins, lsu42TempValues);
+        case SensorType::LSUADV:
+            return interpolate2d(esr, lsuAdvTempBins, lsuAdvTempValues);
+    }
+
+    return 0;
 }
 
 float GetNernstDc(int ch)
