@@ -547,32 +547,7 @@ int TunerStudio::handleCrcCommand(TsChannelBase* tsChannel, char *data, size_t i
 }
 
 void startTunerStudioConnectivity(void) {
-	// Assert tune & output channel struct sizes
-//	static_assert(sizeof(persistent_config_s) == TOTAL_CONFIG_SIZE, "TS datapage size mismatch");
-// useful trick if you need to know how far off is the static_assert
-//	char (*__kaboom)[sizeof(persistent_config_s)] = 1;
-// another useful trick
-//  static_assert(offsetof (engine_configuration_s,HD44780_e) == 700);
-
+	/* just reset debug counters */
+	/* actually already zeroed */
 	memset(&tsState, 0, sizeof(tsState));
-	
-#if EFI_BLUETOOTH_SETUP
-	// module initialization start (it waits for disconnect and then communicates to the module)
-	// Usage:   "bluetooth_hc06 <baud> <name> <pincode>"
-	// Example: "bluetooth_hc06 38400 rusefi 1234"
-	// bluetooth_jdy 115200 alphax 1234
-	addConsoleActionSSS("bluetooth_hc05", [](const char *baudRate, const char *name, const char *pinCode) {
-		bluetoothStart(BLUETOOTH_HC_05, baudRate, name, pinCode);
-	});
-	addConsoleActionSSS("bluetooth_hc06", [](const char *baudRate, const char *name, const char *pinCode) {
-		bluetoothStart(BLUETOOTH_HC_06, baudRate, name, pinCode);
-	});
-	addConsoleActionSSS("bluetooth_bk", [](const char *baudRate, const char *name, const char *pinCode) {
-		bluetoothStart(BLUETOOTH_BK3231, baudRate, name, pinCode);
-	});
-	addConsoleActionSSS("bluetooth_jdy", [](const char *baudRate, const char *name, const char *pinCode) {
-		bluetoothStart(BLUETOOTH_JDY_3x, baudRate, name, pinCode);
-	});
-	addConsoleAction("bluetooth_cancel", bluetoothCancel);
-#endif /* EFI_BLUETOOTH_SETUP */
 }
