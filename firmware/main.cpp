@@ -166,6 +166,7 @@ extern "C" void MemManage_Handler_C(void* sp) {
 #if (__CORTEX_M > 0)
 	//For HardFault/BusFault this is the address that was accessed causing the error
 	uint32_t faultAddress = SCB->MMFAR;
+	(void)faultAddress;
 
 	//Flags about hardfault / busfault
 	//See http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.dui0552a/Cihdjcfc.html for reference
