@@ -49,7 +49,7 @@ public:
 	virtual void flush() { }
 	virtual bool isConfigured() const { return true; }
 	virtual bool isReady() const { return true; }
-	virtual int reStart() { }
+	virtual int reStart() { return 0; }
 	virtual void stop() { }
 
 	// Base functions that use the above virtual implementation
