@@ -2,7 +2,7 @@
 
 # rusEFI Wideband Controller
 
-[User Documentation](https://rusefi.com/s/wb)
+[User Documentation](https://wiki.rusefi.com/WBO)
 
 [Forum Thread](https://rusefi.com/forum/viewtopic.php?f=4&t=1856)
 
