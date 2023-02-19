@@ -31,10 +31,12 @@ rm -f ${DELIVER_DIR}/*
 
 if uname | grep "NT"; then
   HEX2DFU=./ext/encedo_hex2dfu/hex2dfu.exe
+  SREC_CAT=srec_cat.exe
 else
   HEX2DFU=./ext/encedo_hex2dfu/hex2dfu.bin
+  chmod u+x $HEX2DFU
+  SREC_CAT=srec_cat
 fi
-chmod u+x $HEX2DFU
 
 echo ""
 echo "Creating deliveries:"
@@ -55,9 +57,12 @@ if [ $USE_OPENBLT = "yes" ]; then
   echo "OpenBLT bin (for DFU another util)"
   cp -v boards/${BOARD}/openblt/bin/openblt_${BOARD}.bin ${DELIVER_DIR}/openblt.bin
 
+  OPENBLT_HEX=boards/${BOARD}/openblt/bin/openblt_${BOARD}.hex
   echo ""
   echo "Invoking hex2dfu for composite OpenBLT+Wideband image (for DFU util)"
-  $HEX2DFU -i boards/${BOARD}/openblt/bin/openblt_${BOARD}.hex -i build/wideband.hex -C 0x1C -o ${DELIVER_DIR}/wideband.dfu -b ${DELIVER_DIR}/wideband.bin
+  $HEX2DFU -i ${OPENBLT_HEX} -i build/wideband.hex -C 0x1C -o ${DELIVER_DIR}/wideband.dfu -b ${DELIVER_DIR}/wideband.bin
+  echo "Combining two hex files into composite hex file"
+  $SREC_CAT ${OPENBLT_HEX} -Intel build/wideband.hex -Intel -o ${DELIVER_DIR}/wideband.hex -Intel
 else
   echo "Bin for raw flashing"
   cp build/wideband.bin ${DELIVER_DIR}/wideband.bin
