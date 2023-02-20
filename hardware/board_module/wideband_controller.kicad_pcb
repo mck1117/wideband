@@ -114,7 +114,7 @@
   (net 43 "/Nernst_esr_drive_42")
   (net 44 "/Nernst_esr_drive_adv")
   (net 45 "unconnected-(U2-Pad25)")
-  (net 46 "Net-(U2-Pad14)")
+  (net 46 "Net-(C6-Pad1)")
   (net 47 "unconnected-(U2-Pad11)")
   (net 48 "unconnected-(U2-Pad10)")
   (net 49 "unconnected-(U2-Pad3)")
@@ -758,7 +758,7 @@
     (property "LCSC" "C50282")
     (property "Sheetfile" "wideband_controller.kicad_sch")
     (property "Sheetname" "")
-    (path "/00000000-0000-0000-0000-00005f8996df")
+    (path "/00000000-0000-0000-0000-00005f8b9d88")
     (attr smd)
     (fp_text reference "U1" (at 0 -3.55) (layer "F.SilkS") hide
       (effects (font (size 1 1) (thickness 0.15)))
@@ -2317,7 +2317,7 @@
     (pad "13" smd roundrect locked (at 0.4 4.175 180) (size 0.5 1.5) (layers "F.Cu" "F.Paste" "F.Mask") (roundrect_rratio 0.25)
       (net 22 "/heater_pwm") (pinfunction "PA7") (pintype "bidirectional") (tstamp d0fdaee2-893e-47da-943f-74c27f013deb))
     (pad "14" smd roundrect locked (at 1.2 4.175 180) (size 0.5 1.5) (layers "F.Cu" "F.Paste" "F.Mask") (roundrect_rratio 0.25)
-      (net 46 "Net-(U2-Pad14)") (pinfunction "PB0") (pintype "bidirectional") (tstamp 72e61875-718d-4e15-b6f2-d949f5612323))
+      (net 46 "Net-(C6-Pad1)") (pinfunction "PB0") (pintype "bidirectional") (tstamp 72e61875-718d-4e15-b6f2-d949f5612323))
     (pad "15" smd roundrect locked (at 2 4.175 180) (size 0.5 1.5) (layers "F.Cu" "F.Paste" "F.Mask") (roundrect_rratio 0.25)
       (net 41 "/SEL_1") (pinfunction "PB1") (pintype "bidirectional") (tstamp b0750fdc-33dc-4831-8a50-603d78566491))
     (pad "16" smd roundrect locked (at 2.8 4.175 180) (size 0.5 1.5) (layers "F.Cu" "F.Paste" "F.Mask") (roundrect_rratio 0.25)
@@ -2396,7 +2396,7 @@
     (pad "1" smd roundrect (at -0.51 0 270) (size 0.54 0.64) (layers "F.Cu" "F.Paste" "F.Mask") (roundrect_rratio 0.25)
       (net 54 "/VBatt_Sense") (pintype "passive") (tstamp 6ae5ac37-ef37-4b00-86f0-8699323cb30a))
     (pad "2" smd roundrect (at 0.51 0 270) (size 0.54 0.64) (layers "F.Cu" "F.Paste" "F.Mask") (roundrect_rratio 0.25)
-      (net 46 "Net-(U2-Pad14)") (pintype "passive") (tstamp 992751b9-fd19-4131-a400-c10509a829f4))
+      (net 46 "Net-(C6-Pad1)") (pintype "passive") (tstamp 992751b9-fd19-4131-a400-c10509a829f4))
     (model "${KICAD6_3DMODEL_DIR}/Resistor_SMD.3dshapes/R_0402_1005Metric.wrl"
       (offset (xyz 0 0 0))
       (scale (xyz 1 1 1))
@@ -2566,7 +2566,7 @@
     (fp_line (start -0.5 0.25) (end -0.5 -0.25) (layer "F.Fab") (width 0.1) (tstamp 638698f1-7348-4061-b996-de4b1fd37b8a))
     (fp_line (start -0.5 -0.25) (end 0.5 -0.25) (layer "F.Fab") (width 0.1) (tstamp dc53284f-addf-4164-aa8b-3cd9fd3660cc))
     (pad "1" smd roundrect (at -0.48 0 90) (size 0.56 0.62) (layers "F.Cu" "F.Paste" "F.Mask") (roundrect_rratio 0.25)
-      (net 46 "Net-(U2-Pad14)") (pintype "passive") (tstamp a4337720-76f6-43f6-9bb0-22dc1801e8ff))
+      (net 46 "Net-(C6-Pad1)") (pintype "passive") (tstamp a4337720-76f6-43f6-9bb0-22dc1801e8ff))
     (pad "2" smd roundrect (at 0.48 0 90) (size 0.56 0.62) (layers "F.Cu" "F.Paste" "F.Mask") (roundrect_rratio 0.25)
       (net 1 "GND") (pintype "passive") (tstamp d310ae68-fdf7-4511-98d7-730c482caa49))
     (model "${KICAD6_3DMODEL_DIR}/Capacitor_SMD.3dshapes/C_0402_1005Metric.wrl"
@@ -2652,7 +2652,7 @@
     (fp_line (start -0.525 0.27) (end -0.525 -0.27) (layer "F.Fab") (width 0.1) (tstamp 7f3ea70d-6246-4c9c-bb8a-3ae0273c08fd))
     (fp_line (start 0.525 0.27) (end -0.525 0.27) (layer "F.Fab") (width 0.1) (tstamp f2dd3c9a-a296-4a6b-84bf-81a48e904736))
     (pad "1" smd roundrect (at -0.51 0 90) (size 0.54 0.64) (layers "F.Cu" "F.Paste" "F.Mask") (roundrect_rratio 0.25)
-      (net 46 "Net-(U2-Pad14)") (pintype "passive") (tstamp 0570a8c1-893b-471b-96fc-21ada6f0d132))
+      (net 46 "Net-(C6-Pad1)") (pintype "passive") (tstamp 0570a8c1-893b-471b-96fc-21ada6f0d132))
     (pad "2" smd roundrect (at 0.51 0 90) (size 0.54 0.64) (layers "F.Cu" "F.Paste" "F.Mask") (roundrect_rratio 0.25)
       (net 1 "GND") (pintype "passive") (tstamp 02e39c83-a1e8-4180-89bd-ed69c4a7ec7c))
     (model "${KICAD6_3DMODEL_DIR}/Resistor_SMD.3dshapes/R_0402_1005Metric.wrl"
