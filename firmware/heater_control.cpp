@@ -76,6 +76,9 @@ struct heater_state {
     int batteryStabTime;
     float rampVoltage;
     HeaterState heaterState;
+#ifdef HEATER_MAX_DUTY
+    int cycle;
+#endif
     uint8_t ch;
     uint8_t pwm_ch;
 };
@@ -271,8 +274,12 @@ static void HeaterThread(void*)
             float duty = voltageRatio * voltageRatio;
 
             #ifdef HEATER_MAX_DUTY
-            if (duty > HEATER_MAX_DUTY) {
-                duty = HEATER_MAX_DUTY;
+            s.cycle++;
+            // limit PWM each 10th cycle (2 time per second) to measure heater supply voltage throuth "Heater-"
+            if ((s.cycle % 10) == 0) {
+                if (duty > HEATER_MAX_DUTY) {
+                    duty = HEATER_MAX_DUTY;
+                }
             }
             #endif
 
