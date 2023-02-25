@@ -76,3 +76,63 @@ AnalogResult AnalogSample()
         .VirtualGroundVoltageInt = HALF_VCC,
     };
 }
+
+/* TODO: optimize */
+void SetupESRDriver(SensorType sensor)
+{
+    switch (sensor) {
+        case SensorType::LSU42:
+            /* disable bias */
+            palSetPadMode(NERNST_49_BIAS_PORT, NERNST_49_BIAS_PIN,
+                PAL_MODE_INPUT);
+            /* disable all others ESR drivers */
+            palSetPadMode(NERNST_49_ESR_DRIVER_PORT, NERNST_49_ESR_DRIVER_PIN,
+                PAL_MODE_INPUT);
+            palSetPadMode(NERNST_ADV_ESR_DRIVER_PORT, NERNST_ADV_ESR_DRIVER_PIN,
+                PAL_MODE_INPUT);
+            /* enable LSU4.2 */
+            palSetPadMode(NERNST_42_ESR_DRIVER_PORT, NERNST_42_ESR_DRIVER_PIN,
+                PAL_MODE_OUTPUT_PUSHPULL);
+        break;
+        case SensorType::LSU49:
+            /* disable all others ESR drivers */
+            palSetPadMode(NERNST_42_ESR_DRIVER_PORT, NERNST_42_ESR_DRIVER_PIN,
+                PAL_MODE_INPUT);
+            palSetPadMode(NERNST_ADV_ESR_DRIVER_PORT, NERNST_ADV_ESR_DRIVER_PIN,
+                PAL_MODE_INPUT);
+            /* enable LSU4.2 */
+            palSetPadMode(NERNST_49_ESR_DRIVER_PORT, NERNST_49_ESR_DRIVER_PIN,
+                PAL_MODE_OUTPUT_PUSHPULL);
+            /* enable bias */
+            palSetPadMode(NERNST_49_BIAS_PORT, NERNST_49_BIAS_PIN,
+                PAL_MODE_OUTPUT_PUSHPULL);
+            palSetPad(NERNST_49_BIAS_PORT, NERNST_49_BIAS_PIN);
+        break;
+        case SensorType::LSUADV:
+            /* disable bias */
+            palSetPadMode(NERNST_49_BIAS_PORT, NERNST_49_BIAS_PIN,
+                PAL_MODE_INPUT);
+            /* disable all others ESR drivers */
+            palSetPadMode(NERNST_49_ESR_DRIVER_PORT, NERNST_49_ESR_DRIVER_PIN,
+                PAL_MODE_INPUT);
+            palSetPadMode(NERNST_42_ESR_DRIVER_PORT, NERNST_42_ESR_DRIVER_PIN,
+                PAL_MODE_INPUT);
+            /* enable LSU4.2 */
+            palSetPadMode(NERNST_ADV_ESR_DRIVER_PORT, NERNST_ADV_ESR_DRIVER_PIN,
+                PAL_MODE_OUTPUT_PUSHPULL);
+        break;
+    }
+}
+
+int GetESRSupplyR()
+{
+    switch (GetSensorType()) {
+        case SensorType::LSU42:
+            return 6800;
+        case SensorType::LSU49:
+            return 22000;
+        case SensorType::LSUADV:
+            return 47000;
+    }
+    return 0;
+}
