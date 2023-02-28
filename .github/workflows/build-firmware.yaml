@@ -46,4 +46,4 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: Wideband ${{matrix.build-target}}
-          path: ./firmware/c/${{matrix.build-target}}/wideband.*
+          path: ./firmware/deliver/${{matrix.build-target}}/wideband.*
