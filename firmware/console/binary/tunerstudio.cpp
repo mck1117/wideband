@@ -462,7 +462,7 @@ void tunerStudioError(TsChannelBase* tsChannel, const char *msg) {
 
 static void handleGetVersion(TsChannelBase* tsChannel) {
 	char versionBuffer[32];
-	chsnprintf(versionBuffer, sizeof(versionBuffer), "%s", BOARD_NAME);
+	chsnprintf(versionBuffer, sizeof(versionBuffer), BOARD_NAME);
 	tsChannel->sendResponse(TS_CRC, (const uint8_t *) versionBuffer, strlen(versionBuffer) + 1);
 }
 
