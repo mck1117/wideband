@@ -34,6 +34,10 @@ jobs:
       - name: Test Compiler
         run: arm-none-eabi-gcc -v
 
+      - name: Install srecord for srec_cat
+        run: |
+          sudo apt-get install srecord
+
       - name: Build Firmware
         working-directory: ./firmware/boards/${{matrix.build-target}}
         run: ./build_wideband.sh
