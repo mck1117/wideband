@@ -223,7 +223,7 @@ static void handleTestCommand(TsChannelBase* tsChannel) {
 	 * extension of the protocol to simplify troubleshooting
 	 */
 	tunerStudioDebug(tsChannel, "got T (Test)");
-	chsnprintf(testOutputBuffer, sizeof(testOutputBuffer), "%s\r\n", BOARD_NAME);
+	chsnprintf(testOutputBuffer, sizeof(testOutputBuffer), BOARD_NAME "\r\n");
 	tsChannel->write((const uint8_t*)testOutputBuffer, strlen(testOutputBuffer));
 
 	chsnprintf(testOutputBuffer, sizeof(testOutputBuffer),  "%s\r\n", __DATE__ );
