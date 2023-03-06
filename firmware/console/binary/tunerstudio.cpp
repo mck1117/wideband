@@ -226,7 +226,7 @@ static void handleTestCommand(TsChannelBase* tsChannel) {
 	chsnprintf(testOutputBuffer, sizeof(testOutputBuffer), BOARD_NAME "\r\n");
 	tsChannel->write((const uint8_t*)testOutputBuffer, strlen(testOutputBuffer));
 
-	chsnprintf(testOutputBuffer, sizeof(testOutputBuffer),  "%s\r\n", __DATE__ );
+	chsnprintf(testOutputBuffer, sizeof(testOutputBuffer), __DATE__ "\r\n");
 	tsChannel->write((const uint8_t*)testOutputBuffer, strlen(testOutputBuffer));
 
 /*
