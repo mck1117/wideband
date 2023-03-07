@@ -65,7 +65,9 @@ if [ $USE_OPENBLT = "yes" ]; then
   $SREC_CAT ${OPENBLT_HEX} -Intel build/wideband.hex -Intel -o ${DELIVER_DIR}/wideband.hex -Intel
 else
   echo "Bin for raw flashing"
-  cp build/wideband.bin ${DELIVER_DIR}/wideband.bin
+  cp build/wideband.bin ${DELIVER_DIR}
+
+  cp build/wideband.hex ${DELIVER_DIR}
 
   echo "Invoking hex2dfu for DFU file"
   $HEX2DFU -i build/wideband.hex -o ${DELIVER_DIR}/wideband.dfu
