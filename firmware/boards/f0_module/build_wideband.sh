@@ -43,5 +43,5 @@ xxd -i build/wideband_image.bin \
     | cat <(echo -n "static const ") - \
     > ${DELIVER_DIR}/wideband_image.h
 
-cp ${DELIVER_DIR}/wideband_image_with_bl.bin ../for_rusefi/wideband_image_with_bl.bin
-cp ${DELIVER_DIR}/wideband_image.h ../for_rusefi/wideband_image.h
+cp ${DELIVER_DIR}/wideband_image_with_bl.bin ../for_rusefi/
+cp ${DELIVER_DIR}/wideband_image.h ../for_rusefi/
