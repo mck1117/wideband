@@ -45,3 +45,12 @@ xxd -i build/wideband_image.bin \
 
 cp ${DELIVER_DIR}/wideband_image_with_bl.bin ../for_rusefi/wideband_image_with_bl.bin
 cp ${DELIVER_DIR}/wideband_image.h ../for_rusefi/wideband_image.h
+
+# todo: f1 uses open BLT and f0 uses custom bootloader :(
+
+# github artifacts are taken from deliver folder
+cp build/wideband.bin ${DELIVER_DIR}
+
+cp build/wideband.hex ${DELIVER_DIR}
+
+#todo: do we want DFU same like for f1 boards?
