@@ -34,9 +34,9 @@ jobs:
       - name: Test Compiler
         run: arm-none-eabi-gcc -v
 
-      - name: Install srecord for srec_cat
+      - name: Install build tools
         run: |
-          sudo apt-get install srecord
+          sudo apt-get install srecord libarchive-zip-perl
 
       - name: Build Firmware
         working-directory: ./firmware/boards/${{matrix.build-target}}
