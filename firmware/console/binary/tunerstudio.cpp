@@ -215,8 +215,6 @@ static bool isKnownCommand(char command) {
  * rusEfi own test command
  */
 
-#define VCS_VERSION "unknown"
-
 static void handleTestCommand(TsChannelBase* tsChannel) {
 	tsState.testCommandCounter++;
 	char testOutputBuffer[64];
@@ -225,10 +223,10 @@ static void handleTestCommand(TsChannelBase* tsChannel) {
 	 * extension of the protocol to simplify troubleshooting
 	 */
 	tunerStudioDebug(tsChannel, "got T (Test)");
-	chsnprintf(testOutputBuffer, sizeof(testOutputBuffer),  VCS_VERSION "\r\n");
+	chsnprintf(testOutputBuffer, sizeof(testOutputBuffer), BOARD_NAME "\r\n");
 	tsChannel->write((const uint8_t*)testOutputBuffer, strlen(testOutputBuffer));
 
-	chsnprintf(testOutputBuffer, sizeof(testOutputBuffer),  __DATE__ "\r\n");
+	chsnprintf(testOutputBuffer, sizeof(testOutputBuffer), __DATE__ "\r\n");
 	tsChannel->write((const uint8_t*)testOutputBuffer, strlen(testOutputBuffer));
 
 /*
@@ -464,8 +462,7 @@ void tunerStudioError(TsChannelBase* tsChannel, const char *msg) {
 
 static void handleGetVersion(TsChannelBase* tsChannel) {
 	char versionBuffer[32];
-	//chsnprintf(versionBuffer, sizeof(versionBuffer), "rusEFI v%d@%s", getRusEfiVersion(), VCS_VERSION);
-	chsnprintf(versionBuffer, sizeof(versionBuffer), "rusEFI Wideband Rev2");
+	chsnprintf(versionBuffer, sizeof(versionBuffer), BOARD_NAME);
 	tsChannel->sendResponse(TS_CRC, (const uint8_t *) versionBuffer, strlen(versionBuffer) + 1);
 }
 
