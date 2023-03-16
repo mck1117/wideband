@@ -2,7 +2,7 @@
 
 // board-specific stuff shared between bootloader and firmware
 
-const CANConfig canConfig500 =
+static const CANConfig canConfig500 =
 {
     CAN_MCR_ABOM | CAN_MCR_AWUM | CAN_MCR_TXFP,
     /*
@@ -10,3 +10,7 @@ const CANConfig canConfig500 =
     */
     CAN_BTR_SJW(0) | CAN_BTR_BRP(4 - 1)  | CAN_BTR_TS1(13 - 1) | CAN_BTR_TS2(2 - 1),
 };
+
+const CANConfig& GetCanConfig() {
+    return canConfig500;
+}

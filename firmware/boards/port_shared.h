@@ -1,4 +1,4 @@
 #include "ch.h"
 #include "hal.h"
 
-extern const CANConfig canConfig500;
+const CANConfig& GetCanConfig();

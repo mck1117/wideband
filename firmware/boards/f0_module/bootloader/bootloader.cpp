@@ -222,7 +222,7 @@ THD_FUNCTION(BootloaderThread, arg)
     (void)arg;
 
     // turn on CAN
-    canStart(&CAND1, &canConfig500);
+    canStart(&CAND1, &GetCanConfig());
 
     WaitForBootloaderCmd();
 
