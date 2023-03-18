@@ -12,7 +12,7 @@ if [ $USE_OPENBLT = "yes" ]; then
   echo ""
   echo "Building bootloader"
   make clean
-  make -j12 BOARD=${BOARD} || exit 1
+  make -j BOARD=${BOARD} || exit 1
 
   # back to board dir
   cd ..
@@ -23,7 +23,7 @@ cd ../..
 echo ""
 echo "Build application"
 # make clean
-make -j12 BOARD=${BOARD} || exit 1
+make -j BOARD=${BOARD} || exit 1
 
 DELIVER_DIR=deliver/${BOARD}
 mkdir -p ${DELIVER_DIR}
