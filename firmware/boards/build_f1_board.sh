@@ -57,6 +57,10 @@ if [ $USE_OPENBLT = "yes" ]; then
   echo "OpenBLT bin (for DFU another util)"
   cp -v boards/${BOARD}/openblt/bin/openblt_${BOARD}.bin ${DELIVER_DIR}/openblt.bin
 
+  echo ""
+  echo "OpenBLT elf for debugging"
+  cp -v boards/${BOARD}/openblt/bin/openblt_${BOARD}.elf ${DELIVER_DIR}/openblt.elf
+
   OPENBLT_HEX=boards/${BOARD}/openblt/bin/openblt_${BOARD}.hex
   echo ""
   echo "Invoking hex2dfu for composite OpenBLT+Wideband image (for DFU util)"
@@ -68,6 +72,9 @@ else
   cp build/wideband.bin ${DELIVER_DIR}
 
   cp build/wideband.hex ${DELIVER_DIR}
+
+  echo "elf for debugging"
+  cp build/wideband.elf ${DELIVER_DIR}
 
   echo "Invoking hex2dfu for DFU file"
   $HEX2DFU -i build/wideband.hex -o ${DELIVER_DIR}/wideband.dfu
