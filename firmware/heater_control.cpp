@@ -12,36 +12,34 @@
 #include "can.h"
 
 struct sensorHeaterParams {
-    uint16_t closedLoopThresholdESR;
-    uint16_t targetESR;
-    uint16_t overheatESR;
-    uint16_t underheatESR;
+    float targetTemp;
+    float targetESR;
 };
 
 static const struct sensorHeaterParams heaterParams49 = {
-        .closedLoopThresholdESR = LSU49_HEATER_CLOSED_LOOP_THRESHOLD_ESR,
-        .targetESR = LSU49_HEATER_TARGET_ESR,
-        .overheatESR = LSU49_HEATER_OVERHEAT_ESR,
-        .underheatESR = LSU49_HEATER_UNDERHEAT_ESR,
-    };
+    .targetTemp = 780,
+    .targetESR = 300,
+};
+
 static const struct sensorHeaterParams heaterParams42 = {
-        .closedLoopThresholdESR = LSU42_HEATER_CLOSED_LOOP_THRESHOLD_ESR,
-        .targetESR = LSU42_HEATER_TARGET_ESR,
-        .overheatESR = LSU42_HEATER_OVERHEAT_ESR,
-        .underheatESR = LSU42_HEATER_UNDERHEAT_ESR,
-    };
+    .targetTemp = 730,
+    .targetESR = 80,
+};
+
 static const struct sensorHeaterParams heaterParamsAdv = {
-        //TODO
-    };
+    .targetTemp = 785,
+    .targetESR = 300,
+};
 
 static const sensorHeaterParams *getHeaterParams(SensorType type) {
     switch (type) {
-        case SensorType::LSU49:
-            return &heaterParams49;
         case SensorType::LSU42:
             return &heaterParams42;
         case SensorType::LSUADV:
             return &heaterParamsAdv;
+        case SensorType::LSU49:
+        default:
+            return &heaterParams49;
     }
 }
 
@@ -119,7 +117,7 @@ static struct heater_state state[AFR_CHANNELS] =
 #endif
 };
 
-static HeaterState GetNextState(struct heater_state &s, HeaterAllow heaterAllowState, float batteryVoltage, float sensorEsr)
+static HeaterState GetNextState(struct heater_state &s, HeaterAllow heaterAllowState, float batteryVoltage, float sensorTemp)
 {
     bool heaterAllowed = heaterAllowState == HeaterAllow::Allowed;
 
@@ -146,13 +144,17 @@ static HeaterState GetNextState(struct heater_state &s, HeaterAllow heaterAllowS
         return HeaterState::Preheat;
     }
 
+    float overheatTemp = heater->targetTemp + 100;
+    float closedLoopTemp = heater->targetTemp - 50;
+    float underheatTemp = heater->targetTemp - 100;
+
     switch (s.heaterState)
     {
         case HeaterState::Preheat:
             s.timeCounter--;
 
             // If preheat timeout, or sensor is already hot (engine running?)
-            if (s.timeCounter <= 0 || sensorEsr < heater->closedLoopThresholdESR)
+            if (s.timeCounter <= 0 || sensorTemp > closedLoopTemp)
             {
                 // If enough time has elapsed, start the ramp
                 // Start the ramp at 4 volts
@@ -167,7 +169,7 @@ static HeaterState GetNextState(struct heater_state &s, HeaterAllow heaterAllowS
             // Stay in preheat - wait for time to elapse
             break;
         case HeaterState::WarmupRamp:
-            if (sensorEsr < heater->closedLoopThresholdESR)
+            if (sensorTemp > closedLoopTemp)
             {
                 return HeaterState::ClosedLoop;
             }
@@ -182,12 +184,12 @@ static HeaterState GetNextState(struct heater_state &s, HeaterAllow heaterAllowS
             break;
         case HeaterState::ClosedLoop:
             // Check that the sensor's ESR is acceptable for normal operation
-            if (sensorEsr < heater->overheatESR)
+            if (sensorTemp > overheatTemp)
             {
                 SetFault(s.ch, Fault::SensorOverheat);
                 return HeaterState::Stopped;
             }
-            else if (sensorEsr > heater->underheatESR)
+            else if (sensorTemp < underheatTemp)
             {
                 SetFault(s.ch, Fault::SensorUnderheat);
                 return HeaterState::Stopped;
@@ -223,6 +225,8 @@ static float GetVoltageForState(struct heater_state &s, float heaterEsr)
         case HeaterState::ClosedLoop:
             // "nominal" heater voltage is 7.5v, so apply correction around that point (instead of relying on integrator so much)
             // Negated because lower resistance -> hotter
+
+            // TODO: heater PID should operate on temperature, not ESR
             return 7.5f - s.heaterPid.GetOutput(heater->targetESR, heaterEsr);
         case HeaterState::Stopped:
             // Something has gone wrong, turn off the heater.
@@ -256,6 +260,7 @@ static void HeaterThread(void*)
 
             // Read sensor state
             float heaterEsr = GetSensorInternalResistance(s.ch);
+            float sensorTemperature = GetSensorTemperature(s.ch);
 
             // If we haven't heard from rusEFI, use the internally sensed 
             // battery voltage instead of voltage over CAN.
@@ -264,7 +269,7 @@ static void HeaterThread(void*)
                                         : GetRemoteBatteryVoltage();
 
             // Run the state machine
-            s.heaterState = GetNextState(s, heaterAllowState, batteryVoltage, heaterEsr);
+            s.heaterState = GetNextState(s, heaterAllowState, batteryVoltage, sensorTemperature);
             float heaterVoltage = GetVoltageForState(s, heaterEsr);
 
             // Limit to 11 volts
