@@ -73,6 +73,7 @@ struct heater_state {
     int timeCounter;
     int batteryStabTime;
     float rampVoltage;
+    float heaterVoltage;
     HeaterState heaterState;
 #ifdef HEATER_MAX_DUTY
     int cycle;
@@ -291,16 +292,14 @@ static void HeaterThread(void*)
             }
             #endif
 
-            if (batteryVoltage < 23)
+            if (batteryVoltage >= 23)
             {
-                // Pipe the output to the heater driver
-                heaterPwm.SetDuty(s.pwm_ch, duty);
+                duty = 0;
+                heaterVoltage = 0;
             }
-            else
-            {
-                // Overvoltage protection - sensor not rated for PWM above 24v
-                heaterPwm.SetDuty(s.pwm_ch, 0);
-            }
+            // Pipe the output to the heater driver
+            heaterPwm.SetDuty(s.pwm_ch, duty);
+            s.heaterVoltage = heaterVoltage;
         }
 
         // Loop at ~20hz
@@ -327,6 +326,11 @@ bool IsRunningClosedLoop(int ch)
 float GetHeaterDuty(int ch)
 {
     return heaterPwm.GetLastDuty(state[ch].pwm_ch);
+}
+
+float GetHeaterEffVoltage(int ch)
+{
+    return state[ch].heaterVoltage;
 }
 
 HeaterState GetHeaterState(int ch)
