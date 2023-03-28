@@ -60,7 +60,7 @@ public:
         } __attribute__((packed));
 
         // pad to 256 bytes including tag
-        uint8_t pad[256 - 4];
+        uint8_t pad[256 - sizeof(Tag)];
     };
 };
 

@@ -146,7 +146,7 @@ SensorType GetSensorType()
     return SensorType::LSU49;
 }
 
-void SetupESRDriver(SensorType sensor)
+void SetupESRDriver(SensorType)
 {
     // NOP
 }
@@ -157,8 +157,7 @@ int GetESRSupplyR()
     return 22000;
 }
 
-void ToggleESRDriver(SensorType sensor)
+void ToggleESRDriver(SensorType)
 {
-    (void)sensor;
     palTogglePad(NERNST_49_ESR_DRIVER_PORT, NERNST_49_ESR_DRIVER_PIN);
 }
