@@ -22,7 +22,7 @@ void CanTxThread(void*)
     while(1)
     {
         for (int ch = 0; ch < AFR_CHANNELS; ch++) {
-            SendRusefiFormat(ch);
+            SendCanForChannel(ch);
         }
 
         chThdSleepMilliseconds(10);
@@ -160,4 +160,10 @@ void SendRusefiFormat(uint8_t ch)
         frame.get().Status = GetCurrentFault(ch);
         frame.get().HeaterDuty = GetHeaterDuty(ch) * 255;
     }
+}
+
+// Weak link so boards can override it
+__attribute__((weak)) void SendCanForChannel(uint8_t ch)
+{
+    SendRusefiFormat(ch);
 }
