@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -e
+set -o pipefail
 
 # first build the bootloader
 cd bootloader
@@ -31,6 +31,7 @@ arm-none-eabi-objcopy -I binary -O binary --gap-fill 0xFF --pad-to 0x63FC build/
 
 # compute the crc and write that to a file (in binary)
 crc32 build/wideband_fullsize_nocrc.bin | xxd -r -p - > build/wideband_crc.bin
+[ $? -eq 0 ] || { echo "crc32 computation failed"; exit 1; }
 
 # Now glue the image and CRC together
 cat build/wideband_fullsize_nocrc.bin build/wideband_crc.bin > build/wideband_image.bin

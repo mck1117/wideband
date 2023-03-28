@@ -147,6 +147,22 @@
 #define VAL_GPIOEODR            0x0000FFFF
 
 /*
+ * Port F setup.
+ * Everything input with pull-up expect:
+ */
+#define VAL_GPIOFCRL            0x88888888      /*  PF7...PF0 */
+#define VAL_GPIOFCRH            0x88888888      /* PF15...PF8 */
+#define VAL_GPIOFODR            0xFFFFFFFF
+
+/*
+ * Port G setup.
+ * Everything input with pull-up expect:
+ */
+#define VAL_GPIOGCRL            0x88888888      /*  PG7...PG0 */
+#define VAL_GPIOGCRH            0x88888888      /* PG15...PG8 */
+#define VAL_GPIOGODR            0xFFFFFFFF
+
+/*
  * USB bus activation macro, required by the USB driver.
  */
 #define usb_lld_connect_bus(usbp)

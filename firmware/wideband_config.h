@@ -49,19 +49,6 @@
 // mininal battery voltage to continue heating
 #define HEATER_BATTETY_OFF_VOLTAGE  8.5
 
-//LSU 4.9
-#define LSU49_HEATER_CLOSED_LOOP_THRESHOLD_ESR 500
-#define LSU49_HEATER_TARGET_ESR 300
-#define LSU49_HEATER_OVERHEAT_ESR 150
-#define LSU49_HEATER_UNDERHEAT_ESR 700
-
-//LSU 4.2
-// TODO: check this!!!
-#define LSU42_HEATER_CLOSED_LOOP_THRESHOLD_ESR 150
-#define LSU42_HEATER_TARGET_ESR 90
-#define LSU42_HEATER_OVERHEAT_ESR 45
-#define LSU42_HEATER_UNDERHEAT_ESR 250
-
 // *******************************
 //    TunerStudio configuration
 // *******************************
