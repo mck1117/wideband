@@ -109,7 +109,7 @@ void sendAck()
     CANTxFrame frame;
 
     frame.IDE = CAN_IDE_EXT;
-    frame.EID = 0x727573;   // ascii "rus"
+    frame.EID = WB_ACK;   // ascii "rus"
     frame.RTR = CAN_RTR_DATA;
     frame.DLC = 0;
 
