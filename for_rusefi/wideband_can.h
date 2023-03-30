@@ -5,6 +5,9 @@
 // ascii "rus"
 #define WB_ACK 0x727573
 #define WB_BL_ENTER 0xEF0'0000
+#define WB_BL_ERASE 0xEF1'5A5A
+#define WB_BL_DATA_BASE 0xEF2'0000
+#define WB_BL_REBOOT 0xEF3'0000
 #define WB_MSG_SET_INDEX 0xEF4'0000
 #define WB_MGS_ECU_STATUS 0xEF5'0000
 #define WB_DATA_BASE_ADDR 0x190
