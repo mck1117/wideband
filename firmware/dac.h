@@ -5,6 +5,8 @@
 /* for DACConfig */
 #include "hal.h"
 
+#if HAL_USE_DAC
+
 class Dac
 {
 public:
@@ -18,3 +20,5 @@ private:
     DACDriver* const m_driver;
     float m_voltageFloat[2];
 };
+
+#endif

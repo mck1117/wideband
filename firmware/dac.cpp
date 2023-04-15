@@ -5,6 +5,8 @@
 
 #include <rusefi/math.h>
 
+#if HAL_USE_DAC
+
 Dac::Dac(DACDriver& driver)
     : m_driver(&driver)
 {
@@ -26,3 +28,5 @@ float Dac::GetLastVoltage(int channel)
 {
     return m_voltageFloat[channel];
 }
+
+#endif
