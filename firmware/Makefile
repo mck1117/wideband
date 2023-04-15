@@ -145,6 +145,7 @@ CPPSRC = $(ALLCPPSRC) \
           fault.cpp \
           lambda_conversion.cpp \
           pwm.cpp \
+          dac.cpp \
           pump_dac.cpp \
           sampling.cpp \
           heater_control.cpp \

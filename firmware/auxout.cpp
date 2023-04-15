@@ -1,4 +1,5 @@
 #include "pwm.h"
+#include "dac.h"
 #include "lambda_conversion.h"
 #include "port.h"
 #include "io_pins.h"
@@ -57,42 +58,6 @@ void SetAuxDac(int channel, float voltage)
 #endif
 
 #ifdef AUXOUT_DAC_DEVICE
-
-class Dac
-{
-public:
-    Dac(DACDriver& driver);
-
-    void Start(DACConfig& config);
-    void SetVoltage(int channel, float duty);
-    float GetLastVoltage(int channel);
-
-private:
-    DACDriver* const m_driver;
-    float m_voltageFloat[2];
-};
-
-Dac::Dac(DACDriver& driver)
-    : m_driver(&driver)
-{
-}
-
-void Dac::Start(DACConfig& config)
-{
-    dacStart(m_driver, &config);
-}
-
-void Dac::SetVoltage(int channel, float voltage) {
-    voltage = clampF(0, voltage, VCC_VOLTS);
-    m_voltageFloat[channel] = voltage;
-
-    dacPutChannelX(m_driver, channel, voltage / VCC_VOLTS * (1 << 12));
-}
-
-float Dac::GetLastVoltage(int channel)
-{
-    return m_voltageFloat[channel];
-}
 
 static DACConfig auxDacConfig = {
   .init         = 2047U,
