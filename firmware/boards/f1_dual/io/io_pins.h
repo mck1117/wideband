@@ -43,14 +43,6 @@
 #define R_HEATER_PORT				GPIOB
 #define R_HEATER_PIN				6
 
-// PB7
-#define L_HEATER_PORT				GPIOB
-#define L_HEATER_PIN				7
-
-// PB6
-#define R_HEATER_PORT				GPIOB
-#define R_HEATER_PIN				6
-
 // PA1 TIM2_CH2
 #define PUMP_DAC_PWM_DEVICE			PWMD2
 #define PUMP_DAC_PWM_CHANNEL_0		2	/* left */
