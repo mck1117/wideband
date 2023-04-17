@@ -25,7 +25,8 @@ void SamplingUpdateLiveData()
         data->nernstVoltage = GetNernstDc(ch);
         data->pumpCurrentTarget = GetPumpCurrent(ch);
         data->pumpCurrentMeasured = GetPumpNominalCurrent(ch);
-        data->heaterDuty = GetHeaterDuty(ch);
+        data->heaterDuty = GetHeaterDuty(ch) * 1000;    // 0.1 %
+        data->heaterEffectiveVoltage = GetHeaterEffVoltage(ch) * 100;
         data->esr = GetSensorInternalResistance(ch);
         data->fault = (uint8_t)GetCurrentFault(ch);
         data->heaterState = (uint8_t)GetHeaterState(ch);
