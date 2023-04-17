@@ -18,7 +18,7 @@
 // Rev2 low pass filter cut frequency is about 21Hz (sic!)
 // 48Mhz / (2 ^ 12) ~= 12 KHz
 // 64mhz / (2 ^ 12) ~= 16 KHz
-static const PWMConfig auxPwmConfig = {
+static PWMConfig auxPwmConfig = {
     .frequency = STM32_SYSCLK,
     .period = 1 << 12,
     .callback = nullptr,
@@ -35,6 +35,18 @@ static const PWMConfig auxPwmConfig = {
 #endif
     .dier = 0
 };
+
+static void auxDacFillPwmConfig(void)
+{
+    auxPwmConfig.channels[AUXOUT_DAC_PWM_CHANNEL_0].mode = PWM_COMPLEMENTARY_OUTPUT_ACTIVE_HIGH;
+    auxPwmConfig.channels[AUXOUT_DAC_PWM_CHANNEL_1].mode = PWM_COMPLEMENTARY_OUTPUT_ACTIVE_HIGH;
+#ifdef AUXOUT_DAC_PWM_CHANNEL_0_NC
+    auxPwmConfig.channels[AUXOUT_DAC_PWM_CHANNEL_0_NC].mode = PWM_COMPLEMENTARY_OUTPUT_ACTIVE_HIGH;
+#endif
+#ifdef AUXOUT_DAC_PWM_CHANNEL_1_NC
+    auxPwmConfig.channels[AUXOUT_DAC_PWM_CHANNEL_1_NC].mode = PWM_COMPLEMENTARY_OUTPUT_ACTIVE_HIGH;
+#endif
+}
 
 static Pwm auxDac(AUXOUT_DAC_PWM_DEVICE);
 
@@ -135,6 +147,7 @@ void AuxOutThread(void*)
 void InitAuxDac()
 {
 #if defined(AUXOUT_DAC_PWM_DEVICE)
+    auxDacFillPwmConfig();
     auxDac.Start(auxPwmConfig);
 
     SetAuxDac(0, 0.0);
