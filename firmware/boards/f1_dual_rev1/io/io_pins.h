@@ -57,11 +57,11 @@
 #define AUXOUT_DAC_PWM_DEVICE		PWMD8
 // PC6 - TIM1_CH2N
 #define AUXOUT_DAC_PWM_CHANNEL_0	0
-// Noise cancelation output (should be inverted)
+// Riple cancelation output (should be inverted)
 #define AUXOUT_DAC_PWM_CHANNEL_0_NC 1
 // PC8 - TIM1_CH3N
 #define AUXOUT_DAC_PWM_CHANNEL_1	2
-// Noise cancelation output (should be inverted)
+// Riple cancelation output (should be inverted)
 #define AUXOUT_DAC_PWM_CHANNEL_1_NC	3
 
 #define ID_SEL1_PORT				GPIOC
