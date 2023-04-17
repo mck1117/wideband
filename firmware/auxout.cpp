@@ -15,6 +15,13 @@
 
 #ifdef AUXOUT_DAC_PWM_DEVICE
 
+#ifndef AUXOUT_DAC_PWM_OUTPUT_MODE
+#define AUXOUT_DAC_PWM_OUTPUT_MODE PWM_OUTPUT_ACTIVE_HIGH
+#endif
+#ifndef AUXOUT_DAC_PWM_NC_OUTPUT_MODE
+#define AUXOUT_DAC_PWM_NC_OUTPUT_MODE PWM_OUTPUT_ACTIVE_LOW
+#endif
+
 // Rev2 low pass filter cut frequency is about 21Hz (sic!)
 // 48Mhz / (2 ^ 12) ~= 12 KHz
 // 64mhz / (2 ^ 12) ~= 16 KHz
@@ -23,11 +30,10 @@ static PWMConfig auxPwmConfig = {
     .period = 1 << 12,
     .callback = nullptr,
     .channels = {
-        // TODO: do any boards use the "primary" outputs instead of the "complementary" outputs?
-        [0] = {/*PWM_OUTPUT_ACTIVE_HIGH |*/ PWM_COMPLEMENTARY_OUTPUT_ACTIVE_HIGH, nullptr},
-        [1] = {/*PWM_OUTPUT_ACTIVE_HIGH |*/ PWM_COMPLEMENTARY_OUTPUT_ACTIVE_HIGH, nullptr},
-        [2] = {/*PWM_OUTPUT_ACTIVE_HIGH |*/ PWM_COMPLEMENTARY_OUTPUT_ACTIVE_HIGH, nullptr},
-        [3] = {/*PWM_OUTPUT_ACTIVE_HIGH |*/ PWM_COMPLEMENTARY_OUTPUT_ACTIVE_HIGH, nullptr}
+        [0] = {0, nullptr},
+        [1] = {0, nullptr},
+        [2] = {0, nullptr},
+        [3] = {0, nullptr}
     },
     .cr2 = 0,
 #if STM32_PWM_USE_ADVANCED
@@ -38,13 +44,13 @@ static PWMConfig auxPwmConfig = {
 
 static void auxDacFillPwmConfig(void)
 {
-    auxPwmConfig.channels[AUXOUT_DAC_PWM_CHANNEL_0].mode = PWM_COMPLEMENTARY_OUTPUT_ACTIVE_HIGH;
-    auxPwmConfig.channels[AUXOUT_DAC_PWM_CHANNEL_1].mode = PWM_COMPLEMENTARY_OUTPUT_ACTIVE_HIGH;
+    auxPwmConfig.channels[AUXOUT_DAC_PWM_CHANNEL_0].mode = AUXOUT_DAC_PWM_OUTPUT_MODE;
+    auxPwmConfig.channels[AUXOUT_DAC_PWM_CHANNEL_1].mode = AUXOUT_DAC_PWM_OUTPUT_MODE;
 #ifdef AUXOUT_DAC_PWM_CHANNEL_0_NC
-    auxPwmConfig.channels[AUXOUT_DAC_PWM_CHANNEL_0_NC].mode = PWM_COMPLEMENTARY_OUTPUT_ACTIVE_HIGH;
+    auxPwmConfig.channels[AUXOUT_DAC_PWM_CHANNEL_0_NC].mode = AUXOUT_DAC_PWM_NC_OUTPUT_MODE;
 #endif
 #ifdef AUXOUT_DAC_PWM_CHANNEL_1_NC
-    auxPwmConfig.channels[AUXOUT_DAC_PWM_CHANNEL_1_NC].mode = PWM_COMPLEMENTARY_OUTPUT_ACTIVE_HIGH;
+    auxPwmConfig.channels[AUXOUT_DAC_PWM_CHANNEL_1_NC].mode = AUXOUT_DAC_PWM_NC_OUTPUT_MODE;
 #endif
 }
 
