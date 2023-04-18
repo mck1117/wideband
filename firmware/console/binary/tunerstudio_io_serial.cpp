@@ -191,28 +191,39 @@ int SerialTsChannel::reStart() {
 			} while ((!done) && (--retry));
 
 			if (retry <= 0) {
+				sdStop(m_driver);
 				ret = -3;
 			}
 		}
 
-		/* switch to new baudrate? */
-		if (cfg.speed != baud) {
-			sdStop(m_driver);
+		if (ret == 0) {
+			/* switch to new baudrate? */
+			if (cfg.speed != baud) {
+				sdStop(m_driver);
 
-			if (ret == 0) {
-				/* switch baudrate */
-				cfg.speed = baud;
-				sdStart(m_driver, &cfg);
+				if (ret == 0) {
+					/* switch baudrate */
+					cfg.speed = baud;
+					sdStart(m_driver, &cfg);
 
-				chThdSleepMilliseconds(10);
+					chThdSleepMilliseconds(10);
+				}
 			}
 		}
 
-		/* now reset BT to apply new settings */
-		chprintf((BaseSequentialStream *)m_driver, "AT+RESET\r\n");
-		if (bt_wait_ok() != 0) {
-			sdStop(m_driver);
-			ret = -4;
+		if (ret == 0) {
+			/* now reset BT to apply new settings */
+			chprintf((BaseSequentialStream *)m_driver, "AT+RESET\r\n");
+			if (bt_wait_ok() != 0) {
+				sdStop(m_driver);
+				ret = -4;
+			}
+		}
+
+		if (ret < 0) {
+			/* set requested baudrate and wait for direct uart connection */
+			cfg.speed = baud;
+			sdStart(m_driver, &cfg);
 		}
 	} else {
 		/* Direct uart connetion */
