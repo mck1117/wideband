@@ -95,6 +95,22 @@ struct PrimaryChannelThread : public TunerstudioThread {
 
 static PrimaryChannelThread primaryChannelThread;
 
+#ifdef TS_SECONDARY_SERIAL_PORT
+static SerialTsChannel secondaryChannel(TS_SECONDARY_SERIAL_PORT);
+
+struct SecondaryChannelThread : public TunerstudioThread {
+    SecondaryChannelThread() : TunerstudioThread("Secondary TS Channel") { }
+
+    TsChannelBase* setupChannel() {
+        secondaryChannel.start(TS_SECONDARY_BAUDRATE);
+
+        return &secondaryChannel;
+    }
+};
+
+static SecondaryChannelThread secondaryChannelThread;
+
+#endif /* TS_SECONDARY_SERIAL_PORT */
 #endif /* TS_ENABLED */
 
 void InitUart()
@@ -104,5 +120,8 @@ void InitUart()
 #endif
 #ifdef TS_ENABLED
     primaryChannelThread.Start();
+#ifdef TS_SECONDARY_SERIAL_PORT
+    secondaryChannelThread.Start();
+#endif
 #endif
 }
