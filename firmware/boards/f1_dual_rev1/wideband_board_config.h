@@ -63,11 +63,19 @@
 #define TS_PRIMARY_SERIAL_PORT	SD3
 #define TS_PRIMARY_BAUDRATE		115200
 
+#if 1
 // *******************************
-//   TunerStudio Primary Port
+//   TunerStudio Secondary Port - J3 connector (2x2)
 // *******************************
-#define TS_SECONDARY_SERIAL_PORT	SD3
+#define TS_SECONDARY_SERIAL_PORT	SD1
 #define TS_SECONDARY_BAUDRATE		115200
+#else
+// *******************************
+//   Debug serial device
+// *******************************
+#define DEBUG_SERIAL_PORT			SD1
+#define DEBUG_SERIAL_BAUDRATE		115200
+#endif
 
 // *******************************
 //   MAX31855 spi port
