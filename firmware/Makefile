@@ -155,6 +155,7 @@ CPPSRC = $(ALLCPPSRC) \
           uart.cpp \
           auxout.cpp \
           livedata.cpp \
+          indication.cpp \
           console/binary/tunerstudio.cpp \
           console/binary/tunerstudio_io.cpp \
           console/binary/tunerstudio_io_serial.cpp \
