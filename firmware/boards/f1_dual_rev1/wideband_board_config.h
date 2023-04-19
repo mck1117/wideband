@@ -63,7 +63,11 @@
 #define TS_PRIMARY_SERIAL_PORT	SD1
 #define TS_PRIMARY_BAUDRATE		115200
 
-// TODO: add BT port on PC10, PC11 - UART4/USART3
+// *******************************
+//   TunerStudio Primary Port
+// *******************************
+#define TS_SECONDARY_SERIAL_PORT	SD3
+#define TS_SECONDARY_BAUDRATE		115200
 
 // *******************************
 //   MAX31855 spi port
