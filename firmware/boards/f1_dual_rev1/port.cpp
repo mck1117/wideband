@@ -5,7 +5,7 @@
 
 #include "hal.h"
 
-#define ADC_CHANNEL_COUNT 8
+#define ADC_CHANNEL_COUNT 10
 #define ADC_SAMPLE ADC_SAMPLE_7P5
 
 static adcsample_t adcBuffer[ADC_CHANNEL_COUNT * ADC_OVERSAMPLE];
@@ -18,23 +18,33 @@ const ADCConversionGroup convGroup =
     .error_cb = nullptr,
     .cr1 = 0,
     .cr2 =
-        ADC_CR2_CONT |
-        ADC_CR2_ADON,   /* keep ADC enabled between convertions - for GD32 */
-    .smpr1 = 0,
+        ADC_CR2_CONT/* |
+        ADC_CR2_ADON*/,   /* keep ADC enabled between convertions - for GD32 */
+    .smpr1 =
+        ADC_SMPR1_SMP_AN10(ADC_SAMPLE) |
+        ADC_SMPR1_SMP_AN11(ADC_SAMPLE) |
+        ADC_SMPR1_SMP_AN12(ADC_SAMPLE) | /* PC2 - ADC123_IN12 - L_Un_3x_sense */
+        ADC_SMPR1_SMP_AN13(ADC_SAMPLE) | /* PC3 */
+        ADC_SMPR1_SMP_AN14(ADC_SAMPLE) |
+        ADC_SMPR1_SMP_AN15(ADC_SAMPLE),  /* PC5 */
     .smpr2 =
-        ADC_SMPR2_SMP_AN0(ADC_SAMPLE) |
-        ADC_SMPR2_SMP_AN3(ADC_SAMPLE) |
+        ADC_SMPR2_SMP_AN0(ADC_SAMPLE) | /* PA0 */
+        ADC_SMPR2_SMP_AN1(ADC_SAMPLE) | /* PA1 - ADC12_IN1 - R_Un_3x_sense */
+        ADC_SMPR2_SMP_AN2(ADC_SAMPLE) | /* PA2 */
+        ADC_SMPR2_SMP_AN3(ADC_SAMPLE) | /* PA3 */
         ADC_SMPR2_SMP_AN4(ADC_SAMPLE) |
         ADC_SMPR2_SMP_AN5(ADC_SAMPLE) |
-        ADC_SMPR2_SMP_AN6(ADC_SAMPLE) |
-        ADC_SMPR2_SMP_AN7(ADC_SAMPLE) |
-        ADC_SMPR2_SMP_AN8(ADC_SAMPLE) |
+        ADC_SMPR2_SMP_AN6(ADC_SAMPLE) | /* PA6 */
+        ADC_SMPR2_SMP_AN7(ADC_SAMPLE) | /* PA7 */
+        ADC_SMPR2_SMP_AN8(ADC_SAMPLE) | /* PB8 */
         ADC_SMPR2_SMP_AN9(ADC_SAMPLE),
     .sqr1 = ADC_SQR1_NUM_CH(ADC_CHANNEL_COUNT),
     .sqr2 =
         /* TODO: move these two channels to slow ADC! */
         ADC_SQR2_SQ7_N(15) | /* PC5 - ADC12_IN15 - L_Heater_sense */
-        ADC_SQR2_SQ8_N(8),   /* PB0 - ADC12_IN8 - R_Heater_sense */
+        ADC_SQR2_SQ8_N(8)  | /* PB0 - ADC12_IN8 - R_Heater_sense */
+        ADC_SQR2_SQ9_N(2)  | /* PA2 - ADC12_IN2 - R_Un_sense */
+        ADC_SQR2_SQ10_N(3),  /* PA3 - ADC12_IN3 - L_Un_sense */
     .sqr3 =
         ADC_SQR3_SQ1_N(0)  | /* PA0 - ADC12_IN0 - R_Ip_sense */
         ADC_SQR3_SQ2_N(1)  | /* PA1 - ADC12_IN1 - R_Un_3x_sense */
@@ -84,6 +94,7 @@ static float r_vbatt = 0;
 
 AnalogResult AnalogSample()
 {
+    AnalogResult res;
     /* TODO: remove Vbat measurement through heaters
      * TODO: keep heater voltage measurement for optional source for pwm calculation
      * TODO: add aux output voltage measurement for diagnostic (use slow ADC?) */
@@ -107,27 +118,29 @@ AnalogResult AnalogSample()
         r_vbatt = BATTERY_FILTER_ALPHA * vbatt_raw + (1.0 - BATTERY_FILTER_ALPHA) * r_vbatt;
     }
 
-    return
-    {
-        .ch = {
-            {
-                /* left */
-                .NernstVoltage = (AverageSamples(adcBuffer, 3) - NERNST_INPUT_OFFSET) * NERNST_INPUT_GAIN,
-                .PumpCurrentVoltage = AverageSamples(adcBuffer, 2),
-                .BatteryVoltage = l_vbatt,
-            },
-            {
-                /* right */
-                .NernstVoltage = (AverageSamples(adcBuffer, 1) - NERNST_INPUT_OFFSET) * NERNST_INPUT_GAIN,
-                .PumpCurrentVoltage = AverageSamples(adcBuffer, 0),
-                .BatteryVoltage = r_vbatt,
-            },
-        },
-        /* Dual board has separate internal virtual ground = 3.3V / 2
-         * VirtualGroundVoltageInt is used to calculate Ip current only as it
-         * is used as offset for diffirential amp */
-        .VirtualGroundVoltageInt = HALF_VCC,
-    };
+    /* Dual board has separate internal virtual ground = 3.3V / 2
+     * VirtualGroundVoltageInt is used to calculate Ip current only as it
+     * is used as offset for diffirential amp */
+    res.VirtualGroundVoltageInt = HALF_VCC;
+
+    for (int i = 0; i < AFR_CHANNELS; i++) {
+        float NernstRaw = AverageSamples(adcBuffer, (i == 0) ? 3 : 1);
+        if ((NernstRaw > 0.01) && (NernstRaw < (3.3 - 0.01))) {
+            /* not clamped */
+            res.ch[i].NernstVoltage = (NernstRaw - NERNST_INPUT_OFFSET) * NERNST_INPUT_GAIN;
+        } else {
+            /* Clamped, use ungained input */
+            res.ch[i].NernstVoltage = AverageSamples(adcBuffer, (i == 0) ? 9 : 8) - HALF_VCC;
+        }
+    }
+    /* left */
+    res.ch[0].PumpCurrentVoltage = AverageSamples(adcBuffer, 2);
+    res.ch[0].BatteryVoltage = l_vbatt;
+    /* right */
+    res.ch[1].PumpCurrentVoltage = AverageSamples(adcBuffer, 0);
+    res.ch[1].BatteryVoltage = r_vbatt;
+
+    return res;
 }
 
 /* TODO: optimize */
