@@ -21,7 +21,7 @@ void Dac::SetVoltage(int channel, float voltage) {
     voltage = clampF(0, voltage, VCC_VOLTS);
     m_voltageFloat[channel] = voltage;
 
-    dacPutChannelX(m_driver, channel, voltage / VCC_VOLTS * (1 << 12));
+    dacPutChannelX(m_driver, channel, voltage / VCC_VOLTS * ((1 << 12) - 1));
 }
 
 float Dac::GetLastVoltage(int channel)
