@@ -1,7 +1,7 @@
 #pragma once
 
 // TS settings
-#define TS_SIGNATURE "rusEFI 2023.03.23.wideband_dual"
+#define TS_SIGNATURE "rusEFI 2023.04.21.wideband_dual"
 
 // This board implements two channels
 #define AFR_CHANNELS 2

@@ -23,6 +23,7 @@ void SamplingUpdateLiveData()
         data->lambda = GetLambda(ch);
         data->temperature = GetSensorTemperature(ch);
         data->nernstDc = GetNernstDc(ch) * 1000;
+        data->nernstV = (int16_t)(GetNernstV(ch) * 1000.0);
         data->nernstAc = GetNernstAc(ch) * 1000;
         data->pumpCurrentTarget = GetPumpCurrent(ch);
         data->pumpCurrentMeasured = GetPumpNominalCurrent(ch);
