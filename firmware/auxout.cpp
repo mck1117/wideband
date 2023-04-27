@@ -19,21 +19,21 @@
 // 48Mhz / (2 ^ 12) ~= 12 KHz
 // 64mhz / (2 ^ 12) ~= 16 KHz
 static const PWMConfig auxPwmConfig = {
-    STM32_SYSCLK,
-    1 << 12,
-    nullptr,
-    {
+    .frequency = STM32_SYSCLK,
+    .period = 1 << 12,
+    .callback = nullptr,
+    .channels = {
         // TODO: do any boards use the "primary" outputs instead of the "complementary" outputs?
-        {/*PWM_OUTPUT_ACTIVE_HIGH |*/ PWM_COMPLEMENTARY_OUTPUT_ACTIVE_HIGH, nullptr},
-        {/*PWM_OUTPUT_ACTIVE_HIGH |*/ PWM_COMPLEMENTARY_OUTPUT_ACTIVE_HIGH, nullptr},
-        {/*PWM_OUTPUT_ACTIVE_HIGH |*/ PWM_COMPLEMENTARY_OUTPUT_ACTIVE_HIGH, nullptr},
-        {/*PWM_OUTPUT_ACTIVE_HIGH |*/ PWM_COMPLEMENTARY_OUTPUT_ACTIVE_HIGH, nullptr}
+        [0] = {/*PWM_OUTPUT_ACTIVE_HIGH |*/ PWM_COMPLEMENTARY_OUTPUT_ACTIVE_HIGH, nullptr},
+        [1] = {/*PWM_OUTPUT_ACTIVE_HIGH |*/ PWM_COMPLEMENTARY_OUTPUT_ACTIVE_HIGH, nullptr},
+        [2] = {/*PWM_OUTPUT_ACTIVE_HIGH |*/ PWM_COMPLEMENTARY_OUTPUT_ACTIVE_HIGH, nullptr},
+        [3] = {/*PWM_OUTPUT_ACTIVE_HIGH |*/ PWM_COMPLEMENTARY_OUTPUT_ACTIVE_HIGH, nullptr}
     },
-    0,
-    0,
+    .cr2 = 0,
 #if STM32_PWM_USE_ADVANCED
-    0
+    .bdtr = 0,
 #endif
+    .dier = 0
 };
 
 static Pwm auxDac(AUXOUT_DAC_PWM_DEVICE);
