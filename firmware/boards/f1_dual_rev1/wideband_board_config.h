@@ -68,7 +68,7 @@
 // *******************************
 //   MAX31855 spi port
 // *******************************
-#define EGT_SPI_DRIVER			(&SPID1)
+#define EGT_SPI_DRIVER			(&SPID3)
 
 // Serial connection over BT module
 // enable BT module setup attempt
