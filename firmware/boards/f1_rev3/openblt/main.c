@@ -10,7 +10,7 @@
 #include "stm32f1xx_ll_usart.h"                  /* STM32 LL USART header              */
 #include "stm32f1xx_ll_gpio.h"                   /* STM32 LL GPIO header               */
 
-#include "../io/io_pins.h"
+#include "io_pins.h"
 
 /****************************************************************************************
 * Function prototypes
