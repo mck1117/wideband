@@ -73,6 +73,8 @@
 #include "tunerstudio_impl.h"
 #include "byteswap.h"
 
+#include "indication.h"
+
 #include <rusefi/crc.h>
 
 #ifndef EFI_BLUETOOTH_SETUP
@@ -437,7 +439,7 @@ void TunerstudioThread::ThreadTask() {
 	// Until the end of time, process incoming messages.
 	while (true) {
 		if (tsProcessOne(channel) == 0) {
-			//onDataArrived(true);
+			onDataArrived(true);
 			btTimeout = 0;
 		} else {
 			btTimeout += TS_COMMUNICATION_TIMEOUT;
@@ -449,7 +451,7 @@ void TunerstudioThread::ThreadTask() {
 				// Try this only once
 				btInitAttempted = true;
 			}
-			//onDataArrived(false);
+			onDataArrived(false);
 		}
 	}
 }
