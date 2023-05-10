@@ -151,7 +151,7 @@ CPPSRC = $(ALLCPPSRC) \
           heater_control.cpp \
           pid.cpp \
           pump_control.cpp \
-          max31855.cpp \
+          max3185x.cpp \
           uart.cpp \
           auxout.cpp \
           livedata.cpp \

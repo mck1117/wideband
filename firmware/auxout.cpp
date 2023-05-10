@@ -6,7 +6,7 @@
 
 #include "wideband_config.h"
 
-#include "max31855.h"
+#include "max3185x.h"
 
 #include "hal.h"
 

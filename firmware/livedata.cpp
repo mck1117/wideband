@@ -5,7 +5,7 @@
 #include "sampling.h"
 #include "pump_dac.h"
 #include "heater_control.h"
-#include "max31855.h"
+#include "max3185x.h"
 #include "fault.h"
 
 #include <rusefi/arrays.h>
