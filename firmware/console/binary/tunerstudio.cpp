@@ -183,10 +183,6 @@ void TunerStudio::handlePageReadCommand(TsChannelBase* tsChannel, ts_response_fo
 	tsChannel->sendResponse(mode, addr, count);
 }
 
-void requestBurn(void) {
-	SaveConfiguration();
-}
-
 static void sendResponseCode(ts_response_format_e mode, TsChannelBase *tsChannel, const uint8_t responseCode) {
 	if (mode == TS_CRC) {
 		tsChannel->writeCrcPacket(responseCode, nullptr, 0);
