@@ -199,8 +199,12 @@ static void sendResponseCode(ts_response_format_e mode, TsChannelBase *tsChannel
 static void handleBurnCommand(TsChannelBase* tsChannel, ts_response_format_e mode) {
 	tsState.burnCommandCounter++;
 
-	SaveConfiguration();
+	int ret = SaveConfiguration();
+	if (ret) {
+		tunerStudioError(tsChannel, "ERROR: failed to save settings");
+	}
 
+	/* TODO: reply error? */
 	sendResponseCode(mode, tsChannel, TS_RESPONSE_BURN_OK);
 }
 
