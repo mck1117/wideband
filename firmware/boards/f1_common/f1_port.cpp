@@ -120,7 +120,7 @@ void rebootToOpenblt()
 #if USE_OPENBLT
     /* safe to call on already inited shares area */
     SharedParamsInit();
-    /* Store sing to stay in OpenBLT */
+    /* Store flag to stay in OpenBLT */
     SharedParamsWriteByIndex(0, 0x01);
 
     rebootNow();
