@@ -58,12 +58,24 @@
 #define HEATER_MAX_DUTY		(0.85)
 
 // *******************************
-//   TunerStudio Primary Port
+//   TunerStudio Primary Port - Routed to BlueTooth
 // *******************************
-#define TS_PRIMARY_SERIAL_PORT	SD1
+#define TS_PRIMARY_SERIAL_PORT	SD3
 #define TS_PRIMARY_BAUDRATE		115200
 
-// TODO: add BT port on PC10, PC11 - UART4/USART3
+#if 1
+// *******************************
+//   TunerStudio Secondary Port - J3 connector (2x2)
+// *******************************
+#define TS_SECONDARY_SERIAL_PORT	SD1
+#define TS_SECONDARY_BAUDRATE		115200
+#else
+// *******************************
+//   Debug serial device
+// *******************************
+#define DEBUG_SERIAL_PORT			SD1
+#define DEBUG_SERIAL_BAUDRATE		115200
+#endif
 
 // *******************************
 //   MAX31855 spi port

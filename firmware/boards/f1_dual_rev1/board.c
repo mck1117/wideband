@@ -49,5 +49,6 @@ void __early_init(void) {
  */
 void boardInit(void) {
   AFIO->MAPR |= AFIO_MAPR_I2C1_REMAP |    /* remap I2C1 to PB8, PB9 */
+                AFIO_MAPR_USART3_REMAP_0 |  /* remap USART3 to PC10, PC11 */
                 AFIO_MAPR_SWJ_CFG_1;      /* JTAG-DP disabled, SW-DP enabled, PA13, PA14 are only used */
 }
