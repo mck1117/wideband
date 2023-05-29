@@ -57,9 +57,12 @@ int InitConfiguration()
 
     mfsObjectInit(&mfs1);
 
-    mfsStart(&mfs1, &mfscfg1);
+    mfs_error_t err = mfsStart(&mfs1, &mfscfg1);
+    if (err != MFS_NO_ERROR) {
+        return -1;
+    }
 
-    mfs_error_t err = mfsReadRecord(&mfs1, MFS_CONFIGURATION_RECORD_ID, &size, GetConfiguratiuonPtr());
+    err = mfsReadRecord(&mfs1, MFS_CONFIGURATION_RECORD_ID, &size, GetConfiguratiuonPtr());
     if ((err != MFS_NO_ERROR) || (size != GetConfigurationSize() || !cfg.IsValid())) {
         /* load defaults */
         cfg.LoadDefaults();
@@ -79,9 +82,13 @@ void SetConfiguration()
 }
 
 /* TS stuff */
-void SaveConfiguration() {
+int SaveConfiguration() {
     /* TODO: handle error */
-    mfsWriteRecord(&mfs1, MFS_CONFIGURATION_RECORD_ID, GetConfigurationSize(), GetConfiguratiuonPtr());
+    mfs_error_t err = mfsWriteRecord(&mfs1, MFS_CONFIGURATION_RECORD_ID, GetConfigurationSize(), GetConfiguratiuonPtr());
+    if (err != MFS_NO_ERROR) {
+        return -1;
+    }
+    return 0;
 }
 
 uint8_t *GetConfiguratiuonPtr()
