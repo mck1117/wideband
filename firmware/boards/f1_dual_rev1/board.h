@@ -41,11 +41,9 @@
 
 /*
  * MCU type, supported types are defined in ./os/hal/platforms/hal_lld.h.
- */
+ * see ChibiOS/os/common/ext/ST/STM32F1xx/stm32f1xx.h:
+ * STM32F103xE is for STM32F103RC */
 #define STM32F103xE
-// TODO:
-//#define STM32F103xC
-
 /*
  * IO pins assignments.
  */

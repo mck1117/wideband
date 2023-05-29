@@ -6,15 +6,30 @@
 #include "hal_mfs.h"
 
 // Storage
-
+// TODO: runtime detection?
 static const MFSConfig mfscfg1 = {
     .flashp           = (BaseFlash *)&EFLD1,
     .erased           = 0xFFFFFFFFU,
+#ifdef STM32F103xB
+    /* 128K flash device with 1K pages
+     * use last 8 pages for settings
+     * one bank is 4K */
     .bank_size        = 4096U,
     .bank0_start      = 120U,
     .bank0_sectors    = 4U,
     .bank1_start      = 124U,
     .bank1_sectors    = 4U
+#endif
+#ifdef STM32F103xE
+    /* 256K flash device with 2K pages
+     * use last 8 pages for settings
+     * one bank is 8K */
+    .bank_size        = 8096U,
+    .bank0_start      = 120U,
+    .bank0_sectors    = 4U,
+    .bank1_start      = 124U,
+    .bank1_sectors    = 4U
+#endif
 };
 
 static MFSDriver mfs1;
