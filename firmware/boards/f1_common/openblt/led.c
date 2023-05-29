@@ -6,7 +6,7 @@
 #include "stm32f1xx.h"                           /* STM32 registers and drivers        */
 #include "stm32f1xx_ll_gpio.h"                   /* STM32 LL GPIO header               */
 
-#include "../io/io_pins.h"
+#include "io_pins.h"
 
 /****************************************************************************************
 * Local data declarations
