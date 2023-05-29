@@ -5,7 +5,7 @@
 #include "lambda_conversion.h"
 #include "sampling.h"
 #include "heater_control.h"
-#include "max31855.h"
+#include "max3185x.h"
 #include "fault.h"
 #include "uart.h"
 

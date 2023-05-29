@@ -10,7 +10,7 @@
 #include "uart.h"
 #include "io_pins.h"
 #include "auxout.h"
-#include "max31855.h"
+#include "max3185x.h"
 #include "port.h"
 #include "tunerstudio.h"
 #include "indication.h"
