@@ -82,7 +82,6 @@ void SetAuxDac(int channel, float voltage)
 {
     voltage = voltage / AUXOUT_GAIN;
     auto duty = voltage / VCC_VOLTS;
-    duty = 1.0 - duty;
     duty = clampF(0, duty, 1);
 
     auxDac.SetDuty(auxOutPwmCh[channel], duty);
