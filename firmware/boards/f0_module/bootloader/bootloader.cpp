@@ -2,6 +2,7 @@
 #include "port_shared.h"
 #include "flash.h"
 #include "io_pins.h"
+#include "../../for_rusefi/wideband_can.h"
 
 #include <cstring>
 #include <rusefi/crc.h>
