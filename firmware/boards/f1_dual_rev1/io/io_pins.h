@@ -1,11 +1,15 @@
 #pragma once
 
-#define LED_BLUE_PORT GPIOB
-#define LED_BLUE_PIN 13
-#define LL_LED_BLUE_PIN LL_GPIO_PIN_13
+#define LED_BLUE_PORT GPIOA
+#define LED_BLUE_PIN 8
+#define LL_LED_BLUE_PIN LL_GPIO_PIN_8
 
-#define LED_GREEN_PORT GPIOA
-#define LED_GREEN_PIN 8
+// Left
+#define LED_GREEN_PORT GPIOB
+#define LED_GREEN_PIN 13
+// Rights TODO
+#define LED_R_GREEN_PORT GPIOC
+#define LED_R_GREEN_PIN 1
 
 // Communication - UART
 #define UART_GPIO_PORT				GPIOA
@@ -43,22 +47,27 @@
 #define R_HEATER_PORT				GPIOB
 #define R_HEATER_PIN				6
 
-// PA1 TIM2_CH2
-#define PUMP_DAC_PWM_DEVICE			PWMD2
-#define PUMP_DAC_PWM_CHANNEL_0		2	/* left */
-#define PUMP_DAC_PWM_CHANNEL_1		1 	/* right */
+// PA4, PA5
+#define PUMP_DAC_DAC_DEVICE_0		DACD2
+#define PUMP_DAC_DAC_DEVICE_1		DACD1
+#define PUMP_DAC_DAC_CHANNEL_0		1	/* PA5 - DAC_OUT2 - left */
+#define PUMP_DAC_DAC_CHANNEL_1		0 	/* PA4 - DAC_OUT1 - right */
 
 // TIM1 - DAC for AUX outputs
-#define AUXOUT_DAC_PWM_DEVICE		PWMD1
-// PB14 - TIM1_CH2N
-#define AUXOUT_DAC_PWM_CHANNEL_0	1
-// PB15 - TIM1_CH3N
+#define AUXOUT_DAC_PWM_DEVICE		PWMD8
+// PC6 - TIM1_CH2N
+#define AUXOUT_DAC_PWM_CHANNEL_0	0
+// Riple cancelation output (should be inverted)
+#define AUXOUT_DAC_PWM_CHANNEL_0_NC 1
+// PC8 - TIM1_CH3N
 #define AUXOUT_DAC_PWM_CHANNEL_1	2
-// CH2N and CH3N are complementary outputs
-#define AUXOUT_DAC_PWM_OUTPUT_MODE	PWM_COMPLEMENTARY_OUTPUT_ACTIVE_LOW
+// Riple cancelation output (should be inverted)
+#define AUXOUT_DAC_PWM_CHANNEL_1_NC	3
 
 #define ID_SEL1_PORT				GPIOC
 #define ID_SEL1_PIN					13
+#define ID_SEL2_PORT				GPIOC
+#define ID_SEL2_PIN					13
 
 // PC15 - SPI1_CS1 - L_EGT
 #define EGT_CS0_PORT				GPIOC

@@ -5,7 +5,7 @@
 #include "lambda_conversion.h"
 #include "sampling.h"
 #include "heater_control.h"
-#include "max31855.h"
+#include "max3185x.h"
 #include "fault.h"
 #include "uart.h"
 
@@ -13,11 +13,10 @@
 #include "tunerstudio_io.h"
 #include "wideband_board_config.h"
 
-#ifdef UART_DEBUG
-// just a reminder that we have either TS connectivity or this UART_DEBUG but not both
+#ifdef DEBUG_SERIAL_PORT
 
 SerialConfig cfg = {
-    .speed = 115200,
+    .speed = DEBUG_SERIAL_BAUDRATE,
     .cr1 = 0,
     .cr2 = USART_CR2_STOP1_BITS | USART_CR2_LINEN,
     .cr3 = 0
@@ -30,7 +29,6 @@ static void UartThread(void*)
 {
     chRegSetThreadName("UART debug");
 
-    // in UART_DEBUG mode we only support Serial - this file name here has a bit of a confusing naming
     sdStart(&SD1, &cfg);
 
     while(true)
@@ -73,7 +71,9 @@ static void UartThread(void*)
     }
 }
 
-#elif defined(TS_ENABLED)
+#endif /* DEBUG_SERIAL_PORT */
+
+#ifdef TS_ENABLED
 
 #ifdef TS_PRIMARY_UART_PORT
 static UartTsChannel primaryChannel(TS_PRIMARY_UART_PORT);
@@ -95,13 +95,33 @@ struct PrimaryChannelThread : public TunerstudioThread {
 
 static PrimaryChannelThread primaryChannelThread;
 
-#endif
+#ifdef TS_SECONDARY_SERIAL_PORT
+static SerialTsChannel secondaryChannel(TS_SECONDARY_SERIAL_PORT);
+
+struct SecondaryChannelThread : public TunerstudioThread {
+    SecondaryChannelThread() : TunerstudioThread("Secondary TS Channel") { }
+
+    TsChannelBase* setupChannel() {
+        secondaryChannel.start(TS_SECONDARY_BAUDRATE);
+
+        return &secondaryChannel;
+    }
+};
+
+static SecondaryChannelThread secondaryChannelThread;
+
+#endif /* TS_SECONDARY_SERIAL_PORT */
+#endif /* TS_ENABLED */
 
 void InitUart()
 {
-#ifdef UART_DEBUG
+#ifdef DEBUG_SERIAL_PORT
     chThdCreateStatic(waUartThread, sizeof(waUartThread), NORMALPRIO, UartThread, nullptr);
-#elif defined(TS_ENABLED)
+#endif
+#ifdef TS_ENABLED
     primaryChannelThread.Start();
+#ifdef TS_SECONDARY_SERIAL_PORT
+    secondaryChannelThread.Start();
+#endif
 #endif
 }

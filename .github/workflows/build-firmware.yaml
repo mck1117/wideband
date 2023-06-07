@@ -15,6 +15,7 @@ jobs:
           - build-target: f1_rev2
           - build-target: f1_rev3
           - build-target: f1_dual
+          - build-target: f1_dual_rev1
 
     steps:
       - uses: actions/checkout@v1

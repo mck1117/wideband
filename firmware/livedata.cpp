@@ -5,7 +5,7 @@
 #include "sampling.h"
 #include "pump_dac.h"
 #include "heater_control.h"
-#include "max31855.h"
+#include "max3185x.h"
 #include "fault.h"
 
 #include <rusefi/arrays.h>
@@ -21,11 +21,13 @@ void SamplingUpdateLiveData()
         volatile struct livedata_afr_s *data = &livedata_afr[ch];
 
         data->lambda = GetLambda(ch);
-        data->temperature = GetSensorTemperature(ch);
-        data->nernstVoltage = GetNernstDc(ch);
+        data->temperature = GetSensorTemperature(ch) * 10;
+        data->nernstDc = GetNernstDc(ch) * 1000;
+        data->nernstAc = GetNernstAc(ch) * 1000;
         data->pumpCurrentTarget = GetPumpCurrent(ch);
         data->pumpCurrentMeasured = GetPumpNominalCurrent(ch);
-        data->heaterDuty = GetHeaterDuty(ch);
+        data->heaterDuty = GetHeaterDuty(ch) * 1000;    // 0.1 %
+        data->heaterEffectiveVoltage = GetHeaterEffVoltage(ch) * 100;
         data->esr = GetSensorInternalResistance(ch);
         data->fault = (uint8_t)GetCurrentFault(ch);
         data->heaterState = (uint8_t)GetHeaterState(ch);

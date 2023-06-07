@@ -1,11 +1,12 @@
 #include "pwm.h"
+#include "dac.h"
 #include "lambda_conversion.h"
 #include "port.h"
 #include "io_pins.h"
 
 #include "wideband_config.h"
 
-#include "max31855.h"
+#include "max3185x.h"
 
 #include "hal.h"
 
@@ -14,33 +15,66 @@
 
 #ifdef AUXOUT_DAC_PWM_DEVICE
 
+#ifndef AUXOUT_DAC_PWM_OUTPUT_MODE
+#define AUXOUT_DAC_PWM_OUTPUT_MODE PWM_OUTPUT_ACTIVE_HIGH
+#endif
+#ifndef AUXOUT_DAC_PWM_NC_OUTPUT_MODE
+#define AUXOUT_DAC_PWM_NC_OUTPUT_MODE PWM_OUTPUT_ACTIVE_LOW
+#endif
+
 // Rev2 low pass filter cut frequency is about 21Hz (sic!)
 // 48Mhz / (2 ^ 12) ~= 12 KHz
 // 64mhz / (2 ^ 12) ~= 16 KHz
-static const PWMConfig auxPwmConfig = {
-    STM32_SYSCLK,
-    1 << 12,
-    nullptr,
-    {
-        // TODO: do any boards use the "primary" outputs instead of the "complementary" outputs?
-        {/*PWM_OUTPUT_ACTIVE_HIGH |*/ PWM_COMPLEMENTARY_OUTPUT_ACTIVE_HIGH, nullptr},
-        {/*PWM_OUTPUT_ACTIVE_HIGH |*/ PWM_COMPLEMENTARY_OUTPUT_ACTIVE_HIGH, nullptr},
-        {/*PWM_OUTPUT_ACTIVE_HIGH |*/ PWM_COMPLEMENTARY_OUTPUT_ACTIVE_HIGH, nullptr},
-        {/*PWM_OUTPUT_ACTIVE_HIGH |*/ PWM_COMPLEMENTARY_OUTPUT_ACTIVE_HIGH, nullptr}
+static PWMConfig auxPwmConfig = {
+    .frequency = STM32_SYSCLK,
+    .period = 1 << 12,
+    .callback = nullptr,
+    .channels = {
+        [0] = {0, nullptr},
+        [1] = {0, nullptr},
+        [2] = {0, nullptr},
+        [3] = {0, nullptr}
     },
-    0,
-    0,
+    .cr2 = 0,
 #if STM32_PWM_USE_ADVANCED
-    0
+    .bdtr = 0,
 #endif
+    .dier = 0
 };
+
+static void auxDacFillPwmConfig(void)
+{
+    auxPwmConfig.channels[AUXOUT_DAC_PWM_CHANNEL_0].mode = AUXOUT_DAC_PWM_OUTPUT_MODE;
+    auxPwmConfig.channels[AUXOUT_DAC_PWM_CHANNEL_1].mode = AUXOUT_DAC_PWM_OUTPUT_MODE;
+#ifdef AUXOUT_DAC_PWM_CHANNEL_0_NC
+    auxPwmConfig.channels[AUXOUT_DAC_PWM_CHANNEL_0_NC].mode = AUXOUT_DAC_PWM_NC_OUTPUT_MODE;
+#endif
+#ifdef AUXOUT_DAC_PWM_CHANNEL_1_NC
+    auxPwmConfig.channels[AUXOUT_DAC_PWM_CHANNEL_1_NC].mode = AUXOUT_DAC_PWM_NC_OUTPUT_MODE;
+#endif
+}
 
 static Pwm auxDac(AUXOUT_DAC_PWM_DEVICE);
 
-static const uint8_t auxOutPwmCh[] = {
+static const uint8_t auxOutPwmCh[AFR_CHANNELS] = {
     AUXOUT_DAC_PWM_CHANNEL_0,
 #if (AFR_CHANNELS > 1)
     AUXOUT_DAC_PWM_CHANNEL_1,
+#endif
+};
+
+static const int8_t auxOutPwmChN[AFR_CHANNELS] = {
+#ifdef AUXOUT_DAC_PWM_CHANNEL_0_NC
+    AUXOUT_DAC_PWM_CHANNEL_0_NC,
+#else
+    -1,
+#endif
+#if (AFR_CHANNELS > 1)
+#ifdef AUXOUT_DAC_PWM_CHANNEL_1_NC
+    AUXOUT_DAC_PWM_CHANNEL_1_NC,
+#else
+    -1,
+#endif
 #endif
 };
 
@@ -48,51 +82,18 @@ void SetAuxDac(int channel, float voltage)
 {
     voltage = voltage / AUXOUT_GAIN;
     auto duty = voltage / VCC_VOLTS;
-    duty = 1.0 - duty;
     duty = clampF(0, duty, 1);
 
     auxDac.SetDuty(auxOutPwmCh[channel], duty);
+    // Ripple cancelation channel
+    if (auxOutPwmChN[channel >= 0]) {
+        auxDac.SetDuty(auxOutPwmChN[channel], duty);
+    }
 }
 
 #endif
 
 #ifdef AUXOUT_DAC_DEVICE
-
-class Dac
-{
-public:
-    Dac(DACDriver& driver);
-
-    void Start(DACConfig& config);
-    void SetVoltage(int channel, float duty);
-    float GetLastVoltage(int channel);
-
-private:
-    DACDriver* const m_driver;
-    float m_voltageFloat[2];
-};
-
-Dac::Dac(DACDriver& driver)
-    : m_driver(&driver)
-{
-}
-
-void Dac::Start(DACConfig& config)
-{
-    dacStart(m_driver, &config);
-}
-
-void Dac::SetVoltage(int channel, float voltage) {
-    voltage = clampF(0, voltage, VCC_VOLTS);
-    m_voltageFloat[channel] = voltage;
-
-    dacPutChannelX(m_driver, channel, voltage / VCC_VOLTS * (1 << 12));
-}
-
-float Dac::GetLastVoltage(int channel)
-{
-    return m_voltageFloat[channel];
-}
 
 static DACConfig auxDacConfig = {
   .init         = 2047U,
@@ -170,6 +171,7 @@ void AuxOutThread(void*)
 void InitAuxDac()
 {
 #if defined(AUXOUT_DAC_PWM_DEVICE)
+    auxDacFillPwmConfig();
     auxDac.Start(auxPwmConfig);
 
     SetAuxDac(0, 0.0);

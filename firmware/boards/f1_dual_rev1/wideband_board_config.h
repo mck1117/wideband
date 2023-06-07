@@ -16,7 +16,8 @@
 // *******************************
 //    Nernst voltage & ESR sense
 // *******************************
-#define NERNST_INPUT_GAIN (1 / 3.0f)
+#define NERNST_INPUT_GAIN (1 / 3.15f)
+#define NERNST_INPUT_OFFSET (0.247)
 
 // *******************************
 //        Battery Sensing
@@ -53,20 +54,40 @@
 // are not able to measure Vbatt
 // through Heater-
 // *******************************
+// TODO: remove!
 #define HEATER_MAX_DUTY		(0.85)
 
 // *******************************
-//   TunerStudio Primary Port
+//   TunerStudio Primary Port - Routed to BlueTooth
 // *******************************
-#define TS_PRIMARY_SERIAL_PORT	SD1
+#define TS_PRIMARY_SERIAL_PORT	SD3
 #define TS_PRIMARY_BAUDRATE		115200
+
+#if 1
+// *******************************
+//   TunerStudio Secondary Port - J3 connector (2x2)
+// *******************************
+#define TS_SECONDARY_SERIAL_PORT	SD1
+#define TS_SECONDARY_BAUDRATE		115200
+#else
+// *******************************
+//   Debug serial device
+// *******************************
+#define DEBUG_SERIAL_PORT			SD1
+#define DEBUG_SERIAL_BAUDRATE		115200
+#endif
 
 // *******************************
 //   MAX31855 spi port
 // *******************************
-#define EGT_SPI_DRIVER			(&SPID1)
+#define EGT_SPI_DRIVER			(&SPID3)
 
 // Serial connection over BT module
 // enable BT module setup attempt
 #define BT_SERIAL_OVER_JDY33	TRUE
 #define BT_BROADCAST_NAME		"RusEFI WBO x2"
+
+// *******************************
+//   Indication: per channel status LED + communication LED
+// *******************************
+#define ADVANCED_INDICATION

@@ -10,9 +10,10 @@
 #include "uart.h"
 #include "io_pins.h"
 #include "auxout.h"
-#include "max31855.h"
+#include "max3185x.h"
 #include "port.h"
 #include "tunerstudio.h"
+#include "indication.h"
 
 #include "wideband_config.h"
 
@@ -41,6 +42,7 @@ int main() {
 
     InitCan();
     InitUart();
+    InitIndication();
 
 #if (EGT_CHANNELS > 0)
     StartEgt();
@@ -48,6 +50,10 @@ int main() {
 
     while(true)
     {
+#ifdef ADVANCED_INDICATION
+        /* NOP nap */
+        chThdSleepMilliseconds(1000);
+#else
         /* TODO: show error for all AFR channels */
         /* TODO: show EGT errors */
         auto fault = GetCurrentFault(0);
@@ -80,6 +86,7 @@ int main() {
 
             chThdSleepMilliseconds(2000);
         }
+#endif
     }
 }
 

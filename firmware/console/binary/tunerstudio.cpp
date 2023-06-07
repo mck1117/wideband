@@ -73,6 +73,8 @@
 #include "tunerstudio_impl.h"
 #include "byteswap.h"
 
+#include "indication.h"
+
 #include <rusefi/crc.h>
 
 #ifndef EFI_BLUETOOTH_SETUP
@@ -181,10 +183,6 @@ void TunerStudio::handlePageReadCommand(TsChannelBase* tsChannel, ts_response_fo
 	tsChannel->sendResponse(mode, addr, count);
 }
 
-void requestBurn(void) {
-	SaveConfiguration();
-}
-
 static void sendResponseCode(ts_response_format_e mode, TsChannelBase *tsChannel, const uint8_t responseCode) {
 	if (mode == TS_CRC) {
 		tsChannel->writeCrcPacket(responseCode, nullptr, 0);
@@ -197,8 +195,12 @@ static void sendResponseCode(ts_response_format_e mode, TsChannelBase *tsChannel
 static void handleBurnCommand(TsChannelBase* tsChannel, ts_response_format_e mode) {
 	tsState.burnCommandCounter++;
 
-	SaveConfiguration();
+	int ret = SaveConfiguration();
+	if (ret) {
+		tunerStudioError(tsChannel, "ERROR: failed to save settings");
+	}
 
+	/* TODO: reply error? */
 	sendResponseCode(mode, tsChannel, TS_RESPONSE_BURN_OK);
 }
 
@@ -437,7 +439,7 @@ void TunerstudioThread::ThreadTask() {
 	// Until the end of time, process incoming messages.
 	while (true) {
 		if (tsProcessOne(channel) == 0) {
-			//onDataArrived(true);
+			onDataArrived(true);
 			btTimeout = 0;
 		} else {
 			btTimeout += TS_COMMUNICATION_TIMEOUT;
@@ -449,7 +451,7 @@ void TunerstudioThread::ThreadTask() {
 				// Try this only once
 				btInitAttempted = true;
 			}
-			//onDataArrived(false);
+			onDataArrived(false);
 		}
 	}
 }

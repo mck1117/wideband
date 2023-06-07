@@ -77,17 +77,17 @@ static void SystemClock_Config(void)
     ASSERT_RT(BLT_FALSE);
   }
 
-  /* Enable the HSI clock. */
-  LL_RCC_HSI_Enable();
+  /* Enable the HSE clock. */
+  LL_RCC_HSE_Enable();
   /* Wait till HSE is ready. */
-  while (LL_RCC_HSI_IsReady() != 1)
+  while (LL_RCC_HSE_IsReady() != 1)
   {
     ;
   }
 
   /* Configure and enable the PLL. */
   /* 48MHz max */
-  LL_RCC_PLL_ConfigDomain_SYS(LL_RCC_PLLSOURCE_HSI_DIV_2, LL_RCC_PLL_MUL_12);
+  LL_RCC_PLL_ConfigDomain_SYS(LL_RCC_PLLSOURCE_HSE_DIV_2, LL_RCC_PLL_MUL_12);
   LL_RCC_PLL_Enable();
 
   /* Wait till PLL is ready. */

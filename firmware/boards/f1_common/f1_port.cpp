@@ -6,15 +6,30 @@
 #include "hal_mfs.h"
 
 // Storage
-
+// TODO: runtime detection?
 static const MFSConfig mfscfg1 = {
     .flashp           = (BaseFlash *)&EFLD1,
     .erased           = 0xFFFFFFFFU,
+#ifdef STM32F103xB
+    /* 128K flash device with 1K pages
+     * use last 8 pages for settings
+     * one bank is 4K */
     .bank_size        = 4096U,
     .bank0_start      = 120U,
     .bank0_sectors    = 4U,
     .bank1_start      = 124U,
     .bank1_sectors    = 4U
+#endif
+#ifdef STM32F103xE
+    /* 256K flash device with 2K pages
+     * use last 8 pages for settings
+     * one bank is 8K */
+    .bank_size        = 8096U,
+    .bank0_start      = 120U,
+    .bank0_sectors    = 4U,
+    .bank1_start      = 124U,
+    .bank1_sectors    = 4U
+#endif
 };
 
 static MFSDriver mfs1;
@@ -30,8 +45,19 @@ static Configuration cfg;
 // Configuration defaults
 void Configuration::LoadDefaults()
 {
+    int i;
+
     CanIndexOffset = 0;
     sensorType = BOARD_DEFAULT_SENSOR_TYPE;
+
+    /* default auxout curve is 0..5V for AFR 8.5 to 18.0
+     * default auxout[n] input is AFR[n] */
+    for (i = 0; i < 8; i++) {
+        auxOutBins[0][i] = auxOutBins[1][i] = 8.5 + (18.0 - 8.5) / 7 * i;
+        auxOutValues[0][i] = auxOutValues[1][i] = 0.0 + (5.0 - 0.0) / 7 * i;
+    }
+    auxOutputSource[0] = AuxOutputMode::Afr0;
+    auxOutputSource[1] = AuxOutputMode::Afr1;
 
     /* Finaly */
     Tag = ExpectedTag;
@@ -46,9 +72,12 @@ int InitConfiguration()
 
     mfsObjectInit(&mfs1);
 
-    mfsStart(&mfs1, &mfscfg1);
+    mfs_error_t err = mfsStart(&mfs1, &mfscfg1);
+    if (err != MFS_NO_ERROR) {
+        return -1;
+    }
 
-    mfs_error_t err = mfsReadRecord(&mfs1, MFS_CONFIGURATION_RECORD_ID, &size, GetConfiguratiuonPtr());
+    err = mfsReadRecord(&mfs1, MFS_CONFIGURATION_RECORD_ID, &size, GetConfiguratiuonPtr());
     if ((err != MFS_NO_ERROR) || (size != GetConfigurationSize() || !cfg.IsValid())) {
         /* load defaults */
         cfg.LoadDefaults();
@@ -68,9 +97,13 @@ void SetConfiguration()
 }
 
 /* TS stuff */
-void SaveConfiguration() {
+int SaveConfiguration() {
     /* TODO: handle error */
-    mfsWriteRecord(&mfs1, MFS_CONFIGURATION_RECORD_ID, GetConfigurationSize(), GetConfiguratiuonPtr());
+    mfs_error_t err = mfsWriteRecord(&mfs1, MFS_CONFIGURATION_RECORD_ID, GetConfigurationSize(), GetConfiguratiuonPtr());
+    if (err != MFS_NO_ERROR) {
+        return -1;
+    }
+    return 0;
 }
 
 uint8_t *GetConfiguratiuonPtr()

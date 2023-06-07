@@ -145,15 +145,17 @@ CPPSRC = $(ALLCPPSRC) \
           fault.cpp \
           lambda_conversion.cpp \
           pwm.cpp \
+          dac.cpp \
           pump_dac.cpp \
           sampling.cpp \
           heater_control.cpp \
           pid.cpp \
           pump_control.cpp \
-          max31855.cpp \
+          max3185x.cpp \
           uart.cpp \
           auxout.cpp \
           livedata.cpp \
+          indication.cpp \
           console/binary/tunerstudio.cpp \
           console/binary/tunerstudio_io.cpp \
           console/binary/tunerstudio_io_serial.cpp \

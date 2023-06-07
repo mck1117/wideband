@@ -71,7 +71,7 @@ void SetConfiguration();
 /* TS stuff */
 uint8_t *GetConfiguratiuonPtr();
 size_t GetConfigurationSize();
-void SaveConfiguration();
+int SaveConfiguration();
 const char *getTsSignature();
 
 // LSU4.2, LSU4.9 or LSU_ADV
