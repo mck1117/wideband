@@ -89,6 +89,8 @@ int Max3185x::detect()
 	uint32_t data;
 
 	int ret = spi_txrx(tx, rx, 4);
+	if (ret)
+		return ret;
 	data =	(rx[0] << 24) |
 			(rx[1] << 16) |
 			(rx[2] <<  8) |
