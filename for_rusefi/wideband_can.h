@@ -15,7 +15,7 @@ enum class Fault : uint8_t
 {
     None = 0,
 
-    // First fault code at 3 so it's easier to see
+    // First fault code at 3 so it's easier to see blink code
     SensorDidntHeat = 3,
     SensorOverheat = 4,
     SensorUnderheat = 5,
