@@ -114,9 +114,8 @@ float GetPumpOutputDuty(int ch)
 #ifdef PUMP_DAC_PWM_DEVICE
     return pumpDac.GetLastDuty(pumpDacPwmCh[ch]);
 #endif
-#ifdef PUMP_DAC_DAC_DEVICE
-    /* TODO: */
-    return 0.0;
+#ifdef PUMP_DAC_DAC_DEVICE_0
+    return pumpDacs[ch].GetLastVoltage(0) / 3.3;
 #endif
 }
 
