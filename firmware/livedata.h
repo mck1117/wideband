@@ -30,7 +30,8 @@ struct livedata_afr_s {
 			float pumpCurrentMeasured;
 			uint16_t heaterDuty;
 			uint16_t heaterEffectiveVoltage;
-			float esr;
+			uint16_t esr;
+			int16_t nernstV;
 			uint8_t fault; // See wbo::Fault
 			uint8_t heaterState;
 		} __attribute__((packed));

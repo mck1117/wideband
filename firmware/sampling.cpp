@@ -15,6 +15,7 @@
 struct measure_results {
     float nernstAc;
     float nernstDc;
+    float nernstV;
     float pumpCurrentSenseVoltage;
     float internalBatteryVoltage;
 };
@@ -71,6 +72,7 @@ static void SamplingThread(void*)
             // Compute AC (difference) and DC (average) components
             float nernstAcLocal = f_abs(r2_opposite_phase - r_2[ch]);
             res.nernstDc = (r2_opposite_phase + r_2[ch]) / 2;
+            res.nernstV = result.ch[ch].NernstVoltage;
 
             res.nernstAc =
                 (1 - ESR_SENSE_ALPHA) * res.nernstAc +
@@ -142,6 +144,11 @@ float GetSensorTemperature(int ch)
 float GetNernstDc(int ch)
 {
     return results[ch].nernstDc;
+}
+
+float GetNernstV(int ch)
+{
+    return results[ch].nernstV;
 }
 
 float GetPumpNominalCurrent(int ch)
