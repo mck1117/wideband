@@ -204,13 +204,41 @@ static void handleBurnCommand(TsChannelBase* tsChannel, ts_response_format_e mod
 	sendResponseCode(mode, tsChannel, TS_RESPONSE_BURN_OK);
 }
 
+static void handleIoTestCommand(TsChannelBase* tsChannel, ts_response_format_e mode, uint16_t subsystem, uint16_t /* index */) {
+	/* index is not used yet */
+
+	switch (subsystem) {
+#if 0
+	/* DFU */
+	case 0xba:
+		jump_to_bootloader();
+		break;
+#endif
+
+	case 0xbb:
+		rebootNow();
+		break;
+
+#if USE_OPENBLT
+	case 0xbc:
+		/* Jump to OpenBLT if present */
+		rebootToOpenblt();
+		break;
+#endif
+
+	default:
+		tunerStudioError(tsChannel, "Unexpected IoTest command");
+	}
+}
+
 static bool isKnownCommand(char command) {
 	return command == TS_HELLO_COMMAND || command == TS_READ_COMMAND || command == TS_OUTPUT_COMMAND
 			|| command == TS_BURN_COMMAND
 			|| command == TS_CHUNK_WRITE_COMMAND
 			|| command == TS_GET_SCATTERED_GET_COMMAND
 			|| command == TS_CRC_CHECK_COMMAND
-			|| command == TS_GET_FIRMWARE_VERSION;
+			|| command == TS_GET_FIRMWARE_VERSION
+			|| command == TS_IO_TEST_COMMAND;
 }
 
 /**
@@ -503,43 +531,62 @@ int TunerStudio::handleCrcCommand(TsChannelBase* tsChannel, char *data, size_t i
 	if (handled)
 		return true;
 
+	/* check if we can extract subsystem and index for IoTest command */
+	if (incomingPacketSize < sizeof(TunerStudioCmdPacketHeader)) {
+		sendErrorCode(tsChannel, TS_RESPONSE_UNDERRUN);
+		tunerStudioError(tsChannel, "ERROR: underrun");
+		return false;
+	} else {
+		const TunerStudioCmdPacketHeader* header = reinterpret_cast<TunerStudioCmdPacketHeader*>(data);
+		handled = true;
+
+		switch (command) {
+		case TS_IO_TEST_COMMAND:
+			handleIoTestCommand(tsChannel, TS_CRC, SWAP_UINT16(header->subsystem), SWAP_UINT16(header->index));
+			break;
+		default:
+			/* noone of simple commands */
+			handled = false;
+		}
+	}
+
 	/* check if we can extract page, offset and count */
 	if (incomingPacketSize < sizeof(TunerStudioDataPacketHeader)) {
 		sendErrorCode(tsChannel, TS_RESPONSE_UNDERRUN);
 		tunerStudioError(tsChannel, "ERROR: underrun");
 		return false;
-	}
+	} else {
+		const TunerStudioDataPacketHeader* header = reinterpret_cast<TunerStudioDataPacketHeader*>(data);
 
-	const TunerStudioDataPacketHeader* header = reinterpret_cast<TunerStudioDataPacketHeader*>(data);
-
-	switch(command)
-	{
-	case TS_OUTPUT_COMMAND:
-		tsState.outputChannelsCommandCounter++;
-		cmdOutputChannels(tsChannel, header->offset, header->count);
-		break;
-	case TS_CHUNK_WRITE_COMMAND:
-		if (header->page == 0)
-			handleWriteChunkCommand(tsChannel, TS_CRC, header->offset, header->count, data + sizeof(TunerStudioDataPacketHeader));
-		else
-			handleScatterListWriteCommand(tsChannel, header->offset, header->count, data + sizeof(TunerStudioDataPacketHeader));
-		break;
-	case TS_CRC_CHECK_COMMAND:
-		if (header->page == 0)
-			handleCrc32Check(tsChannel, TS_CRC, header->offset, header->count);
-		else
-			handleScatterListCrc32Check(tsChannel, header->offset, header->count);
-		break;
-	case TS_READ_COMMAND:
-		if (header->page == 0)
-			handlePageReadCommand(tsChannel, TS_CRC, header->offset, header->count);
-		else
-			handleScatterListReadCommand(tsChannel, header->offset, header->count);
-		break;
-	default:
-		sendErrorCode(tsChannel, TS_RESPONSE_UNRECOGNIZED_COMMAND);
-		tunerStudioError(tsChannel, "ERROR: ignoring unexpected command");
-		return false;
+		switch(command)
+		{
+		case TS_OUTPUT_COMMAND:
+			tsState.outputChannelsCommandCounter++;
+			cmdOutputChannels(tsChannel, header->offset, header->count);
+			break;
+		case TS_CHUNK_WRITE_COMMAND:
+			if (header->page == 0)
+				handleWriteChunkCommand(tsChannel, TS_CRC, header->offset, header->count, data + sizeof(TunerStudioDataPacketHeader));
+			else
+				handleScatterListWriteCommand(tsChannel, header->offset, header->count, data + sizeof(TunerStudioDataPacketHeader));
+			break;
+		case TS_CRC_CHECK_COMMAND:
+			if (header->page == 0)
+				handleCrc32Check(tsChannel, TS_CRC, header->offset, header->count);
+			else
+				handleScatterListCrc32Check(tsChannel, header->offset, header->count);
+			break;
+		case TS_READ_COMMAND:
+			if (header->page == 0)
+				handlePageReadCommand(tsChannel, TS_CRC, header->offset, header->count);
+			else
+				handleScatterListReadCommand(tsChannel, header->offset, header->count);
+			break;
+		default:
+			sendErrorCode(tsChannel, TS_RESPONSE_UNRECOGNIZED_COMMAND);
+			tunerStudioError(tsChannel, "ERROR: ignoring unexpected command");
+			return false;
+		}
 	}
 
 	return true;

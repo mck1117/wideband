@@ -74,6 +74,9 @@ size_t GetConfigurationSize();
 int SaveConfiguration();
 const char *getTsSignature();
 
+void rebootNow();
+void rebootToOpenblt();
+
 // LSU4.2, LSU4.9 or LSU_ADV
 SensorType GetSensorType();
 void SetupESRDriver(SensorType sensor);

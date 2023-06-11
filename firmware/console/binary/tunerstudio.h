@@ -31,6 +31,12 @@ void startTunerStudioConnectivity(void);
 
 typedef struct {
 	uint8_t cmd;
+	uint16_t subsystem;
+	uint16_t index;
+} __attribute__((packed)) TunerStudioCmdPacketHeader;
+
+typedef struct {
+	uint8_t cmd;
 	uint16_t page;
 	uint16_t offset;
 	uint16_t count;

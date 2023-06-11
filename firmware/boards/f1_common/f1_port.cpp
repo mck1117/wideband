@@ -125,6 +125,23 @@ SensorType GetSensorType()
     return cfg.sensorType;
 }
 
+void rebootNow()
+{
+    NVIC_SystemReset();
+}
+
+void rebootToOpenblt()
+{
+#if USE_OPENBLT
+    /* safe to call on already inited shares area */
+    SharedParamsInit();
+    /* Store flag to stay in OpenBLT */
+    SharedParamsWriteByIndex(0, 0x01);
+
+    rebootNow();
+#endif
+}
+
 void ToggleESRDriver(SensorType sensor)
 {
     switch (sensor) {
