@@ -5,6 +5,13 @@
 #include "hal.h"
 #include "hal_mfs.h"
 
+#if USE_OPENBLT
+/* communication with OpenBLT that is plain C, not to modify external file */
+extern "C" {
+    #include "openblt/shared_params.h"
+};
+#endif
+
 // Storage
 // TODO: runtime detection?
 static const MFSConfig mfscfg1 = {

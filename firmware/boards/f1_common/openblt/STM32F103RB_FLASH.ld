@@ -31,6 +31,10 @@
 /* Entry Point */
 ENTRY(Reset_Handler)
 
+/* First 16 bytes of RAM are reserved for shared region
+ * between FW and bootloader */
+_OpenBLT_Shared_Params_Size = 16;
+
 /* Highest address of the user mode stack */
 _estack = 0x20005000;    /* end of RAM */
 /* Generate a link error if heap and stack don't fit into RAM */
@@ -40,13 +44,26 @@ _Min_Stack_Size = 0x400; /* required amount of stack */
 /* Specify the memory areas */
 MEMORY
 {
-RAM (xrw)      : ORIGIN = 0x20000000, LENGTH = 20K
+SHARED (xrw)    : ORIGIN = 0x20000000, LENGTH = _OpenBLT_Shared_Params_Size
+RAM (xrw)      : ORIGIN = 0x20000000 + _OpenBLT_Shared_Params_Size, LENGTH = 20K - _OpenBLT_Shared_Params_Size
 FLASH (rx)      : ORIGIN = 0x8000000, LENGTH = 8K
 }
 
 /* Define output sections */
 SECTIONS
 {
+  .shared (NOLOAD) :
+  {
+    . = ALIGN(4);
+    _sshared = .;
+    __shared_start__ = _sshared;
+    *(.shared)
+    *(.shared.*)
+    KEEP(*(.shared))
+    . = ALIGN(4);
+    _eshared = .;
+    __shared_end__ = _eshared;
+  } >SHARED
   /* The startup code goes first into FLASH */
   .isr_vector :
   {

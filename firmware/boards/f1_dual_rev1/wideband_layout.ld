@@ -2,12 +2,18 @@
  * STM32F103xB memory setup.
  */
 
+/* OpenBLT code */
+_OpenBLT_Flash_Size = DEFINED(USE_BOOTLOADER) ? 8k : 0;
+
+/* OpenBLT <-> main FW shared area */
+_OpenBLT_Shared_Params_Size = DEFINED(USE_BOOTLOADER) ? 16 : 0;
+
 MEMORY
 {
     /* empty section to keep linker happy */
     blflash (rx) : org = 0x08000000, len = 0
-    appflash (rx) : org = DEFINED(USE_BOOTLOADER) ? (0x08000000 + 8k) : 0x08000000, len = DEFINED(USE_BOOTLOADER) ? (256k - 8k - 8k) : (256k - 8k)
-    configflash (rx) : org = 0x08000000 + 256k - 8k, len = 8k
+    appflash (rx) : org = (0x08000000 + _OpenBLT_Flash_Size), len = (256k - _OpenBLT_Flash_Size - 8k)
+    configflash (rx) : org = (0x08000000 + 256k - 8k), len = 8k
     flash1 (rx) : org = 0x00000000, len = 0
     flash2 (rx) : org = 0x00000000, len = 0
     flash3 (rx) : org = 0x00000000, len = 0
@@ -15,7 +21,8 @@ MEMORY
     flash5 (rx) : org = 0x00000000, len = 0
     flash6 (rx) : org = 0x00000000, len = 0
     flash7 (rx) : org = 0x00000000, len = 0
-    ram0   (wx) : org = 0x20000200, len = 48k
+    shared (wx) : org = 0x20000000, len = _OpenBLT_Shared_Params_Size
+    ram0   (wx) : org = 0x20000000 + _OpenBLT_Shared_Params_Size, len = 48k - _OpenBLT_Shared_Params_Size
     ram1   (wx) : org = 0x00000000, len = 0
     ram2   (wx) : org = 0x00000000, len = 0
     ram3   (wx) : org = 0x00000000, len = 0

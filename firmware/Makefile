@@ -225,6 +225,10 @@ endif
 ifeq ($(USE_OPENBLT),yes)
   # Reserve start of flash for OpenBLT
   USE_OPT += -Wl,--defsym=USE_BOOTLOADER=1
+  DDEFS += -DUSE_OPENBLT=TRUE
+  # Shared params
+  INCDIR += boards/f1_common/openblt
+  CSRC += boards/f1_common/openblt/shared_params.c
 endif
 
 #
