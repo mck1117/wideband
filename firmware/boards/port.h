@@ -4,15 +4,18 @@
 #include "port_shared.h"
 #include "wideband_config.h"
 
+struct AnalogChannelResult
+{
+    float NernstVoltage;
+    float PumpCurrentVoltage;
+    /* for dual version - this is voltage on Heater-, switches between zero and Vbatt with heater PWM,
+        * used for both Vbatt measurement and Heater diagnostic */
+    float BatteryVoltage;
+};
+
 struct AnalogResult
 {
-    struct {
-        float NernstVoltage;
-        float PumpCurrentVoltage;
-        /* for dual version - this is voltage on Heater-, switches between zero and Vbatt with heater PWM,
-         * used for both Vbatt measurement and Heater diagnostic */
-        float BatteryVoltage;
-    } ch[AFR_CHANNELS];
+    AnalogChannelResult ch[AFR_CHANNELS];
     float VirtualGroundVoltageInt;
 };
 
