@@ -11,16 +11,6 @@
 
 #include <rusefi/interpolation.h>
 
-// Stored results
-struct measure_results {
-    float nernstAc;
-    float nernstDc;
-    float pumpCurrentSenseVoltage;
-    float internalBatteryVoltage;
-};
-
-static struct measure_results results[AFR_CHANNELS];
-
 // Last point is approximated by the greatest measurable sensor resistance
 static const float lsu49TempBins[]   = {   80, 100, 150, 200, 250, 300, 350, 400, 450, 550, 650, 800, 1000, 1200, 2500, 4500 };
 static const float lsu49TempValues[] = { 1030, 972, 888, 840, 806, 780, 761, 744, 729, 703, 686, 665,  642,  628,  567,  500 };
@@ -31,6 +21,45 @@ static const float lsu42TempValues[] = { 1199, 961, 857, 806, 775, 750, 730, 715
 static const float lsuAdvTempBins[]   = {   53,  96, 130, 162, 184, 206, 239, 278, 300, 330, 390, 462, 573, 730, 950, 1200, 1500, 1900, 2500, 3500, 5000, 6000 };
 static const float lsuAdvTempValues[] = { 1198, 982, 914, 875, 855, 838, 816, 794, 785, 771, 751, 732, 711, 691, 671,  653,  635,  614,  588,  562,  537,  528 };
 
+struct Sampler {
+public:
+    void ApplySample(AnalogChannelResult& result, float virtualGroundVoltageInt);
+
+    float GetNernstDc() const {
+        return nernstDc;
+    }
+
+    float GetNernstAc() const {
+        return nernstAc;
+    }
+
+    float GetPumpNominalCurrent() const {
+        // Gain is 10x, then a 61.9 ohm resistor
+        // Effective resistance with the gain is 619 ohms
+        // 1000 is to convert to milliamperes
+        constexpr float ratio = -1000 / (PUMP_CURRENT_SENSE_GAIN * LSU_SENSE_R);
+        return pumpCurrentSenseVoltage * ratio;
+    }
+
+    float GetInternalBatteryVoltage() const {
+        // Dual HW can measure heater voltage for each channel
+        // by measuring voltage on Heater- while FET is off
+        // TODO: rename function?
+        return internalBatteryVoltage;
+    }
+
+private:
+    float r_2 = 0;
+    float r_3 = 0;
+
+    float nernstAc;
+    float nernstDc;
+    float pumpCurrentSenseVoltage;
+    float internalBatteryVoltage;
+};
+
+static Sampler samplers[AFR_CHANNELS];
+
 constexpr float f_abs(float x)
 {
     return x > 0 ? x : -x;
@@ -40,9 +69,6 @@ static THD_WORKING_AREA(waSamplingThread, 256);
 
 static void SamplingThread(void*)
 {
-    float r_2[AFR_CHANNELS] = {0};
-    float r_3[AFR_CHANNELS] = {0};
-
     chRegSetThreadName("Sampling");
 
     SetupESRDriver(GetSensorType());
@@ -57,44 +83,51 @@ static void SamplingThread(void*)
         // Toggle the pin after sampling so that any switching noise occurs while we're doing our math instead of when sampling
         ToggleESRDriver(GetSensorType());
 
-        for (int ch = 0; ch < AFR_CHANNELS; ch++) {
-            measure_results &res = results[ch];
-            float r_1 = result.ch[ch].NernstVoltage;
-
-            // r2_opposite_phase estimates where the previous sample would be had we not been toggling
-            // AKA the absolute value of the difference between r2_opposite_phase and r2 is the amplitude
-            // of the AC component on the nernst voltage.  We have to pull this trick so as to use the past 3
-            // samples to cancel out any slope in the DC (aka actual nernst cell output) from the AC measurement
-            // See firmware/sampling.png for a drawing of what's going on here
-            float r2_opposite_phase = (r_1 + r_3[ch]) / 2;
-
-            // Compute AC (difference) and DC (average) components
-            float nernstAcLocal = f_abs(r2_opposite_phase - r_2[ch]);
-            res.nernstDc = (r2_opposite_phase + r_2[ch]) / 2;
-
-            res.nernstAc =
-                (1 - ESR_SENSE_ALPHA) * res.nernstAc +
-                ESR_SENSE_ALPHA * nernstAcLocal;
-
-            // Exponential moving average (aka first order lpf)
-            res.pumpCurrentSenseVoltage =
-                (1 - PUMP_FILTER_ALPHA) * res.pumpCurrentSenseVoltage +
-                PUMP_FILTER_ALPHA * (result.ch[ch].PumpCurrentVoltage - result.VirtualGroundVoltageInt);
-
-            #ifdef BATTERY_INPUT_DIVIDER
-                res.internalBatteryVoltage = result.ch[ch].BatteryVoltage;
-            #endif
-
-            // Shift history over by one
-            r_3[ch] = r_2[ch];
-            r_2[ch] = r_1;
+        for (int ch = 0; ch < AFR_CHANNELS; ch++)
+        {
+            samplers[ch].ApplySample(result.ch[ch], result.VirtualGroundVoltageInt);
         }
 
 #if defined(TS_ENABLED)
         /* tunerstudio */
         SamplingUpdateLiveData();
 #endif
+
     }
+}
+
+
+void Sampler::ApplySample(AnalogChannelResult& result, float virtualGroundVoltageInt)
+{
+    float r_1 = result.NernstVoltage;
+
+    // r2_opposite_phase estimates where the previous sample would be had we not been toggling
+    // AKA the absolute value of the difference between r2_opposite_phase and r2 is the amplitude
+    // of the AC component on the nernst voltage.  We have to pull this trick so as to use the past 3
+    // samples to cancel out any slope in the DC (aka actual nernst cell output) from the AC measurement
+    // See firmware/sampling.png for a drawing of what's going on here
+    float r2_opposite_phase = (r_1 + r_3) / 2;
+
+    // Compute AC (difference) and DC (average) components
+    float nernstAcLocal = f_abs(r2_opposite_phase - r_2);
+    nernstDc = (r2_opposite_phase + r_2) / 2;
+
+    nernstAc =
+        (1 - ESR_SENSE_ALPHA) * nernstAc +
+        ESR_SENSE_ALPHA * nernstAcLocal;
+
+    // Exponential moving average (aka first order lpf)
+    pumpCurrentSenseVoltage =
+        (1 - PUMP_FILTER_ALPHA) * pumpCurrentSenseVoltage +
+        PUMP_FILTER_ALPHA * (result.PumpCurrentVoltage - virtualGroundVoltageInt);
+
+#ifdef BATTERY_INPUT_DIVIDER
+    internalBatteryVoltage = result.BatteryVoltage;
+#endif
+
+    // Shift history over by one
+    r_3 = r_2;
+    r_2 = r_1;
 }
 
 void StartSampling()
@@ -105,7 +138,7 @@ void StartSampling()
 
 float GetNernstAc(int ch)
 {
-    return results[ch].nernstAc;
+    return samplers[ch].GetNernstAc();
 }
 
 float GetSensorInternalResistance(int ch)
@@ -141,22 +174,15 @@ float GetSensorTemperature(int ch)
 
 float GetNernstDc(int ch)
 {
-    return results[ch].nernstDc;
+    return samplers[ch].GetNernstDc();
 }
 
 float GetPumpNominalCurrent(int ch)
 {
-    // Gain is 10x, then a 61.9 ohm resistor
-    // Effective resistance with the gain is 619 ohms
-    // 1000 is to convert to milliamperes
-    constexpr float ratio = -1000 / (PUMP_CURRENT_SENSE_GAIN * LSU_SENSE_R);
-    return results[ch].pumpCurrentSenseVoltage * ratio;
+    return samplers[ch].GetPumpNominalCurrent();
 }
 
 float GetInternalBatteryVoltage(int ch)
 {
-    // Dual HW can measure heater voltage for each channel
-    // by measuring voltage on Heater- while FET is off
-    // TODO: rename function?
-    return results[ch].internalBatteryVoltage;
+    return samplers[ch].GetInternalBatteryVoltage();
 }
