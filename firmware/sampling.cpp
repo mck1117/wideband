@@ -25,15 +25,18 @@ struct Sampler : public ISampler {
 public:
     void ApplySample(AnalogChannelResult& result, float virtualGroundVoltageInt);
 
-    float GetNernstDc() const override {
+    float GetNernstDc() const override
+    {
         return nernstDc;
     }
 
-    float GetNernstAc() const override {
+    float GetNernstAc() const override
+    {
         return nernstAc;
     }
 
-    float GetPumpNominalCurrent() const override {
+    float GetPumpNominalCurrent() const override
+    {
         // Gain is 10x, then a 61.9 ohm resistor
         // Effective resistance with the gain is 619 ohms
         // 1000 is to convert to milliamperes
@@ -41,11 +44,43 @@ public:
         return pumpCurrentSenseVoltage * ratio;
     }
 
-    float GetInternalBatteryVoltage() const override {
+    float GetInternalBatteryVoltage() const override
+    {
         // Dual HW can measure heater voltage for each channel
         // by measuring voltage on Heater- while FET is off
         // TODO: rename function?
         return internalBatteryVoltage;
+    }
+
+    float GetSensorTemperature() const override
+    {
+        float esr = GetSensorInternalResistance();
+
+        if (esr > 5000)
+        {
+            return 0;
+        }
+
+        switch (GetSensorType()) {
+            case SensorType::LSU49:
+                return interpolate2d(esr, lsu49TempBins, lsu49TempValues);
+            case SensorType::LSU42:
+                return interpolate2d(esr, lsu42TempBins, lsu42TempValues);
+            case SensorType::LSUADV:
+                return interpolate2d(esr, lsuAdvTempBins, lsuAdvTempValues);
+        }
+
+        return 0;
+    }
+
+    float GetSensorInternalResistance() const override
+    {
+        // Sensor is the lowside of a divider, top side is GetESRSupplyR(), and 3.3v AC pk-pk is injected
+        float totalEsr = GetESRSupplyR() / (VCC_VOLTS / GetNernstAc() - 1);
+
+        // There is a resistor between the opamp and Vm sensor pin.  Remove the effect of that
+        // resistor so that the remainder is only the ESR of the sensor itself
+        return totalEsr - VM_RESISTOR_VALUE;
     }
 
 private:
@@ -59,6 +94,11 @@ private:
 };
 
 static Sampler samplers[AFR_CHANNELS];
+
+ISampler& GetSampler(int ch)
+{
+    return samplers[ch];
+}
 
 constexpr float f_abs(float x)
 {
@@ -139,35 +179,15 @@ float GetNernstAc(int ch)
     return samplers[ch].GetNernstAc();
 }
 
+// TODO: remove these helpers
 float GetSensorInternalResistance(int ch)
 {
-    // Sensor is the lowside of a divider, top side is GetESRSupplyR(), and 3.3v AC pk-pk is injected
-    float totalEsr = GetESRSupplyR() / (VCC_VOLTS / GetNernstAc(ch) - 1);
-
-    // There is a resistor between the opamp and Vm sensor pin.  Remove the effect of that
-    // resistor so that the remainder is only the ESR of the sensor itself
-    return totalEsr - VM_RESISTOR_VALUE;
+    return samplers[ch].GetSensorInternalResistance();
 }
 
 float GetSensorTemperature(int ch)
 {
-    float esr = GetSensorInternalResistance(ch);
-
-    if (esr > 5000)
-    {
-        return 0;
-    }
-
-    switch (GetSensorType()) {
-        case SensorType::LSU49:
-            return interpolate2d(esr, lsu49TempBins, lsu49TempValues);
-        case SensorType::LSU42:
-            return interpolate2d(esr, lsu42TempBins, lsu42TempValues);
-        case SensorType::LSUADV:
-            return interpolate2d(esr, lsuAdvTempBins, lsuAdvTempValues);
-    }
-
-    return 0;
+    return samplers[ch].GetSensorTemperature();
 }
 
 float GetNernstDc(int ch)

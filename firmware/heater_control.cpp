@@ -257,16 +257,18 @@ static void HeaterThread(void*)
         auto heaterAllowState = GetHeaterAllowed();
 
         for (i = 0; i < AFR_CHANNELS; i++) {
+            const auto& sampler = GetSampler(i);
+
             heater_state &s = state[i];
 
             // Read sensor state
-            float heaterEsr = GetSensorInternalResistance(s.ch);
-            float sensorTemperature = GetSensorTemperature(s.ch);
+            float heaterEsr = sampler.GetSensorInternalResistance();
+            float sensorTemperature = sampler.GetSensorTemperature();
 
             // If we haven't heard from rusEFI, use the internally sensed 
             // battery voltage instead of voltage over CAN.
             float batteryVoltage = heaterAllowState == HeaterAllow::Unknown
-                                        ? GetInternalBatteryVoltage(s.ch)
+                                        ? sampler.GetInternalBatteryVoltage()
                                         : GetRemoteBatteryVoltage();
 
             // Run the state machine
