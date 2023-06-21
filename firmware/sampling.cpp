@@ -21,19 +21,19 @@ static const float lsu42TempValues[] = { 1199, 961, 857, 806, 775, 750, 730, 715
 static const float lsuAdvTempBins[]   = {   53,  96, 130, 162, 184, 206, 239, 278, 300, 330, 390, 462, 573, 730, 950, 1200, 1500, 1900, 2500, 3500, 5000, 6000 };
 static const float lsuAdvTempValues[] = { 1198, 982, 914, 875, 855, 838, 816, 794, 785, 771, 751, 732, 711, 691, 671,  653,  635,  614,  588,  562,  537,  528 };
 
-struct Sampler {
+struct Sampler : public ISampler {
 public:
     void ApplySample(AnalogChannelResult& result, float virtualGroundVoltageInt);
 
-    float GetNernstDc() const {
+    float GetNernstDc() const override {
         return nernstDc;
     }
 
-    float GetNernstAc() const {
+    float GetNernstAc() const override {
         return nernstAc;
     }
 
-    float GetPumpNominalCurrent() const {
+    float GetPumpNominalCurrent() const override {
         // Gain is 10x, then a 61.9 ohm resistor
         // Effective resistance with the gain is 619 ohms
         // 1000 is to convert to milliamperes
@@ -41,7 +41,7 @@ public:
         return pumpCurrentSenseVoltage * ratio;
     }
 
-    float GetInternalBatteryVoltage() const {
+    float GetInternalBatteryVoltage() const override {
         // Dual HW can measure heater voltage for each channel
         // by measuring voltage on Heater- while FET is off
         // TODO: rename function?
@@ -92,10 +92,8 @@ static void SamplingThread(void*)
         /* tunerstudio */
         SamplingUpdateLiveData();
 #endif
-
     }
 }
-
 
 void Sampler::ApplySample(AnalogChannelResult& result, float virtualGroundVoltageInt)
 {
