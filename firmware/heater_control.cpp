@@ -282,9 +282,9 @@ void HeaterController::Update(const ISampler& sampler, HeaterAllow heaterAllowSt
     float duty = voltageRatio * voltageRatio;
 
     #ifdef HEATER_MAX_DUTY
-    s.cycle++;
+    cycle++;
     // limit PWM each 10th cycle (2 time per second) to measure heater supply voltage throuth "Heater-"
-    if ((s.cycle % 10) == 0) {
+    if ((cycle % 10) == 0) {
         if (duty > HEATER_MAX_DUTY) {
             duty = HEATER_MAX_DUTY;
         }
