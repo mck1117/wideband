@@ -173,9 +173,3 @@ void StartSampling()
     adcStart(&ADCD1, nullptr);
     chThdCreateStatic(waSamplingThread, sizeof(waSamplingThread), NORMALPRIO + 5, SamplingThread, nullptr);
 }
-
-// TODO: remove these helpers
-float GetInternalBatteryVoltage(int ch)
-{
-    return samplers[ch].GetInternalBatteryVoltage();
-}

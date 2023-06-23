@@ -14,5 +14,3 @@ struct ISampler
 const ISampler& GetSampler(int ch);
 
 void StartSampling();
-
-float GetInternalBatteryVoltage(int ch);
