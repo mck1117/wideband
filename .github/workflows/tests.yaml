@@ -1,0 +1,53 @@
+name: Unit Tests
+
+on: [push,pull_request]
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ubuntu-20.04, macos-latest]
+
+    steps:
+    - uses: actions/checkout@v1
+      with:
+        submodules: recursive
+        fetch-depth: 0
+
+    - name: Discover cores
+      if: ${{ matrix.os != 'macos-latest' }}
+      run: lscpu | egrep 'Model name|Socket|Thread|NUMA|CPU\(s\)'
+
+    - name: Install required software (ubuntu)
+      if: ${{ matrix.os != 'macos-latest' }}
+      run: |
+        sudo apt-get update
+        sudo apt-get install valgrind
+
+    - name: Print Compiler version
+      # NOTE: on mac, this is actually symlink'd to clang, not gcc, but that's ok - we want to build on both
+      working-directory: .
+      run: gcc -v
+
+    - name: Build Tests
+      working-directory: test
+      run: make -j4 SANITIZE=yes
+
+    - name: Run Tests
+      working-directory: test
+      run: ASAN_OPTIONS=detect_stack_use_after_return=1 build/wideband_test
+
+    - name: Rebuild Tests For Valgrind
+      # Valgrind isn't compatible with address sanitizer, so we have to rebuild the code
+      if: ${{ matrix.os != 'macos-latest' }}
+      working-directory: test
+      run: |
+        make clean
+        make -j4 SANITIZE=no
+
+    - name: Run Tests (Valgrind)
+      if: ${{ matrix.os != 'macos-latest' }}
+      working-directory: test
+      run: valgrind --error-exitcode=1 --leak-check=no build/wideband_test
