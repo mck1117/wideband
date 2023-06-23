@@ -91,7 +91,7 @@ void InitPumpDac()
 void SetPumpCurrentTarget(int ch, int32_t microampere)
 {
     // Don't allow pump current when the sensor isn't hot
-    if (!IsRunningClosedLoop(ch))
+    if (!GetHeaterController(ch).IsRunningClosedLoop())
     {
         microampere = 0;
     }

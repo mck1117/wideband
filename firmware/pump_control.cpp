@@ -34,10 +34,13 @@ static void PumpThread(void*)
         {
             pump_control_state &s = state[ch];
 
+            const auto& sampler = GetSampler(ch);
+            const auto& heater = GetHeaterController(ch);
+
             // Only actuate pump when running closed loop!
-            if (IsRunningClosedLoop(ch))
+            if (heater.IsRunningClosedLoop())
             {
-                float nernstVoltage = GetNernstDc(ch);
+                float nernstVoltage = sampler.GetNernstDc();
 
                 float result = s.pumpPid.GetOutput(NERNST_TARGET, nernstVoltage);
 

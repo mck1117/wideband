@@ -67,7 +67,7 @@ int main() {
             palTogglePad(LED_GREEN_PORT, LED_GREEN_PIN);
 
             // Slow blink if closed loop, fast if not
-            chThdSleepMilliseconds(IsRunningClosedLoop(0) ? 700 : 50);
+            chThdSleepMilliseconds(GetHeaterController(0).IsRunningClosedLoop() ? 700 : 50);
         }
         else
         {

@@ -68,7 +68,7 @@ static constexpr int preheatTimeCounter = HEATER_PREHEAT_TIME / HEATER_CONTROL_P
 static constexpr int batteryStabTimeCounter = HEATER_BATTERY_STAB_TIME / HEATER_CONTROL_PERIOD;
 static const struct sensorHeaterParams *heater;
 
-class HeaterController
+class HeaterController : public IHeaterController
 {
 public:
     HeaterController(int ch, int pwm_ch)
@@ -76,14 +76,28 @@ public:
     {
     }
 
-    void Update(const ISampler& sampler, HeaterAllow heaterAllowState);
+    void Update(const ISampler& sampler, HeaterAllow heaterAllowState) override;
+
+    bool IsRunningClosedLoop() const override
+    {
+        return heaterState == HeaterState::ClosedLoop;
+    }
+
+    float GetHeaterEffectiveVoltage() const override
+    {
+        return heaterVoltage;
+    }
+
+    HeaterState GetHeaterState() const override
+    {
+        return heaterState;
+    }
 
 protected:
     HeaterState GetNextState(HeaterAllow haeterAllowState, float batteryVoltage, float sensorTemp);
     float GetVoltageForState(float heaterEsr);
 
-// private:
-public:
+private:
     Pid heaterPid =
         {
             0.3f,      // kP
@@ -101,6 +115,9 @@ public:
 #ifdef HEATER_MAX_DUTY
     int cycle;
 #endif
+
+// TODO: private:
+public:
     const uint8_t ch;
     const uint8_t pwm_ch;
 };
@@ -113,6 +130,11 @@ HeaterController heaterControllers[AFR_CHANNELS] =
     { 1, HEATER_PWM_CHANNEL_1 }
 #endif
 };
+
+const IHeaterController& GetHeaterController(int ch)
+{
+    return heaterControllers[ch];
+}
 
 HeaterState HeaterController::GetNextState(HeaterAllow heaterAllowState, float batteryVoltage, float sensorTemp)
 {
@@ -320,24 +342,14 @@ void StartHeaterControl()
     chThdCreateStatic(waHeaterThread, sizeof(waHeaterThread), NORMALPRIO + 1, HeaterThread, nullptr);
 }
 
-bool IsRunningClosedLoop(int ch)
-{
-    return heaterControllers[ch].heaterState == HeaterState::ClosedLoop;
-}
-
 float GetHeaterDuty(int ch)
 {
     return heaterPwm.GetLastDuty(heaterControllers[ch].pwm_ch);
 }
 
-float GetHeaterEffVoltage(int ch)
-{
-    return heaterControllers[ch].heaterVoltage;
-}
-
 HeaterState GetHeaterState(int ch)
 {
-    return heaterControllers[ch].heaterState;
+    return heaterControllers[ch].GetHeaterState();
 }
 
 const char* describeHeaterState(HeaterState state)

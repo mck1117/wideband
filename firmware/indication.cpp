@@ -49,7 +49,7 @@ static void IndicationThread(void *ptr)
             palToggleLine(data->line);
 
             // Slow blink if closed loop, fast if not
-            chThdSleepMilliseconds(IsRunningClosedLoop(data->idx) ? LED_BLINK_SLOW : LED_BLINK_FAST);
+            chThdSleepMilliseconds(GetHeaterController(data->idx).IsRunningClosedLoop() ? LED_BLINK_SLOW : LED_BLINK_FAST);
         }
         else
         {

@@ -95,7 +95,7 @@ private:
 
 static Sampler samplers[AFR_CHANNELS];
 
-ISampler& GetSampler(int ch)
+const ISampler& GetSampler(int ch)
 {
     return samplers[ch];
 }
@@ -174,32 +174,7 @@ void StartSampling()
     chThdCreateStatic(waSamplingThread, sizeof(waSamplingThread), NORMALPRIO + 5, SamplingThread, nullptr);
 }
 
-float GetNernstAc(int ch)
-{
-    return samplers[ch].GetNernstAc();
-}
-
 // TODO: remove these helpers
-float GetSensorInternalResistance(int ch)
-{
-    return samplers[ch].GetSensorInternalResistance();
-}
-
-float GetSensorTemperature(int ch)
-{
-    return samplers[ch].GetSensorTemperature();
-}
-
-float GetNernstDc(int ch)
-{
-    return samplers[ch].GetNernstDc();
-}
-
-float GetPumpNominalCurrent(int ch)
-{
-    return samplers[ch].GetPumpNominalCurrent();
-}
-
 float GetInternalBatteryVoltage(int ch)
 {
     return samplers[ch].GetInternalBatteryVoltage();

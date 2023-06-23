@@ -20,15 +20,18 @@ void SamplingUpdateLiveData()
     {
         volatile struct livedata_afr_s *data = &livedata_afr[ch];
 
+        const auto& sampler = GetSampler(ch);
+        const auto& heater = GetHeaterController(ch);
+
         data->lambda = GetLambda(ch);
-        data->temperature = GetSensorTemperature(ch) * 10;
-        data->nernstDc = GetNernstDc(ch) * 1000;
-        data->nernstAc = GetNernstAc(ch) * 1000;
+        data->temperature = sampler.GetSensorTemperature() * 10;
+        data->nernstDc = sampler.GetNernstDc() * 1000;
+        data->nernstAc = sampler.GetNernstAc() * 1000;
         data->pumpCurrentTarget = GetPumpCurrent(ch);
-        data->pumpCurrentMeasured = GetPumpNominalCurrent(ch);
+        data->pumpCurrentMeasured = sampler.GetPumpNominalCurrent();
         data->heaterDuty = GetHeaterDuty(ch) * 1000;    // 0.1 %
-        data->heaterEffectiveVoltage = GetHeaterEffVoltage(ch) * 100;
-        data->esr = GetSensorInternalResistance(ch);
+        data->heaterEffectiveVoltage = heater.GetHeaterEffectiveVoltage() * 100;
+        data->esr = sampler.GetSensorInternalResistance();
         data->fault = (uint8_t)GetCurrentFault(ch);
         data->heaterState = (uint8_t)GetHeaterState(ch);
     }

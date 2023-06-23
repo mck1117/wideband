@@ -137,6 +137,9 @@ void SendRusefiFormat(uint8_t ch)
 {
     auto baseAddress = WB_DATA_BASE_ADDR + 2 * (ch + configuration->CanIndexOffset);
 
+    const auto& sampler = GetSampler(ch);
+    const auto& heater = GetHeaterController(ch);
+
     {
         CanTxTyped<wbo::StandardData> frame(baseAddress + 0);
 
@@ -145,17 +148,17 @@ void SendRusefiFormat(uint8_t ch)
 
         uint16_t lambda = GetLambda(ch) * 10000;
         frame.get().Lambda = lambda;
-        frame.get().TemperatureC = GetSensorTemperature(ch);
-        frame.get().Valid = IsRunningClosedLoop(ch) ? 0x01 : 0x00;
+        frame.get().TemperatureC = sampler.GetSensorTemperature();
+        frame.get().Valid = heater.IsRunningClosedLoop() ? 0x01 : 0x00;
     }
 
     {
-        auto esr = GetSensorInternalResistance(ch);
+        auto esr = sampler.GetSensorInternalResistance();
 
         CanTxTyped<wbo::DiagData> frame(baseAddress + 1);
 
         frame.get().Esr = esr;
-        frame.get().NernstDc = GetNernstDc(ch) * 1000;
+        frame.get().NernstDc = sampler.GetNernstDc() * 1000;
         frame.get().PumpDuty = GetPumpOutputDuty(ch) * 255;
         frame.get().Status = GetCurrentFault(ch);
         frame.get().HeaterDuty = GetHeaterDuty(ch) * 255;

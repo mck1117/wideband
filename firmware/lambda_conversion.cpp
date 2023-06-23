@@ -65,7 +65,7 @@ static float GetPhi(float pumpCurrent) {
 
 float GetLambda(int ch)
 {
-    float pumpCurrent = GetPumpNominalCurrent(ch);
+    float pumpCurrent = GetSampler(ch).GetPumpNominalCurrent();
 
     // Lambda is reciprocal of phi
     return 1 / GetPhi(pumpCurrent);
