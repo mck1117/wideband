@@ -15,3 +15,6 @@
 	path = firmware/libfirmware
 	url = https://github.com/rusefi/libfirmware.git
 	branch = master
+[submodule "test/googletest"]
+	path = test/googletest
+	url = https://github.com/google/googletest
