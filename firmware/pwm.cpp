@@ -9,28 +9,6 @@ Pwm::Pwm(PWMDriver& driver)
 {
 }
 
-void Pwm::Start()
-{
-    static const PWMConfig config = {
-        m_counterFrequency,
-        m_counterPeriod,
-        nullptr,
-        {
-            {PWM_OUTPUT_ACTIVE_HIGH | PWM_COMPLEMENTARY_OUTPUT_ACTIVE_LOW, nullptr},
-            {PWM_OUTPUT_ACTIVE_HIGH | PWM_COMPLEMENTARY_OUTPUT_ACTIVE_LOW, nullptr},
-            {PWM_OUTPUT_ACTIVE_HIGH | PWM_COMPLEMENTARY_OUTPUT_ACTIVE_LOW, nullptr},
-            {PWM_OUTPUT_ACTIVE_HIGH | PWM_COMPLEMENTARY_OUTPUT_ACTIVE_LOW, nullptr}
-        },
-        0,
-        0,
-#if STM32_PWM_USE_ADVANCED
-        0
-#endif
-    };
-
-    Start(config);
-}
-
 void Pwm::Start(const PWMConfig& config)
 {
     m_counterFrequency = config.frequency;
