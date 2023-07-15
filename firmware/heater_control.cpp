@@ -48,20 +48,20 @@ using namespace wbo;
 // 400khz / 1024 = 390hz PWM
 static Pwm heaterPwm(HEATER_PWM_DEVICE);
 static const PWMConfig heaterPwmConfig = {
-    400'000,
-    1024,
-    nullptr,
-    {
+    .frequency = 400'000,
+    .period = 1024,
+    .callback = nullptr,
+    .channels = {
         {PWM_OUTPUT_ACTIVE_HIGH, nullptr},
         {PWM_OUTPUT_ACTIVE_HIGH, nullptr},
         {PWM_OUTPUT_ACTIVE_HIGH, nullptr},
         {PWM_OUTPUT_ACTIVE_HIGH, nullptr}
     },
-    0,
-    0,
+    .cr2 = 0,
 #if STM32_PWM_USE_ADVANCED
-    0
+    .bdtr = 0,
 #endif
+    .dier = 0
 };
 
 static constexpr int preheatTimeCounter = HEATER_PREHEAT_TIME / HEATER_CONTROL_PERIOD;
