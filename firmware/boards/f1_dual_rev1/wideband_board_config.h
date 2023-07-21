@@ -13,6 +13,10 @@
 #define ADC_MAX_COUNT (4095)
 #define ADC_OVERSAMPLE 16
 
+// Algo settings
+// TODO: move to settings
+#define HEATER_FAST_HEATING_THRESHOLD_T		550
+
 // *******************************
 //    Nernst voltage & ESR sense
 // *******************************
