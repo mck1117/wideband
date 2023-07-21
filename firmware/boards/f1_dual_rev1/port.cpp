@@ -89,8 +89,8 @@ static float GetMaxSample(adcsample_t* buffer, size_t idx)
     return (float)max * scale;
 }
 
-static float l_vbatt = 0;
-static float r_vbatt = 0;
+static float l_heater_voltage = 0;
+static float r_heater_voltage = 0;
 
 AnalogResult AnalogSample()
 {
@@ -108,14 +108,14 @@ AnalogResult AnalogSample()
 
     if (l_heater && l_heater_new)
     {
-        float vbatt_raw = GetMaxSample(adcBuffer, 6) / BATTERY_INPUT_DIVIDER;
-        l_vbatt = BATTERY_FILTER_ALPHA * vbatt_raw + (1.0 - BATTERY_FILTER_ALPHA) * l_vbatt;
+        float vbatt_raw = GetMaxSample(adcBuffer, 6) / HEATER_INPUT_DIVIDER;
+        l_heater_voltage = HEATER_FILTER_ALPHA * vbatt_raw + (1.0 - HEATER_FILTER_ALPHA) * l_heater_voltage;
     }
 
     if (r_heater && r_heater_new)
     {
-        float vbatt_raw = GetMaxSample(adcBuffer, 7) / BATTERY_INPUT_DIVIDER;
-        r_vbatt = BATTERY_FILTER_ALPHA * vbatt_raw + (1.0 - BATTERY_FILTER_ALPHA) * r_vbatt;
+        float vbatt_raw = GetMaxSample(adcBuffer, 7) / HEATER_INPUT_DIVIDER;
+        r_heater_voltage = HEATER_FILTER_ALPHA * vbatt_raw + (1.0 - HEATER_FILTER_ALPHA) * r_heater_voltage;
     }
 
     /* Dual board has separate internal virtual ground = 3.3V / 2
@@ -135,10 +135,10 @@ AnalogResult AnalogSample()
     }
     /* left */
     res.ch[0].PumpCurrentVoltage = AverageSamples(adcBuffer, 2);
-    res.ch[0].BatteryVoltage = l_vbatt;
+    res.ch[0].BatteryVoltage = l_heater_voltage;
     /* right */
     res.ch[1].PumpCurrentVoltage = AverageSamples(adcBuffer, 0);
-    res.ch[1].BatteryVoltage = r_vbatt;
+    res.ch[1].BatteryVoltage = r_heater_voltage;
 
     return res;
 }
