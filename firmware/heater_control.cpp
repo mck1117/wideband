@@ -71,6 +71,18 @@ HeaterState HeaterControllerBase::GetNextState(HeaterState currentState, HeaterA
     switch (currentState)
     {
         case HeaterState::Preheat:
+            #ifdef HEATER_FAST_HEATING_THRESHOLD_T
+            if (sensorTemp >= HEATER_FAST_HEATING_THRESHOLD_T) {
+                // if sensor is already hot - we can start from higher heater voltage
+                rampVoltage = 7.5;
+
+                // Reset the timer for the warmup phase
+                m_warmupTimer.reset();
+
+                return HeaterState::WarmupRamp;
+            }
+            #endif
+
             // If preheat timeout, or sensor is already hot (engine running?)
             if (m_preheatTimer.hasElapsedSec(m_preheatTimeSec) || sensorTemp > closedLoopTemp)
             {
