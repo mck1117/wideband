@@ -115,7 +115,7 @@ void Sampler::ApplySample(AnalogChannelResult& result, float virtualGroundVoltag
         PUMP_FILTER_ALPHA * (result.PumpCurrentVoltage - virtualGroundVoltageInt);
 
 #ifdef BATTERY_INPUT_DIVIDER
-    internalHeaterVoltage = result.HeaterVoltage;
+    internalHeaterVoltage = result.HeaterSupplyVoltage;
 #endif
 
     // Shift history over by one
