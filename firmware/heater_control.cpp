@@ -177,7 +177,7 @@ void HeaterControllerBase::Update(const ISampler& sampler, HeaterAllow heaterAll
     // If we haven't heard from the ECU, use the internally sensed
     // battery voltage instead of voltage over CAN.
     float batteryVoltage = heaterAllowState == HeaterAllow::Unknown
-                                ? sampler.GetInternalBatteryVoltage()
+                                ? sampler.GetInternalHeaterVoltage()
                                 : GetRemoteBatteryVoltage();
 
     // Run the state machine
