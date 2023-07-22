@@ -1,5 +1,4 @@
 #include "heater_control.h"
-#include "wideband_config.h"
 
 #include "ch.h"
 #include "hal.h"
@@ -9,7 +8,6 @@
 #include "pwm.h"
 #include "sampling.h"
 #include "pid.h"
-#include "can.h"
 
 struct sensorHeaterParams {
     float targetTemp;
