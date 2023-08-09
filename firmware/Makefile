@@ -100,6 +100,7 @@ CHIBIOS  := ChibiOS
 CONFDIR  := $(BOARDDIR)
 BUILDDIR := ./build
 DEPDIR   := ./.dep
+FIRMWARE_DIR = .
 
 ifeq ("$(wildcard $(CHIBIOS)/os/license/license.mk)","")
 # submodules probably aren't checked out, complain to the user about it!
@@ -161,6 +162,7 @@ CPPSRC = $(ALLCPPSRC) \
           console/binary/tunerstudio_io.cpp \
           console/binary/tunerstudio_io_serial.cpp \
           console/binary/tunerstudio_commands.cpp \
+          sampling_thread.cpp \
           main.cpp
 
 # List ASM source files here.

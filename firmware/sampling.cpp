@@ -1,13 +1,7 @@
 #include "sampling.h"
 
-#include "ch.h"
-#include "hal.h"
-
 #include "wideband_config.h"
-
 #include "port.h"
-#include "io_pins.h"
-#include "livedata.h"
 
 #include <rusefi/interpolation.h>
 
@@ -20,7 +14,6 @@ static const float lsu42TempValues[] = { 1199, 961, 857, 806, 775, 750, 730, 715
 
 static const float lsuAdvTempBins[]   = {   53,  96, 130, 162, 184, 206, 239, 278, 300, 330, 390, 462, 573, 730, 950, 1200, 1500, 1900, 2500, 3500, 5000, 6000 };
 static const float lsuAdvTempValues[] = { 1198, 982, 914, 875, 855, 838, 816, 794, 785, 771, 751, 732, 711, 691, 671,  653,  635,  614,  588,  562,  537,  528 };
-
 
 float Sampler::GetNernstDc() const
 {
@@ -80,46 +73,9 @@ float Sampler::GetSensorInternalResistance() const
     return totalEsr - VM_RESISTOR_VALUE;
 }
 
-static Sampler samplers[AFR_CHANNELS];
-
-const ISampler& GetSampler(int ch)
-{
-    return samplers[ch];
-}
-
 constexpr float f_abs(float x)
 {
     return x > 0 ? x : -x;
-}
-
-static THD_WORKING_AREA(waSamplingThread, 256);
-
-static void SamplingThread(void*)
-{
-    chRegSetThreadName("Sampling");
-
-    SetupESRDriver(GetSensorType());
-
-    /* GD32: Insert 20us delay after ADC enable */
-    chThdSleepMilliseconds(1);
-
-    while(true)
-    {
-        auto result = AnalogSample();
-
-        // Toggle the pin after sampling so that any switching noise occurs while we're doing our math instead of when sampling
-        ToggleESRDriver(GetSensorType());
-
-        for (int ch = 0; ch < AFR_CHANNELS; ch++)
-        {
-            samplers[ch].ApplySample(result.ch[ch], result.VirtualGroundVoltageInt);
-        }
-
-#if defined(TS_ENABLED)
-        /* tunerstudio */
-        SamplingUpdateLiveData();
-#endif
-    }
 }
 
 void Sampler::ApplySample(AnalogChannelResult& result, float virtualGroundVoltageInt)
@@ -153,10 +109,4 @@ void Sampler::ApplySample(AnalogChannelResult& result, float virtualGroundVoltag
     // Shift history over by one
     r_3 = r_2;
     r_2 = r_1;
-}
-
-void StartSampling()
-{
-    adcStart(&ADCD1, nullptr);
-    chThdCreateStatic(waSamplingThread, sizeof(waSamplingThread), NORMALPRIO + 5, SamplingThread, nullptr);
 }
