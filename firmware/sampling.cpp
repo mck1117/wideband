@@ -21,77 +21,64 @@ static const float lsu42TempValues[] = { 1199, 961, 857, 806, 775, 750, 730, 715
 static const float lsuAdvTempBins[]   = {   53,  96, 130, 162, 184, 206, 239, 278, 300, 330, 390, 462, 573, 730, 950, 1200, 1500, 1900, 2500, 3500, 5000, 6000 };
 static const float lsuAdvTempValues[] = { 1198, 982, 914, 875, 855, 838, 816, 794, 785, 771, 751, 732, 711, 691, 671,  653,  635,  614,  588,  562,  537,  528 };
 
-struct Sampler : public ISampler {
-public:
-    void ApplySample(AnalogChannelResult& result, float virtualGroundVoltageInt);
 
-    float GetNernstDc() const override
+float Sampler::GetNernstDc() const
+{
+    return nernstDc;
+}
+
+float Sampler::GetNernstAc() const
+{
+    return nernstAc;
+}
+
+float Sampler::GetPumpNominalCurrent() const
+{
+    // Gain is 10x, then a 61.9 ohm resistor
+    // Effective resistance with the gain is 619 ohms
+    // 1000 is to convert to milliamperes
+    constexpr float ratio = -1000 / (PUMP_CURRENT_SENSE_GAIN * LSU_SENSE_R);
+    return pumpCurrentSenseVoltage * ratio;
+}
+
+float Sampler::GetInternalBatteryVoltage() const
+{
+    // Dual HW can measure heater voltage for each channel
+    // by measuring voltage on Heater- while FET is off
+    // TODO: rename function?
+    return internalBatteryVoltage;
+}
+
+float Sampler::GetSensorTemperature() const
+{
+    float esr = GetSensorInternalResistance();
+
+    if (esr > 5000)
     {
-        return nernstDc;
-    }
-
-    float GetNernstAc() const override
-    {
-        return nernstAc;
-    }
-
-    float GetPumpNominalCurrent() const override
-    {
-        // Gain is 10x, then a 61.9 ohm resistor
-        // Effective resistance with the gain is 619 ohms
-        // 1000 is to convert to milliamperes
-        constexpr float ratio = -1000 / (PUMP_CURRENT_SENSE_GAIN * LSU_SENSE_R);
-        return pumpCurrentSenseVoltage * ratio;
-    }
-
-    float GetInternalBatteryVoltage() const override
-    {
-        // Dual HW can measure heater voltage for each channel
-        // by measuring voltage on Heater- while FET is off
-        // TODO: rename function?
-        return internalBatteryVoltage;
-    }
-
-    float GetSensorTemperature() const override
-    {
-        float esr = GetSensorInternalResistance();
-
-        if (esr > 5000)
-        {
-            return 0;
-        }
-
-        switch (GetSensorType()) {
-            case SensorType::LSU49:
-                return interpolate2d(esr, lsu49TempBins, lsu49TempValues);
-            case SensorType::LSU42:
-                return interpolate2d(esr, lsu42TempBins, lsu42TempValues);
-            case SensorType::LSUADV:
-                return interpolate2d(esr, lsuAdvTempBins, lsuAdvTempValues);
-        }
-
         return 0;
     }
 
-    float GetSensorInternalResistance() const override
-    {
-        // Sensor is the lowside of a divider, top side is GetESRSupplyR(), and 3.3v AC pk-pk is injected
-        float totalEsr = GetESRSupplyR() / (VCC_VOLTS / GetNernstAc() - 1);
-
-        // There is a resistor between the opamp and Vm sensor pin.  Remove the effect of that
-        // resistor so that the remainder is only the ESR of the sensor itself
-        return totalEsr - VM_RESISTOR_VALUE;
+    switch (GetSensorType()) {
+        case SensorType::LSU49:
+            return interpolate2d(esr, lsu49TempBins, lsu49TempValues);
+        case SensorType::LSU42:
+            return interpolate2d(esr, lsu42TempBins, lsu42TempValues);
+        case SensorType::LSUADV:
+            return interpolate2d(esr, lsuAdvTempBins, lsuAdvTempValues);
     }
 
-private:
-    float r_2 = 0;
-    float r_3 = 0;
+    return 0;
+}
 
-    float nernstAc;
-    float nernstDc;
-    float pumpCurrentSenseVoltage;
-    float internalBatteryVoltage;
-};
+float Sampler::GetSensorInternalResistance() const
+{
+    // Sensor is the lowside of a divider, top side is GetESRSupplyR(), and 3.3v AC pk-pk is injected
+    float totalEsr = GetESRSupplyR() / (VCC_VOLTS / GetNernstAc() - 1);
+
+    // There is a resistor between the opamp and Vm sensor pin.  Remove the effect of that
+    // resistor so that the remainder is only the ESR of the sensor itself
+    return totalEsr - VM_RESISTOR_VALUE;
+}
 
 static Sampler samplers[AFR_CHANNELS];
 

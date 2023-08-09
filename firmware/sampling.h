@@ -10,6 +10,30 @@ struct ISampler
     virtual float GetSensorInternalResistance() const = 0;
 };
 
+struct AnalogChannelResult;
+
+class Sampler : public ISampler
+{
+public:
+    void ApplySample(AnalogChannelResult& result, float virtualGroundVoltageInt);
+
+    float GetNernstDc() const override;
+    float GetNernstAc() const override;
+    float GetPumpNominalCurrent() const override;
+    float GetInternalBatteryVoltage() const override;
+    float GetSensorTemperature() const override;
+    float GetSensorInternalResistance() const override;
+
+private:
+    float r_2 = 0;
+    float r_3 = 0;
+
+    float nernstAc = 0;
+    float nernstDc = 0;
+    float pumpCurrentSenseVoltage = 0;
+    float internalBatteryVoltage = 0;
+};
+
 // Get the sampler for a particular channel
 const ISampler& GetSampler(int ch);
 
