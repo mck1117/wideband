@@ -11,6 +11,8 @@ FIRMWARE_DIR = ./../firmware
 RUSEFI_LIB = $(FIRMWARE_DIR)/libfirmware
 include $(RUSEFI_LIB)/util/util.mk
 
+include $(FIRMWARE_DIR)/wideband.mk
+
 # C sources that can be compiled in ARM or THUMB mode depending on the global
 # setting.
 CSRC += \
@@ -21,6 +23,7 @@ CSRC += \
 CPPSRC += \
 	$(RUSEFI_LIB_CPP) \
 	$(RUSEFI_LIB_CPP_TEST) \
+	$(WIDEBANDSRC) \
 	gtest-all.cpp \
 	gmock-all.cpp \
 	gtest_main.cpp \
