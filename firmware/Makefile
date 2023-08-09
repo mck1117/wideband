@@ -126,6 +126,8 @@ include $(CHIBIOS)/os/hal/lib/complex/mfs/hal_mfs.mk
 # include board.mk that sets per-board options
 include $(BOARDDIR)/board.mk
 
+include wideband.mk
+
 # Define linker script file here
 LDSCRIPT=app.ld
 
@@ -139,6 +141,7 @@ CPPSRC = $(ALLCPPSRC) \
           $(BOARDDIR)/port.cpp \
           $(BOARDDIR)/port_shared.cpp \
           $(RUSEFI_LIB_CPP) \
+          $(WIDEBANDSRC) \
           shared/flash.cpp \
           can.cpp \
           can_helper.cpp \
@@ -147,8 +150,6 @@ CPPSRC = $(ALLCPPSRC) \
           pwm.cpp \
           dac.cpp \
           pump_dac.cpp \
-          sampling.cpp \
-          heater_control.cpp \
           pid.cpp \
           pump_control.cpp \
           max3185x.cpp \
