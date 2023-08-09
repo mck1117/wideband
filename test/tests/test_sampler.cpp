@@ -54,7 +54,6 @@ TEST(Sampler, TestAc)
         dut.ApplySample(dataHigh, virtualGroundVoltage);
     }
 
-    // not exactly 0 because of filtering
     EXPECT_NEAR(0.2, dut.GetNernstAc(), 1e-3);
     EXPECT_FLOAT_EQ(0.45f, dut.GetNernstDc());
     EXPECT_NEAR(-0.1616, dut.GetPumpNominalCurrent(), 1e-3);
