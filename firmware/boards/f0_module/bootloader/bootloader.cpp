@@ -1,3 +1,5 @@
+#include "ch.h"
+#include "hal.h"
 
 #include "port_shared.h"
 #include "flash.h"
