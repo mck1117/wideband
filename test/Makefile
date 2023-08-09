@@ -37,6 +37,7 @@ INCDIR += \
 	$(PROJECT_DIR)/googletest/googletest/include \
 	$(RUSEFI_LIB_INC) \
 	$(FIRMWARE_DIR) \
+	$(FIRMWARE_DIR)/boards \
 
 # User may want to pass in a forced value for SANITIZE
 ifeq ($(SANITIZE),)
@@ -63,6 +64,8 @@ ifeq ($(USE_OPT),)
   USE_OPT += -Werror=missing-field-initializers
 endif
 
+USE_OPT += -DWB_PROD=0
+
 # C specific options here (added to USE_OPT).
 ifeq ($(USE_COPT),)
   USE_COPT = -std=gnu99 -fgnu89-inline
@@ -70,7 +73,7 @@ endif
 
 # C++ specific options here (added to USE_OPT).
 ifeq ($(USE_CPPOPT),)
-  USE_CPPOPT = -std=gnu++2a -fno-rtti -fno-use-cxa-atexit
+  USE_CPPOPT = -std=c++17 -fno-rtti -fno-use-cxa-atexit
 endif
 
 # Enable address sanitizer for C++ files, but not on Windows since x86_64-w64-mingw32-g++ doesn't support it.
@@ -137,7 +140,7 @@ BIN  = $(CP) -O binary
 CWARN = -Wall -Wextra -Wstrict-prototypes -pedantic -Wmissing-prototypes -Wold-style-definition
 
 # Define C++ warning options here
-CPPWARN = -Wall -Wextra -Werror -pedantic -Wno-error=sign-compare
+CPPWARN = -Wall -Wextra -Werror -Wno-error=sign-compare
 
 #
 # Compiler settings

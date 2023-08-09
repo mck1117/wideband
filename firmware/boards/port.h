@@ -1,6 +1,8 @@
 #pragma once
 
-#include "hal.h"
+#include <cstdint>
+#include <cstddef>
+
 #include "port_shared.h"
 #include "wideband_config.h"
 

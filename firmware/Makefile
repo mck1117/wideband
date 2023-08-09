@@ -14,6 +14,8 @@ ifeq ($(USE_OPT),)
   USE_OPT = -O2 -ggdb -fomit-frame-pointer -falign-functions=16 -fsingle-precision-constant
 endif
 
+USE_OPT += -DWB_PROD=1
+
 # C specific options here (added to USE_OPT).
 ifeq ($(USE_COPT),)
   USE_COPT = 
@@ -163,6 +165,7 @@ CPPSRC = $(ALLCPPSRC) \
           console/binary/tunerstudio_io_serial.cpp \
           console/binary/tunerstudio_commands.cpp \
           sampling_thread.cpp \
+          heater_control.cpp \
           main.cpp
 
 # List ASM source files here.
