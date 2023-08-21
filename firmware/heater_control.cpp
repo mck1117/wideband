@@ -246,6 +246,7 @@ float HeaterController::GetVoltageForState(float heaterEsr)
             // TODO: heater PID should operate on temperature, not ESR
             return 7.5f - heaterPid.GetOutput(heater->targetESR, heaterEsr);
         case HeaterState::Stopped:
+        case HeaterState::NoHeaterSupply:
             // Something has gone wrong, turn off the heater.
             return 0;
     }

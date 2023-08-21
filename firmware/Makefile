@@ -189,7 +189,7 @@ INCDIR = $(CONFDIR) \
 CWARN = -Wall -Wextra -Wundef -Wstrict-prototypes
 
 # Define C++ warning options here.
-CPPWARN = -Wall -Wextra -Wundef
+CPPWARN = -Wall -Wextra -Wundef -Werror=switch
 
 #
 # Project, target, sources and paths
