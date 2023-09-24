@@ -208,15 +208,13 @@ static void handleIoTestCommand(TsChannelBase* tsChannel, ts_response_format_e m
 	/* index is not used yet */
 
 	switch (subsystem) {
-#if 0
 	/* DFU */
 	case 0xba:
 		/* Send ok to make TS happy, wait until sent */
 		sendOkResponse(tsChannel, TS_CRC);
 		chThdSleepMilliseconds(100);
-		jump_to_bootloader();
+		rebootToDfu();
 		break;
-#endif
 
 	case 0xbb:
 		/* Send ok to make TS happy, wait until sent */
@@ -225,7 +223,6 @@ static void handleIoTestCommand(TsChannelBase* tsChannel, ts_response_format_e m
 		rebootNow();
 		break;
 
-#if USE_OPENBLT
 	case 0xbc:
 		/* Send ok to make TS happy, wait until sent */
 		sendOkResponse(tsChannel, TS_CRC);
@@ -233,7 +230,6 @@ static void handleIoTestCommand(TsChannelBase* tsChannel, ts_response_format_e m
 		/* Jump to OpenBLT if present */
 		rebootToOpenblt();
 		break;
-#endif
 
 	default:
 		tunerStudioError(tsChannel, "Unexpected IoTest command");

@@ -136,7 +136,9 @@ LDSCRIPT=app.ld
 
 # C sources that can be compiled in ARM or THUMB mode depending on the global
 # setting.
-CSRC = $(ALLCSRC) $(BOARDDIR)/board.c
+CSRC = $(ALLCSRC) \
+        $(BOARDDIR)/board.c \
+        boards/f1_common/openblt/shared_params.c
 
 # C++ sources that can be compiled in ARM or THUMB mode depending on the global
 # setting.
@@ -187,7 +189,8 @@ INCDIR = $(CONFDIR) \
          console/binary/ \
          boards/ \
          shared/ \
-         $(BOARDDIR)/io/
+         $(BOARDDIR)/io/ \
+         boards/f1_common/openblt
 
 # Define C warning options here.
 CWARN = -Wall -Wextra -Wundef -Wstrict-prototypes
@@ -236,9 +239,6 @@ ifeq ($(USE_OPENBLT),yes)
   # Reserve start of flash for OpenBLT
   USE_OPT += -Wl,--defsym=USE_BOOTLOADER=1
   DDEFS += -DUSE_OPENBLT=TRUE
-  # Shared params
-  INCDIR += boards/f1_common/openblt
-  CSRC += boards/f1_common/openblt/shared_params.c
 endif
 
 #
