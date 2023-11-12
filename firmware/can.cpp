@@ -94,14 +94,18 @@ void CanRxThread(void*)
             }
         }
         // If it's a bootloader entry request, reboot to the bootloader!
-        else if (frame.DLC == 0 && frame.EID == WB_BL_ENTER)
+        else if (frame.DLC == 1 && frame.EID == WB_BL_ENTER)
         {
-            SendAck();
+            // If 0xFF (force update all) or our ID, reset to bootloader, otherwise ignore
+            if (frame.data8[0] == 0xFF || frame.data8[0] == GetConfiguration()->CanIndexOffset)
+            {
+                SendAck();
 
-            // Let the message get out before we reset the chip
-            chThdSleep(50);
+                // Let the message get out before we reset the chip
+                chThdSleep(50);
 
-            NVIC_SystemReset();
+                NVIC_SystemReset();
+            }
         }
         // Check if it's an "index set" message
         else if (frame.DLC == 1 && frame.EID == WB_MSG_SET_INDEX)
