@@ -58,7 +58,7 @@ AnalogResult AnalogSample()
 // low -> 0
 // floating -> 1
 // high -> 2
-uint8_t readSelPin(ioportid_t port, iopadid_t pad)
+static uint8_t readSelPin(ioportid_t port, iopadid_t pad)
 {
     // If we pull the pin down, does the input follow?
     palSetPadMode(port, pad, PAL_MODE_INPUT_PULLDOWN);
