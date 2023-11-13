@@ -7,7 +7,6 @@
 #include "fault.h"
 #include "pwm.h"
 #include "sampling.h"
-#include "pid.h"
 
 struct sensorHeaterParams {
     float targetTemp;
@@ -62,63 +61,27 @@ static const PWMConfig heaterPwmConfig = {
     .dier = 0
 };
 
-static constexpr int preheatTimeCounter = HEATER_PREHEAT_TIME / HEATER_CONTROL_PERIOD;
-static constexpr int batteryStabTimeCounter = HEATER_BATTERY_STAB_TIME / HEATER_CONTROL_PERIOD;
 static const struct sensorHeaterParams *heater;
 
-class HeaterController : public IHeaterController
+HeaterController::HeaterController(int ch, int pwm_ch)
+    : ch(ch), pwm_ch(pwm_ch)
 {
-public:
-    HeaterController(int ch, int pwm_ch)
-        : ch(ch), pwm_ch(pwm_ch)
-    {
-    }
+}
 
-    void Update(const ISampler& sampler, HeaterAllow heaterAllowState) override;
+bool HeaterController::IsRunningClosedLoop() const
+{
+    return heaterState == HeaterState::ClosedLoop;
+}
 
-    bool IsRunningClosedLoop() const override
-    {
-        return heaterState == HeaterState::ClosedLoop;
-    }
+float HeaterController::GetHeaterEffectiveVoltage() const
+{
+    return heaterVoltage;
+}
 
-    float GetHeaterEffectiveVoltage() const override
-    {
-        return heaterVoltage;
-    }
-
-    HeaterState GetHeaterState() const override
-    {
-        return heaterState;
-    }
-
-protected:
-    HeaterState GetNextState(HeaterAllow haeterAllowState, float batteryVoltage, float sensorTemp);
-    float GetVoltageForState(float heaterEsr);
-
-private:
-    Pid heaterPid =
-        {
-            0.3f,      // kP
-            0.3f,      // kI
-            0.01f,     // kD
-            3.0f,      // Integrator clamp (volts)
-            HEATER_CONTROL_PERIOD
-        };
-
-    int timeCounter = preheatTimeCounter;
-    int batteryStabTime = batteryStabTimeCounter;
-    float rampVoltage = 0;
-    float heaterVoltage = 0;
-    HeaterState heaterState = HeaterState::Preheat;
-#ifdef HEATER_MAX_DUTY
-    int cycle;
-#endif
-
-// TODO: private:
-public:
-    const uint8_t ch;
-    const uint8_t pwm_ch;
-};
+HeaterState HeaterController::GetHeaterState() const
+{
+    return heaterState;
+}
 
 HeaterController heaterControllers[AFR_CHANNELS] =
 {
