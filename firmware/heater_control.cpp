@@ -1,103 +1,37 @@
 #include "heater_control.h"
 
-#include "ch.h"
-#include "hal.h"
-
-#include "port.h"
 #include "fault.h"
-#include "pwm.h"
 #include "sampling.h"
-
-struct sensorHeaterParams {
-    float targetTemp;
-    float targetESR;
-};
-
-static const struct sensorHeaterParams heaterParams49 = {
-    .targetTemp = 780,
-    .targetESR = 300,
-};
-
-static const struct sensorHeaterParams heaterParams42 = {
-    .targetTemp = 730,
-    .targetESR = 80,
-};
-
-static const struct sensorHeaterParams heaterParamsAdv = {
-    .targetTemp = 785,
-    .targetESR = 300,
-};
-
-static const sensorHeaterParams *getHeaterParams(SensorType type) {
-    switch (type) {
-        case SensorType::LSU42:
-            return &heaterParams42;
-        case SensorType::LSUADV:
-            return &heaterParamsAdv;
-        case SensorType::LSU49:
-        default:
-            return &heaterParams49;
-    }
-}
 
 using namespace wbo;
 
-// 400khz / 1024 = 390hz PWM
-static Pwm heaterPwm(HEATER_PWM_DEVICE);
-static const PWMConfig heaterPwmConfig = {
-    .frequency = 400'000,
-    .period = 1024,
-    .callback = nullptr,
-    .channels = {
-        {PWM_OUTPUT_ACTIVE_HIGH, nullptr},
-        {PWM_OUTPUT_ACTIVE_HIGH, nullptr},
-        {PWM_OUTPUT_ACTIVE_HIGH, nullptr},
-        {PWM_OUTPUT_ACTIVE_HIGH, nullptr}
-    },
-    .cr2 = 0,
-#if STM32_PWM_USE_ADVANCED
-    .bdtr = 0,
-#endif
-    .dier = 0
-};
-
-static const struct sensorHeaterParams *heater;
-
-HeaterController::HeaterController(int ch, int pwm_ch)
-    : ch(ch), pwm_ch(pwm_ch)
+HeaterControllerBase::HeaterControllerBase(int ch)
+    : ch(ch)
 {
 }
 
-bool HeaterController::IsRunningClosedLoop() const
+void HeaterControllerBase::Configure(float targetTempC, float targetEsr)
+{
+    m_targetTempC = targetTempC;
+    m_targetEsr = targetEsr;
+}
+
+bool HeaterControllerBase::IsRunningClosedLoop() const
 {
     return heaterState == HeaterState::ClosedLoop;
 }
 
-float HeaterController::GetHeaterEffectiveVoltage() const
+float HeaterControllerBase::GetHeaterEffectiveVoltage() const
 {
     return heaterVoltage;
 }
 
-HeaterState HeaterController::GetHeaterState() const
+HeaterState HeaterControllerBase::GetHeaterState() const
 {
     return heaterState;
 }
 
-HeaterController heaterControllers[AFR_CHANNELS] =
-{
-    { 0, HEATER_PWM_CHANNEL_0 },
-
-#if AFR_CHANNELS >= 2
-    { 1, HEATER_PWM_CHANNEL_1 }
-#endif
-};
-
-const IHeaterController& GetHeaterController(int ch)
-{
-    return heaterControllers[ch];
-}
-
-HeaterState HeaterController::GetNextState(HeaterAllow heaterAllowState, float batteryVoltage, float sensorTemp)
+HeaterState HeaterControllerBase::GetNextState(HeaterAllow heaterAllowState, float batteryVoltage, float sensorTemp)
 {
     bool heaterAllowed = heaterAllowState == HeaterAllow::Allowed;
 
@@ -124,9 +58,9 @@ HeaterState HeaterController::GetNextState(HeaterAllow heaterAllowState, float b
         return HeaterState::Preheat;
     }
 
-    float overheatTemp = heater->targetTemp + 100;
-    float closedLoopTemp = heater->targetTemp - 50;
-    float underheatTemp = heater->targetTemp - 100;
+    float overheatTemp = m_targetTempC + 100;
+    float closedLoopTemp = m_targetTempC - 50;
+    float underheatTemp = m_targetTempC - 100;
 
     switch (heaterState)
     {
@@ -185,7 +119,7 @@ HeaterState HeaterController::GetNextState(HeaterAllow heaterAllowState, float b
     return heaterState;
 }
 
-float HeaterController::GetVoltageForState(float heaterEsr)
+float HeaterControllerBase::GetVoltageForState(float heaterEsr)
 {
     switch (heaterState)
     {
@@ -207,7 +141,7 @@ float HeaterController::GetVoltageForState(float heaterEsr)
             // Negated because lower resistance -> hotter
 
             // TODO: heater PID should operate on temperature, not ESR
-            return 7.5f - heaterPid.GetOutput(heater->targetESR, heaterEsr);
+            return 7.5f - heaterPid.GetOutput(m_targetEsr, heaterEsr);
         case HeaterState::Stopped:
         case HeaterState::NoHeaterSupply:
             // Something has gone wrong, turn off the heater.
@@ -218,7 +152,7 @@ float HeaterController::GetVoltageForState(float heaterEsr)
     return 0;
 }
 
-void HeaterController::Update(const ISampler& sampler, HeaterAllow heaterAllowState)
+void HeaterControllerBase::Update(const ISampler& sampler, HeaterAllow heaterAllowState)
 {
     // Read sensor state
     float heaterEsr = sampler.GetSensorInternalResistance();
@@ -258,60 +192,9 @@ void HeaterController::Update(const ISampler& sampler, HeaterAllow heaterAllowSt
         duty = 0;
         heaterVoltage = 0;
     }
+
     // Pipe the output to the heater driver
-    heaterPwm.SetDuty(pwm_ch, duty);
-    heaterVoltage = heaterVoltage;
-}
-
-static THD_WORKING_AREA(waHeaterThread, 256);
-static void HeaterThread(void*)
-{
-    int i;
-
-    chRegSetThreadName("Heater");
-
-    // Wait for temperature sensing to stabilize so we don't
-    // immediately think we overshot the target temperature
-    chThdSleepMilliseconds(1000);
-
-    // Get sensor type and settings
-    heater = getHeaterParams(GetSensorType());
-
-    while (true)
-    {
-        auto heaterAllowState = GetHeaterAllowed();
-
-        for (i = 0; i < AFR_CHANNELS; i++) {
-            const auto& sampler = GetSampler(i);
-            auto& heater = heaterControllers[i];
-
-            heater.Update(sampler, heaterAllowState);
-        }
-
-        // Loop at ~20hz
-        chThdSleepMilliseconds(HEATER_CONTROL_PERIOD);
-    }
-}
-
-void StartHeaterControl()
-{
-    heaterPwm.Start(heaterPwmConfig);
-    heaterPwm.SetDuty(heaterControllers[0].pwm_ch, 0);
-#if (AFR_CHANNELS > 1)
-    heaterPwm.SetDuty(heaterControllers[1].pwm_ch, 0);
-#endif
-
-    chThdCreateStatic(waHeaterThread, sizeof(waHeaterThread), NORMALPRIO + 1, HeaterThread, nullptr);
-}
-
-float GetHeaterDuty(int ch)
-{
-    return heaterPwm.GetLastDuty(heaterControllers[ch].pwm_ch);
-}
-
-HeaterState GetHeaterState(int ch)
-{
-    return heaterControllers[ch].GetHeaterState();
+    SetDuty(duty);
 }
 
 const char* describeHeaterState(HeaterState state)

@@ -153,7 +153,6 @@ CPPSRC = $(ALLCPPSRC) \
           pwm.cpp \
           dac.cpp \
           pump_dac.cpp \
-          pid.cpp \
           pump_control.cpp \
           max3185x.cpp \
           uart.cpp \
@@ -165,7 +164,7 @@ CPPSRC = $(ALLCPPSRC) \
           console/binary/tunerstudio_io_serial.cpp \
           console/binary/tunerstudio_commands.cpp \
           sampling_thread.cpp \
-          heater_control.cpp \
+          heater_thread.cpp \
           main.cpp
 
 # List ASM source files here.

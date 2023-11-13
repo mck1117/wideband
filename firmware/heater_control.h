@@ -26,16 +26,18 @@ struct IHeaterController
     virtual HeaterState GetHeaterState() const = 0;
 };
 
-class HeaterController : public IHeaterController
+class HeaterControllerBase : public IHeaterController
 {
 public:
-    HeaterController(int ch, int pwm_ch);
-
+    HeaterControllerBase(int ch);
+    void Configure(float targetTempC, float targetEsr);
     void Update(const ISampler& sampler, HeaterAllow heaterAllowState) override;
 
     bool IsRunningClosedLoop() const override;
     float GetHeaterEffectiveVoltage() const override;
     HeaterState GetHeaterState() const override;
+
+    virtual void SetDuty(float duty) const = 0;
 
 protected:
     HeaterState GetNextState(HeaterAllow haeterAllowState, float batteryVoltage, float sensorTemp);
@@ -60,10 +62,12 @@ private:
     int cycle;
 #endif
 
+    float m_targetEsr = 0;
+    float m_targetTempC = 0;
+
 // TODO: private:
 public:
     const uint8_t ch;
-    const uint8_t pwm_ch;
 
     static const int preheatTimeCounter = HEATER_PREHEAT_TIME / HEATER_CONTROL_PERIOD;
     static const int batteryStabTimeCounter = HEATER_BATTERY_STAB_TIME / HEATER_CONTROL_PERIOD;

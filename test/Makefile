@@ -27,6 +27,7 @@ CPPSRC += \
 	gtest-all.cpp \
 	gmock-all.cpp \
 	gtest_main.cpp \
+	test_stubs.cpp \
 	tests/test_sampler.cpp \
 	tests/test_heater.cpp \
 
