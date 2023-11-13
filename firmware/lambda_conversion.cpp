@@ -44,10 +44,31 @@ static float GetPhiLsu42(float pumpCurrent)
     return gain * pumpCurrent + 0.99153f;
 }
 
-static float GetPhiLsuAdv(float /*pumpCurrent*/)
+static float GetPhiLsuAdv(float pumpCurrent)
 {
-    // TODO
-    return 1;
+    // Maximum lambda 2.434
+    if (pumpCurrent > 0.759f)
+    {
+        return 1 / 2.434f;
+    }
+
+    // Minimum lambda is 0.65
+    if (pumpCurrent < -1.108)
+    {
+        return 1 / 0.65f;
+    }
+
+    if (pumpCurrent < 0)
+    {
+        // rich
+        // Accurate with 0.005 lambda from 0.65-1
+        return (0.0379 * pumpCurrent - 0.4496) * pumpCurrent + 0.9902;
+    }
+    else
+    {
+        // lean
+        return (0.1059 * pumpCurrent - 0.8368) * pumpCurrent + 0.9859;
+    }
 }
 
 static float GetPhi(float pumpCurrent) {
