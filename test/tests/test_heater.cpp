@@ -52,7 +52,86 @@ TEST(HeaterStateOutput, Cases)
     EXPECT_EQ(0, dut.GetVoltageForState(HeaterState::NoHeaterSupply, 0));
 }
 
-TEST(HeaterStateMachine, x)
+TEST(HeaterStateMachine, PreheatToWarmupTimeout)
 {
     MockHeater dut;
+    dut.Configure(780, 300);
+
+    for (size_t i = 0; i < HeaterControllerBase::preheatTimeCounter - 1; i++)
+    {
+        EXPECT_EQ(HeaterState::Preheat, dut.GetNextState(HeaterState::Preheat, HeaterAllow::Allowed, 12, 500));
+    }
+
+    // Timer expired, transition to warmup ramp
+    EXPECT_EQ(HeaterState::WarmupRamp, dut.GetNextState(HeaterState::Preheat, HeaterAllow::Allowed, 12, 500));
+}
+
+TEST(HeaterStateMachine, PreheatToWarmupAlreadyWarm)
+{
+    MockHeater dut;
+    dut.Configure(780, 300);
+
+    // Preheat for a little while
+    for (size_t i = 0; i < 10; i++)
+    {
+        EXPECT_EQ(HeaterState::Preheat, dut.GetNextState(HeaterState::Preheat, HeaterAllow::Allowed, 12, 500));
+    }
+
+    // Sensor magically warms up, skip to warmup ramp!
+    EXPECT_EQ(HeaterState::WarmupRamp, dut.GetNextState(HeaterState::Preheat, HeaterAllow::Allowed, 12, 780));
+}
+
+TEST(HeaterStateMachine, WarmupToClosedLoop)
+{
+    MockHeater dut;
+    dut.Configure(780, 300);
+
+    // Warm up for a little while
+    for (size_t i = 0; i < 10; i++)
+    {
+        EXPECT_EQ(HeaterState::WarmupRamp, dut.GetNextState(HeaterState::WarmupRamp, HeaterAllow::Allowed, 12, 500));
+    }
+
+    // Sensor warms up, time for closed loop!
+    EXPECT_EQ(HeaterState::ClosedLoop, dut.GetNextState(HeaterState::WarmupRamp, HeaterAllow::Allowed, 12, 780));
+}
+
+TEST(HeaterStateMachine, WarmupTimeout)
+{
+    MockHeater dut;
+    dut.Configure(780, 300);
+
+    size_t timeoutPeriod = dut.GetTimeCounter();
+
+    // Warm up for a little while
+    for (size_t i = 0; i < timeoutPeriod - 1; i++)
+    {
+        EXPECT_EQ(HeaterState::WarmupRamp, dut.GetNextState(HeaterState::WarmupRamp, HeaterAllow::Allowed, 12, 500)) << "i = " << i;
+    }
+
+    // Warmup times out, sensor transitions to stopped
+    EXPECT_EQ(HeaterState::Stopped, dut.GetNextState(HeaterState::WarmupRamp, HeaterAllow::Allowed, 12, 500));
+}
+
+TEST(HeaterStateMachine, ClosedLoop)
+{
+    MockHeater dut;
+    dut.Configure(780, 300);
+
+    // Temperature is reasonable, stay in closed loop
+    EXPECT_EQ(HeaterState::ClosedLoop, dut.GetNextState(HeaterState::ClosedLoop, HeaterAllow::Allowed, 12, 780));
+
+    // Temperature is too hot, overheat
+    EXPECT_EQ(HeaterState::Stopped, dut.GetNextState(HeaterState::ClosedLoop, HeaterAllow::Allowed, 12, 1000));
+
+    // Temperature is too cold, underheat
+    EXPECT_EQ(HeaterState::Stopped, dut.GetNextState(HeaterState::ClosedLoop, HeaterAllow::Allowed, 12, 600));
+}
+
+TEST(HeaterStateMachine, TerminalStates)
+{
+    MockHeater dut;
+    dut.Configure(780, 300);
+
+    EXPECT_EQ(HeaterState::Stopped, dut.GetNextState(HeaterState::Stopped, HeaterAllow::Allowed, 12, 780));
 }

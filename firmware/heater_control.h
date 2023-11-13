@@ -42,6 +42,11 @@ public:
     HeaterState GetNextState(HeaterState currentState, HeaterAllow haeterAllowState, float batteryVoltage, float sensorTemp);
     float GetVoltageForState(HeaterState state, float sensorEsr);
 
+    int GetTimeCounter() const
+    {
+        return timeCounter;
+    }
+
 private:
     Pid heaterPid =
         {

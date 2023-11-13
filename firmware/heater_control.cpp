@@ -83,6 +83,8 @@ HeaterState HeaterControllerBase::GetNextState(HeaterState currentState, HeaterA
             // Stay in preheat - wait for time to elapse
             break;
         case HeaterState::WarmupRamp:
+            timeCounter--;
+
             if (sensorTemp > closedLoopTemp)
             {
                 return HeaterState::ClosedLoop;
@@ -92,8 +94,6 @@ HeaterState HeaterControllerBase::GetNextState(HeaterState currentState, HeaterA
                 SetFault(ch, Fault::SensorDidntHeat);
                 return HeaterState::Stopped;
             }
-
-            timeCounter--;
 
             break;
         case HeaterState::ClosedLoop:
@@ -116,7 +116,7 @@ HeaterState HeaterControllerBase::GetNextState(HeaterState currentState, HeaterA
             break;
     }
 
-    return heaterState;
+    return currentState;
 }
 
 float HeaterControllerBase::GetVoltageForState(HeaterState state, float sensorEsr)
