@@ -63,7 +63,7 @@ struct DiagData
     uint8_t pad;
 };
 
-static const char* describeFault(Fault fault) {
+static inline const char* describeFault(Fault fault) {
     switch (fault) {
         case Fault::None:
             return "OK";
