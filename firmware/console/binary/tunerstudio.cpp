@@ -105,7 +105,7 @@ void tunerStudioDebug(TsChannelBase* tsChannel, const char *msg) {
 }
 
 uint8_t* getWorkingPageAddr() {
-	return GetConfiguratiuonPtr();
+	return GetConfigurationPtr();
 }
 
 void sendOkResponse(TsChannelBase *tsChannel, ts_response_format_e mode) {

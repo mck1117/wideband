@@ -74,7 +74,7 @@ Configuration* GetConfiguration();
 void SetConfiguration();
 
 /* TS stuff */
-uint8_t *GetConfiguratiuonPtr();
+uint8_t *GetConfigurationPtr();
 size_t GetConfigurationSize();
 int SaveConfiguration();
 const char *getTsSignature();
