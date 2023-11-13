@@ -2,6 +2,26 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Debug Unit Tests (gdb)",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/test/build/wideband_test",
+            // uncomment args below to only debug a particular test
+            //"args": ["--gtest_filter=Heater.StatePreheat"],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}/test/",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ]
+		},
+        {
             "name": "Debug F042 (firmware)",
             "type": "cortex-debug",
             "request": "launch",
