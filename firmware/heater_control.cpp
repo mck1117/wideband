@@ -31,7 +31,7 @@ HeaterState HeaterControllerBase::GetHeaterState() const
     return heaterState;
 }
 
-HeaterState HeaterControllerBase::GetNextState(HeaterAllow heaterAllowState, float batteryVoltage, float sensorTemp)
+HeaterState HeaterControllerBase::GetNextState(HeaterState currentState, HeaterAllow heaterAllowState, float batteryVoltage, float sensorTemp)
 {
     bool heaterAllowed = heaterAllowState == HeaterAllow::Allowed;
 
@@ -62,7 +62,7 @@ HeaterState HeaterControllerBase::GetNextState(HeaterAllow heaterAllowState, flo
     float closedLoopTemp = m_targetTempC - 50;
     float underheatTemp = m_targetTempC - 100;
 
-    switch (heaterState)
+    switch (currentState)
     {
         case HeaterState::Preheat:
             timeCounter--;
@@ -119,9 +119,9 @@ HeaterState HeaterControllerBase::GetNextState(HeaterAllow heaterAllowState, flo
     return heaterState;
 }
 
-float HeaterControllerBase::GetVoltageForState(float heaterEsr)
+float HeaterControllerBase::GetVoltageForState(HeaterState state, float sensorEsr)
 {
-    switch (heaterState)
+    switch (state)
     {
         case HeaterState::Preheat:
             // Max allowed during condensation phase (preheat) is 2v
@@ -141,7 +141,7 @@ float HeaterControllerBase::GetVoltageForState(float heaterEsr)
             // Negated because lower resistance -> hotter
 
             // TODO: heater PID should operate on temperature, not ESR
-            return 7.5f - heaterPid.GetOutput(m_targetEsr, heaterEsr);
+            return 7.5f - heaterPid.GetOutput(m_targetEsr, sensorEsr);
         case HeaterState::Stopped:
         case HeaterState::NoHeaterSupply:
             // Something has gone wrong, turn off the heater.
@@ -155,7 +155,7 @@ float HeaterControllerBase::GetVoltageForState(float heaterEsr)
 void HeaterControllerBase::Update(const ISampler& sampler, HeaterAllow heaterAllowState)
 {
     // Read sensor state
-    float heaterEsr = sampler.GetSensorInternalResistance();
+    float sensorEsr = sampler.GetSensorInternalResistance();
     float sensorTemperature = sampler.GetSensorTemperature();
 
     // If we haven't heard from the ECU, use the internally sensed
@@ -165,8 +165,8 @@ void HeaterControllerBase::Update(const ISampler& sampler, HeaterAllow heaterAll
                                 : GetRemoteBatteryVoltage();
 
     // Run the state machine
-    heaterState = GetNextState(heaterAllowState, batteryVoltage, sensorTemperature);
-    float heaterVoltage = GetVoltageForState(heaterEsr);
+    heaterState = GetNextState(heaterState, heaterAllowState, batteryVoltage, sensorTemperature);
+    float heaterVoltage = GetVoltageForState(heaterState, sensorEsr);
 
     // Limit to 11 volts
     if (heaterVoltage > 11) {

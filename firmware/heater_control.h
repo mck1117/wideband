@@ -39,9 +39,8 @@ public:
 
     virtual void SetDuty(float duty) const = 0;
 
-protected:
-    HeaterState GetNextState(HeaterAllow haeterAllowState, float batteryVoltage, float sensorTemp);
-    float GetVoltageForState(float heaterEsr);
+    HeaterState GetNextState(HeaterState currentState, HeaterAllow haeterAllowState, float batteryVoltage, float sensorTemp);
+    float GetVoltageForState(HeaterState state, float sensorEsr);
 
 private:
     Pid heaterPid =
