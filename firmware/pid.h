@@ -21,6 +21,6 @@ private:
     const float m_kd;
     const float m_clamp;
 
-    float m_lastError;
-    float m_integrator;
+    float m_lastError = 0;
+    float m_integrator = 0;
 };
