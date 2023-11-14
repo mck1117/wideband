@@ -5,8 +5,9 @@
 /* OpenBLT code */
 _OpenBLT_Flash_Size = DEFINED(USE_BOOTLOADER) ? 8k : 0;
 
-/* OpenBLT <-> main FW shared area */
-_OpenBLT_Shared_Params_Size = DEFINED(USE_BOOTLOADER) ? 16 : 0;
+/* OpenBLT <-> main FW shared area same area used to pass some data between restarts
+ * Now always enabled */
+Shared_Params_Size = 16;
 
 MEMORY
 {
@@ -21,8 +22,8 @@ MEMORY
     flash5 (rx) : org = 0x00000000, len = 0
     flash6 (rx) : org = 0x00000000, len = 0
     flash7 (rx) : org = 0x00000000, len = 0
-    shared (wx) : org = 0x20000000, len = _OpenBLT_Shared_Params_Size
-    ram0   (wx) : org = 0x20000000 + _OpenBLT_Shared_Params_Size, len = 48k - _OpenBLT_Shared_Params_Size
+    shared (wx) : org = 0x20000000, len = Shared_Params_Size
+    ram0   (wx) : org = 0x20000000 + Shared_Params_Size, len = 48k - Shared_Params_Size
     ram1   (wx) : org = 0x00000000, len = 0
     ram2   (wx) : org = 0x00000000, len = 0
     ram3   (wx) : org = 0x00000000, len = 0

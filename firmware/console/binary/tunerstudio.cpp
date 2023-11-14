@@ -208,23 +208,19 @@ static void handleIoTestCommand(TsChannelBase* tsChannel, ts_response_format_e m
 	/* index is not used yet */
 
 	switch (subsystem) {
-#if 0
 	/* DFU */
 	case 0xba:
-		jump_to_bootloader();
+		rebootToDfu();
 		break;
-#endif
 
 	case 0xbb:
 		rebootNow();
 		break;
 
-#if USE_OPENBLT
 	case 0xbc:
 		/* Jump to OpenBLT if present */
 		rebootToOpenblt();
 		break;
-#endif
 
 	default:
 		tunerStudioError(tsChannel, "Unexpected IoTest command");
