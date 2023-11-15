@@ -211,16 +211,25 @@ static void handleIoTestCommand(TsChannelBase* tsChannel, ts_response_format_e m
 #if 0
 	/* DFU */
 	case 0xba:
+		/* Send ok to make TS happy, wait until sent */
+		sendOkResponse(tsChannel, TS_CRC);
+		chThdSleepMilliseconds(100);
 		jump_to_bootloader();
 		break;
 #endif
 
 	case 0xbb:
+		/* Send ok to make TS happy, wait until sent */
+		sendOkResponse(tsChannel, TS_CRC);
+		chThdSleepMilliseconds(100);
 		rebootNow();
 		break;
 
 #if USE_OPENBLT
 	case 0xbc:
+		/* Send ok to make TS happy, wait until sent */
+		sendOkResponse(tsChannel, TS_CRC);
+		chThdSleepMilliseconds(100);
 		/* Jump to OpenBLT if present */
 		rebootToOpenblt();
 		break;
