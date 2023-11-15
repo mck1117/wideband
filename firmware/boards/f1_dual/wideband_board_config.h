@@ -23,13 +23,13 @@
 // *******************************
 // 100K + 10K divider
 #define BATTERY_INPUT_DIVIDER (10.0 / (10.0 + 100.0))
-#define BATTERY_FILTER_ALPHA (0.1f)
 
 // *******************************
 //     Heater low side Sensing
 // *******************************
 // 100K + 10K divider
 #define HEATER_INPUT_DIVIDER (10.0 / (10.0 + 100.0))
+#define HEATER_FILTER_ALPHA (0.1f)
 
 // *******************************
 //        Vm output Sensing
