@@ -173,7 +173,7 @@ typedef int pid_t;
  * @note    The default is @p TRUE.
  */
 #if !defined(CH_CFG_USE_TIMESTAMP)
-#define CH_CFG_USE_TIMESTAMP                FALSE
+#define CH_CFG_USE_TIMESTAMP                TRUE
 #endif
 
 /**
