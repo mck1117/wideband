@@ -6,6 +6,7 @@
 
 #include "can.h"
 #include "pid.h"
+#include "timer.h"
 
 enum class HeaterState
 {
@@ -29,7 +30,7 @@ struct IHeaterController
 class HeaterControllerBase : public IHeaterController
 {
 public:
-    HeaterControllerBase(int ch);
+    HeaterControllerBase(int ch, int preheatTimeSec, int warmupTimeSec);
     void Configure(float targetTempC, float targetEsr);
     void Update(const ISampler& sampler, HeaterAllow heaterAllowState) override;
 
@@ -42,11 +43,6 @@ public:
     HeaterState GetNextState(HeaterState currentState, HeaterAllow haeterAllowState, float batteryVoltage, float sensorTemp);
     float GetVoltageForState(HeaterState state, float sensorEsr);
 
-    int GetTimeCounter() const
-    {
-        return timeCounter;
-    }
-
 private:
     Pid heaterPid =
         {
@@ -57,7 +53,6 @@ private:
             HEATER_CONTROL_PERIOD
         };
 
-    int timeCounter = preheatTimeCounter;
     int batteryStabTime = batteryStabTimeCounter;
     float rampVoltage = 0;
     float heaterVoltage = 0;
@@ -69,11 +64,14 @@ private:
     float m_targetEsr = 0;
     float m_targetTempC = 0;
 
-// TODO: private:
-public:
     const uint8_t ch;
 
-    static const int preheatTimeCounter = HEATER_PREHEAT_TIME / HEATER_CONTROL_PERIOD;
+    const int m_preheatTimeSec;
+    const int m_warmupTimeSec;
+
+    Timer m_preheatTimer;
+    Timer m_warmupTimer;
+
     static const int batteryStabTimeCounter = HEATER_BATTERY_STAB_TIME / HEATER_CONTROL_PERIOD;
 };
 

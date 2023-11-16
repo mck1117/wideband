@@ -5,7 +5,7 @@
 
 struct MockHeater : public HeaterControllerBase
 {
-    MockHeater() : HeaterControllerBase(0) { }
+    MockHeater() : HeaterControllerBase(0, 5, 10) { }
 
     MOCK_METHOD(void, SetDuty, (float), (const, override));
 };
@@ -55,20 +55,26 @@ TEST(HeaterStateOutput, Cases)
 TEST(HeaterStateMachine, PreheatToWarmupTimeout)
 {
     MockHeater dut;
+    Timer::setMockTime(0);
     dut.Configure(780, 300);
 
-    for (size_t i = 0; i < HeaterControllerBase::preheatTimeCounter - 1; i++)
-    {
-        EXPECT_EQ(HeaterState::Preheat, dut.GetNextState(HeaterState::Preheat, HeaterAllow::Allowed, 12, 500));
-    }
+    // For a while it should stay in preheat
+    Timer::setMockTime(1e6);
+    EXPECT_EQ(HeaterState::Preheat, dut.GetNextState(HeaterState::Preheat, HeaterAllow::Allowed, 12, 500));
+    Timer::setMockTime(2e6);
+    EXPECT_EQ(HeaterState::Preheat, dut.GetNextState(HeaterState::Preheat, HeaterAllow::Allowed, 12, 500));
+    Timer::setMockTime(4.9e6);
+    EXPECT_EQ(HeaterState::Preheat, dut.GetNextState(HeaterState::Preheat, HeaterAllow::Allowed, 12, 500));
 
     // Timer expired, transition to warmup ramp
+    Timer::setMockTime(5.1e6);
     EXPECT_EQ(HeaterState::WarmupRamp, dut.GetNextState(HeaterState::Preheat, HeaterAllow::Allowed, 12, 500));
 }
 
 TEST(HeaterStateMachine, PreheatToWarmupAlreadyWarm)
 {
     MockHeater dut;
+    Timer::setMockTime(0);
     dut.Configure(780, 300);
 
     // Preheat for a little while
@@ -84,6 +90,7 @@ TEST(HeaterStateMachine, PreheatToWarmupAlreadyWarm)
 TEST(HeaterStateMachine, WarmupToClosedLoop)
 {
     MockHeater dut;
+    Timer::setMockTime(0);
     dut.Configure(780, 300);
 
     // Warm up for a little while
@@ -99,17 +106,19 @@ TEST(HeaterStateMachine, WarmupToClosedLoop)
 TEST(HeaterStateMachine, WarmupTimeout)
 {
     MockHeater dut;
+    Timer::setMockTime(0);
     dut.Configure(780, 300);
 
-    size_t timeoutPeriod = dut.GetTimeCounter();
-
-    // Warm up for a little while
-    for (size_t i = 0; i < timeoutPeriod - 1; i++)
-    {
-        EXPECT_EQ(HeaterState::WarmupRamp, dut.GetNextState(HeaterState::WarmupRamp, HeaterAllow::Allowed, 12, 500)) << "i = " << i;
-    }
+    // For a while it should stay in warmup
+    Timer::setMockTime(1e6);
+    EXPECT_EQ(HeaterState::WarmupRamp, dut.GetNextState(HeaterState::WarmupRamp, HeaterAllow::Allowed, 12, 500));
+    Timer::setMockTime(2e6);
+    EXPECT_EQ(HeaterState::WarmupRamp, dut.GetNextState(HeaterState::WarmupRamp, HeaterAllow::Allowed, 12, 500));
+    Timer::setMockTime(9.9e6);
+    EXPECT_EQ(HeaterState::WarmupRamp, dut.GetNextState(HeaterState::WarmupRamp, HeaterAllow::Allowed, 12, 500));
 
     // Warmup times out, sensor transitions to stopped
+    Timer::setMockTime(10.1e6);
     EXPECT_EQ(HeaterState::Stopped, dut.GetNextState(HeaterState::WarmupRamp, HeaterAllow::Allowed, 12, 500));
 }
 

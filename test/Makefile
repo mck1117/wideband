@@ -39,6 +39,7 @@ INCDIR += \
 	$(RUSEFI_LIB_INC) \
 	$(FIRMWARE_DIR) \
 	$(FIRMWARE_DIR)/boards \
+	$(FIRMWARE_DIR)/util \
 
 # User may want to pass in a forced value for SANITIZE
 ifeq ($(SANITIZE),)
@@ -76,6 +77,8 @@ endif
 ifeq ($(USE_CPPOPT),)
   USE_CPPOPT = -std=c++17 -fno-rtti -fno-use-cxa-atexit
 endif
+
+USE_CPPOPT += -DMOCK_TIMER
 
 # Enable address sanitizer for C++ files, but not on Windows since x86_64-w64-mingw32-g++ doesn't support it.
 # only c++ because lua does some things asan doesn't like, but don't actually cause overruns.

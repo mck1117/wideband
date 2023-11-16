@@ -40,8 +40,8 @@
 // *******************************
 #define HEATER_CONTROL_PERIOD 50
 
-#define HEATER_PREHEAT_TIME 5000
-#define HEATER_WARMUP_TIMEOUT 60000
+#define HEATER_PREHEAT_TIME 5
+#define HEATER_WARMUP_TIMEOUT 60
 
 #define HEATER_BATTERY_STAB_TIME 500
 // minimal battery voltage to start heating without CAN command
