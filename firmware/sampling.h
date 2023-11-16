@@ -34,7 +34,10 @@ private:
     float nernstAc = 0;
     float nernstDc = 0;
     float pumpCurrentSenseVoltage = 0;
+
+#ifdef BATTERY_INPUT_DIVIDER
     float internalBatteryVoltage = 0;
+#endif
 
     Timer m_startupTimer;
 };
