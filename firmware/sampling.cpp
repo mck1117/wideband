@@ -1,6 +1,5 @@
 #include "sampling.h"
 
-#include "wideband_config.h"
 #include "port.h"
 
 #include <rusefi/interpolation.h>

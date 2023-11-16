@@ -1,5 +1,7 @@
 #pragma once
 
+#include "wideband_config.h"
+
 #include "timer.h"
 
 struct ISampler
