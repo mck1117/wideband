@@ -40,6 +40,8 @@ public:
 
     virtual void SetDuty(float duty) const = 0;
 
+    bool GetIsHeatingEnabled(HeaterAllow heaterAllowState, float batteryVoltage);
+
     HeaterState GetNextState(HeaterState currentState, HeaterAllow haeterAllowState, float batteryVoltage, float sensorTemp);
     float GetVoltageForState(HeaterState state, float sensorEsr);
 
@@ -53,7 +55,6 @@ private:
             HEATER_CONTROL_PERIOD
         };
 
-    int batteryStabTime = batteryStabTimeCounter;
     float rampVoltage = 0;
     float heaterVoltage = 0;
     HeaterState heaterState = HeaterState::Preheat;
@@ -69,6 +70,7 @@ private:
     const int m_preheatTimeSec;
     const int m_warmupTimeSec;
 
+    Timer m_batteryStableTimer;
     Timer m_preheatTimer;
     Timer m_warmupTimer;
 

@@ -19,6 +19,7 @@ void HeaterControllerBase::Configure(float targetTempC, float targetEsr)
 
     m_preheatTimer.reset();
     m_warmupTimer.reset();
+    m_batteryStableTimer.reset();
 }
 
 bool HeaterControllerBase::IsRunningClosedLoop() const
@@ -46,15 +47,14 @@ HeaterState HeaterControllerBase::GetNextState(HeaterState currentState, HeaterA
         // measured voltage too low to auto-start heating
         if (batteryVoltage < HEATER_BATTETY_OFF_VOLTAGE)
         {
-            batteryStabTime = batteryStabTimeCounter;
+            m_batteryStableTimer.reset();
             return HeaterState::NoHeaterSupply;
         }
-        // measured voltage is high enougth to auto-start heating, wait some time to stabilize
-        if ((batteryVoltage > HEATER_BATTERY_ON_VOLTAGE) && (batteryStabTime > 0))
+        else if (batteryVoltage > HEATER_BATTERY_ON_VOLTAGE)
         {
-            batteryStabTime--;
+            // measured voltage is high enougth to auto-start heating, wait some time to stabilize
+            heaterAllowed = m_batteryStableTimer.hasElapsedSec(HEATER_BATTERY_STAB_TIME);
         }
-        heaterAllowed = batteryStabTime == 0;
     }
 
     if (!heaterAllowed)
