@@ -5,8 +5,10 @@
 
 using namespace wbo;
 
-HeaterControllerBase::HeaterControllerBase(int ch)
+HeaterControllerBase::HeaterControllerBase(int ch, int preheatTimeSec, int warmupTimeSec)
     : ch(ch)
+    , m_preheatTimeSec(preheatTimeSec)
+    , m_warmupTimeSec(warmupTimeSec)
 {
 }
 
@@ -54,7 +56,7 @@ HeaterState HeaterControllerBase::GetNextState(HeaterState currentState, HeaterA
     if (!heaterAllowed)
     {
         // ECU hasn't allowed preheat yet, reset timer, and force preheat state
-        timeCounter = preheatTimeCounter;
+        m_preheatTimer.reset();
         return HeaterState::Preheat;
     }
 
@@ -65,17 +67,15 @@ HeaterState HeaterControllerBase::GetNextState(HeaterState currentState, HeaterA
     switch (currentState)
     {
         case HeaterState::Preheat:
-            timeCounter--;
-
             // If preheat timeout, or sensor is already hot (engine running?)
-            if (timeCounter <= 0 || sensorTemp > closedLoopTemp)
+            if (m_preheatTimer.hasElapsedSec(m_preheatTimeSec) || sensorTemp > closedLoopTemp)
             {
                 // If enough time has elapsed, start the ramp
                 // Start the ramp at 4 volts
                 rampVoltage = 4;
 
-                // Next phase times out at 15 seconds
-                timeCounter = HEATER_WARMUP_TIMEOUT / HEATER_CONTROL_PERIOD;
+                // Reset the timer for the warmup phase
+                m_warmupTimer.reset();
 
                 return HeaterState::WarmupRamp;
             }
@@ -83,13 +83,11 @@ HeaterState HeaterControllerBase::GetNextState(HeaterState currentState, HeaterA
             // Stay in preheat - wait for time to elapse
             break;
         case HeaterState::WarmupRamp:
-            timeCounter--;
-
             if (sensorTemp > closedLoopTemp)
             {
                 return HeaterState::ClosedLoop;
             }
-            else if (timeCounter == 0)
+            else if (m_warmupTimer.hasElapsedSec(m_warmupTimeSec))
             {
                 SetFault(ch, Fault::SensorDidntHeat);
                 return HeaterState::Stopped;

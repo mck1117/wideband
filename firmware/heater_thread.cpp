@@ -28,7 +28,7 @@ static const PWMConfig heaterPwmConfig = {
 class HeaterController : public HeaterControllerBase {
 public:
     HeaterController(int ch, int pwm_ch)
-        : HeaterControllerBase(ch)
+        : HeaterControllerBase(ch, HEATER_PREHEAT_TIME, HEATER_WARMUP_TIMEOUT)
         , pwm_ch(pwm_ch)
     {
     }
