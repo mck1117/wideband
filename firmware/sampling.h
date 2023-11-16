@@ -1,5 +1,7 @@
 #pragma once
 
+#include "timer.h"
+
 struct ISampler
 {
     virtual float GetNernstDc() const = 0;
@@ -16,6 +18,7 @@ class Sampler : public ISampler
 {
 public:
     void ApplySample(AnalogChannelResult& result, float virtualGroundVoltageInt);
+    void Init();
 
     float GetNernstDc() const override;
     float GetNernstAc() const override;
@@ -32,6 +35,8 @@ private:
     float nernstDc = 0;
     float pumpCurrentSenseVoltage = 0;
     float internalBatteryVoltage = 0;
+
+    Timer m_startupTimer;
 };
 
 // Get the sampler for a particular channel

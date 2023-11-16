@@ -46,6 +46,11 @@ static void SamplingThread(void*)
 
 void StartSampling()
 {
+    for (int i = 0; i < AFR_CHANNELS; i++)
+    {
+        samplers[i].Init();
+    }
+
     adcStart(&ADCD1, nullptr);
     chThdCreateStatic(waSamplingThread, sizeof(waSamplingThread), NORMALPRIO + 5, SamplingThread, nullptr);
 }

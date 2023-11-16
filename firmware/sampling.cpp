@@ -15,6 +15,11 @@ static const float lsu42TempValues[] = { 1199, 961, 857, 806, 775, 750, 730, 715
 static const float lsuAdvTempBins[]   = {   53,  96, 130, 162, 184, 206, 239, 278, 300, 330, 390, 462, 573, 730, 950, 1200, 1500, 1900, 2500, 3500, 5000, 6000 };
 static const float lsuAdvTempValues[] = { 1198, 982, 914, 875, 855, 838, 816, 794, 785, 771, 751, 732, 711, 691, 671,  653,  635,  614,  588,  562,  537,  528 };
 
+void Sampler::Init()
+{
+    m_startupTimer.reset();
+}
+
 float Sampler::GetNernstDc() const
 {
     return nernstDc;
@@ -36,10 +41,19 @@ float Sampler::GetPumpNominalCurrent() const
 
 float Sampler::GetInternalBatteryVoltage() const
 {
+#ifdef BATTERY_INPUT_DIVIDER
     // Dual HW can measure heater voltage for each channel
     // by measuring voltage on Heater- while FET is off
     // TODO: rename function?
     return internalBatteryVoltage;
+#else
+    // After 5 seconds, pretend that we get battery voltage.
+    // This makes the controller usable without CAN control
+    // enabling the heater - CAN message will be able to keep
+    // it disabled, but if no message ever arrives, this will
+    // start heating.
+    return m_startupTimer.hasElapsedSec(5) ? 13 : 0;
+#endif
 }
 
 float Sampler::GetSensorTemperature() const
