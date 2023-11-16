@@ -26,10 +26,16 @@ public:
 	// now and the last reset
 	float getElapsedSecondsAndReset();
 
+	static void setMockTime(int64_t stamp);
+
 private:
+	int64_t getTimestamp() const;
+
 	void reset(int64_t stamp);
 	float getElapsedSeconds(int64_t stamp) const;
 	float getElapsedUs(int64_t stamp) const;
 
 	int64_t m_lastReset;
+
+	static int64_t mockTimeStamp;
 };

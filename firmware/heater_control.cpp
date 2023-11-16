@@ -16,6 +16,9 @@ void HeaterControllerBase::Configure(float targetTempC, float targetEsr)
 {
     m_targetTempC = targetTempC;
     m_targetEsr = targetEsr;
+
+    m_preheatTimer.reset();
+    m_warmupTimer.reset();
 }
 
 bool HeaterControllerBase::IsRunningClosedLoop() const

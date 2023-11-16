@@ -1,5 +1,4 @@
-#include "ch.hpp"
-
+#include <cstdint>
 #include "timer.h"
 
 #define US_PER_SECOND_F 1000000.0
@@ -8,12 +7,31 @@ Timer::Timer() {
 	init();
 }
 
-static int64_t getTimestamp() {
+#ifdef MOCK_TIMER
+
+// in mock land, ticks == microseconds
+#define TIME_US2I(us) (us)
+#define TIME_I2US(ticks) (ticks)
+
+/*static*/ int64_t Timer::mockTimeStamp = 0;
+int64_t Timer::getTimestamp() const {
+	return Timer::mockTimeStamp;
+}
+
+/*static*/ void Timer::setMockTime(int64_t stamp) {
+	Timer::mockTimeStamp = stamp;
+}
+
+#else
+#include "ch.hpp"
+
+int64_t Timer::getTimestamp() const {
 	// Ensure that our timestamp type is compatible with the one ChibiOS returns
 	static_assert(sizeof(int64_t) == sizeof(systimestamp_t));
 
 	return chVTGetTimeStamp();
 }
+#endif // MOCK_TIMER
 
 void Timer::reset() {
 	reset(getTimestamp());

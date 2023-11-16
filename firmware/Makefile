@@ -145,7 +145,6 @@ CPPSRC = $(ALLCPPSRC) \
           $(BOARDDIR)/port_shared.cpp \
           $(RUSEFI_LIB_CPP) \
           $(WIDEBANDSRC) \
-          util/timer.cpp \
           shared/flash.cpp \
           can.cpp \
           can_helper.cpp \
