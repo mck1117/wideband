@@ -8,16 +8,18 @@ Timer::Timer() {
 	init();
 }
 
-static systimestamp_t getTimestamp() {
-	chibios_rt::CriticalSectionLocker csl;
-	return chVTGetTimeStampI();
+static int64_t getTimestamp() {
+	// Ensure that our timestamp type is compatible with the one ChibiOS returns
+	static_assert(sizeof(int64_t) == sizeof(systimestamp_t));
+
+	return chVTGetTimeStamp();
 }
 
 void Timer::reset() {
 	reset(getTimestamp());
 }
 
-void Timer::reset(systimestamp_t stamp) {
+void Timer::reset(int64_t stamp) {
 	m_lastReset = stamp;
 }
 
@@ -52,7 +54,7 @@ float Timer::getElapsedSeconds() const {
 	return getElapsedSeconds(getTimestamp());
 }
 
-float Timer::getElapsedSeconds(systimestamp_t stamp) const {
+float Timer::getElapsedSeconds(int64_t stamp) const {
 	return 1 / US_PER_SECOND_F * getElapsedUs(stamp);
 }
 
@@ -60,7 +62,7 @@ float Timer::getElapsedUs() const {
 	return getElapsedUs(getTimestamp());
 }
 
-float Timer::getElapsedUs(systimestamp_t stamp) const {
+float Timer::getElapsedUs(int64_t stamp) const {
 	auto deltaNt = stamp - m_lastReset;
 
 	// Yes, things can happen slightly in the future if we get a lucky interrupt between

@@ -27,9 +27,9 @@ public:
 	float getElapsedSecondsAndReset();
 
 private:
-	void reset(systimestamp_t stamp);
-	float getElapsedSeconds(systimestamp_t stamp) const;
-	float getElapsedUs(systimestamp_t stamp) const;
+	void reset(int64_t stamp);
+	float getElapsedSeconds(int64_t stamp) const;
+	float getElapsedUs(int64_t stamp) const;
 
-	systimestamp_t m_lastReset;
+	int64_t m_lastReset;
 };
