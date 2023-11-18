@@ -178,7 +178,7 @@ void HeaterControllerBase::Update(const ISampler& sampler, HeaterAllow heaterAll
     }
 
     // duty = (V_eff / V_batt) ^ 2
-    float voltageRatio = heaterVoltage / batteryVoltage;
+    float voltageRatio = (batteryVoltage < 1.0f) ? 0 : heaterVoltage / batteryVoltage;
     float duty = voltageRatio * voltageRatio;
 
     #ifdef HEATER_MAX_DUTY
