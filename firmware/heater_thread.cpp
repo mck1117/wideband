@@ -73,12 +73,15 @@ static void HeaterThread(void*)
         auto& h = heaterControllers[i];
         switch (GetSensorType()) {
             case SensorType::LSU42:
-                return h.Configure(730, 80);
+                h.Configure(730, 80);
+                break;
             case SensorType::LSUADV:
-                return h.Configure(785, 300);
+                h.Configure(785, 300);
+                break;
             case SensorType::LSU49:
             default:
-                return h.Configure(780, 300);
+                h.Configure(780, 300);
+                break;
         }
     }
 
