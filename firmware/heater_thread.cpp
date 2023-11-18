@@ -13,10 +13,10 @@ static const PWMConfig heaterPwmConfig = {
     .period = 1024,
     .callback = nullptr,
     .channels = {
-        {PWM_OUTPUT_ACTIVE_HIGH, nullptr},
-        {PWM_OUTPUT_ACTIVE_HIGH, nullptr},
-        {PWM_OUTPUT_ACTIVE_HIGH, nullptr},
-        {PWM_OUTPUT_ACTIVE_HIGH, nullptr}
+        {PWM_OUTPUT_ACTIVE_HIGH | PWM_COMPLEMENTARY_OUTPUT_ACTIVE_LOW, nullptr},
+        {PWM_OUTPUT_ACTIVE_HIGH | PWM_COMPLEMENTARY_OUTPUT_ACTIVE_LOW, nullptr},
+        {PWM_OUTPUT_ACTIVE_HIGH | PWM_COMPLEMENTARY_OUTPUT_ACTIVE_LOW, nullptr},
+        {PWM_OUTPUT_ACTIVE_HIGH | PWM_COMPLEMENTARY_OUTPUT_ACTIVE_LOW, nullptr}
     },
     .cr2 = 0,
 #if STM32_PWM_USE_ADVANCED
