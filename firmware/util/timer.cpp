@@ -9,6 +9,8 @@ Timer::Timer() {
 
 #ifdef MOCK_TIMER
 
+#define CH_CFG_ST_FREQUENCY 1000000
+
 // in mock land, ticks == microseconds
 #define TIME_US2I(us) (us)
 #define TIME_I2US(ticks) (ticks)
