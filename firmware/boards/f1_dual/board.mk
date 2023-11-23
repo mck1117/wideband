@@ -1,4 +1,5 @@
 USE_BOOTLOADER = no
+ENABLE_TS = yes
 
 MCU = cortex-m3
 

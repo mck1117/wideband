@@ -48,10 +48,3 @@
 #define HEATER_BATTERY_ON_VOLTAGE	9.5
 // mininal battery voltage to continue heating
 #define HEATER_BATTETY_OFF_VOLTAGE  8.5
-
-// *******************************
-//    TunerStudio configuration
-// *******************************
-#if defined(TS_PRIMARY_UART_PORT) || defined(TS_PRIMARY_SERIAL_PORT)
-#define TS_ENABLED
-#endif

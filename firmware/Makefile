@@ -157,15 +157,20 @@ CPPSRC = $(ALLCPPSRC) \
           max3185x.cpp \
           uart.cpp \
           auxout.cpp \
-          livedata.cpp \
           indication.cpp \
-          console/binary/tunerstudio.cpp \
-          console/binary/tunerstudio_io.cpp \
-          console/binary/tunerstudio_io_serial.cpp \
-          console/binary/tunerstudio_commands.cpp \
           sampling_thread.cpp \
           heater_thread.cpp \
           main.cpp
+
+ifneq ($(ENABLE_TS),)
+CPPSRC += console/binary/tunerstudio.cpp \
+          console/binary/tunerstudio_io.cpp \
+          console/binary/tunerstudio_io_serial.cpp \
+          console/binary/tunerstudio_commands.cpp \
+          livedata.cpp \
+
+DDEFS += -DTS_ENABLED=TRUE
+endif
 
 # List ASM source files here.
 ASMSRC = $(ALLASMSRC)
