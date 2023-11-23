@@ -94,10 +94,10 @@ void CanRxThread(void*)
             }
         }
         // If it's a bootloader entry request, reboot to the bootloader!
-        else if (frame.DLC == 1 && frame.EID == WB_BL_ENTER)
+        else if ((frame.DLC == 0 || frame.DLC == 1) && frame.EID == WB_BL_ENTER)
         {
             // If 0xFF (force update all) or our ID, reset to bootloader, otherwise ignore
-            if (frame.data8[0] == 0xFF || frame.data8[0] == GetConfiguration()->CanIndexOffset)
+            if (frame.DLC == 0 || frame.data8[0] == 0xFF || frame.data8[0] == GetConfiguration()->CanIndexOffset)
             {
                 SendAck();
 
