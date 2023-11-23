@@ -95,7 +95,7 @@ int InitConfiguration()
     return 0;
 }
 
-static Configuration c;
+static Configuration config;
 
 Configuration* GetConfiguration()
 {
@@ -104,7 +104,7 @@ Configuration* GetConfiguration()
     // If config has been written before, use the stored configuration
     if (cfg.IsValid())
     {
-        c = cfg;
+        config = cfg;
     }
 
     // Now, override the index with a hardware-strapped option (if present)
@@ -113,19 +113,19 @@ Configuration* GetConfiguration()
 
     // See https://github.com/mck1117/wideband/issues/11 to explain this madness
     switch (3 * sel1 + sel2) {
-        case 0: c.CanIndexOffset = 2; break;
-        case 1: c.CanIndexOffset = 0; break;
-        case 2: c.CanIndexOffset = 3; break;
-        case 3: c.CanIndexOffset = 4; break;
+        case 0: config.CanIndexOffset = 2; break;
+        case 1: config.CanIndexOffset = 0; break;
+        case 2: config.CanIndexOffset = 3; break;
+        case 3: config.CanIndexOffset = 4; break;
         case 4: /* both floating, do nothing */ break;
-        case 5: c.CanIndexOffset = 1; break;
-        case 6: c.CanIndexOffset = 5; break;
-        case 7: c.CanIndexOffset = 6; break;
-        case 8: c.CanIndexOffset = 7; break;
+        case 5: config.CanIndexOffset = 1; break;
+        case 6: config.CanIndexOffset = 5; break;
+        case 7: config.CanIndexOffset = 6; break;
+        case 8: config.CanIndexOffset = 7; break;
         default: break;
     }
 
-    return &c;
+    return &config;
 }
 
 void SetConfiguration()
@@ -136,7 +136,7 @@ void SetConfiguration()
     // Copy data to flash
     Flash::Write(
         reinterpret_cast<flashaddr_t>(&__configflash__start__),
-        reinterpret_cast<const uint8_t*>(&c),
+        reinterpret_cast<const uint8_t*>(&config),
         sizeof(Configuration)
     );
 }
