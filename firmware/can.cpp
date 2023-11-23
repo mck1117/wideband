@@ -144,6 +144,8 @@ void SendRusefiFormat(uint8_t ch)
     const auto& sampler = GetSampler(ch);
     const auto& heater = GetHeaterController(ch);
 
+    float nernstDc = sampler.GetNernstDc();
+
     {
         CanTxTyped<wbo::StandardData> frame(baseAddress + 0);
 
@@ -153,7 +155,9 @@ void SendRusefiFormat(uint8_t ch)
         uint16_t lambda = GetLambda(ch) * 10000;
         frame.get().Lambda = lambda;
         frame.get().TemperatureC = sampler.GetSensorTemperature();
-        frame.get().Valid = heater.IsRunningClosedLoop() ? 0x01 : 0x00;
+        bool heaterClosedLoop = heater.IsRunningClosedLoop();
+        bool nernstValid = nernstDc > (NERNST_TARGET - 0.1f) && nernstDc < (NERNST_TARGET + 0.1f);
+        frame.get().Valid = (heaterClosedLoop && nernstValid) ? 0x01 : 0x00;
     }
 
     {
@@ -162,7 +166,7 @@ void SendRusefiFormat(uint8_t ch)
         CanTxTyped<wbo::DiagData> frame(baseAddress + 1);
 
         frame.get().Esr = esr;
-        frame.get().NernstDc = sampler.GetNernstDc() * 1000;
+        frame.get().NernstDc = nernstDc * 1000;
         frame.get().PumpDuty = GetPumpOutputDuty(ch) * 255;
         frame.get().Status = GetCurrentFault(ch);
         frame.get().HeaterDuty = GetHeaterDuty(ch) * 255;
