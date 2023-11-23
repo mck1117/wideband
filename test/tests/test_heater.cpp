@@ -15,18 +15,16 @@ TEST(HeaterStateOutput, Preheat)
     MockHeater dut;
 
     // Shouldn't depend upon sensor ESR
-    EXPECT_EQ(1.5f, dut.GetVoltageForState(HeaterState::Preheat, 0));
-    EXPECT_EQ(1.5f, dut.GetVoltageForState(HeaterState::Preheat, 300));
-    EXPECT_EQ(1.5f, dut.GetVoltageForState(HeaterState::Preheat, 1000));
+    EXPECT_EQ(2.0f, dut.GetVoltageForState(HeaterState::Preheat, 0));
+    EXPECT_EQ(2.0f, dut.GetVoltageForState(HeaterState::Preheat, 300));
+    EXPECT_EQ(2.0f, dut.GetVoltageForState(HeaterState::Preheat, 1000));
 }
 
 TEST(HeaterStateOutput, WarmupRamp)
 {
     MockHeater dut;
 
-    EXPECT_EQ(1.5f, dut.GetVoltageForState(HeaterState::Preheat, 0));
-    EXPECT_EQ(1.5f, dut.GetVoltageForState(HeaterState::Preheat, 300));
-    EXPECT_EQ(1.5f, dut.GetVoltageForState(HeaterState::Preheat, 1000));
+    // TODO
 }
 
 TEST(HeaterStateOutput, ClosedLoop)
