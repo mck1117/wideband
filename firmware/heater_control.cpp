@@ -65,7 +65,7 @@ HeaterState HeaterControllerBase::GetNextState(HeaterState currentState, HeaterA
     }
 
     float overheatTemp = m_targetTempC + 100;
-    float closedLoopTemp = m_targetTempC - 50;
+    float closedLoopTemp = m_targetTempC - 30;
     float underheatTemp = m_targetTempC - 100;
 
     switch (currentState)
@@ -74,7 +74,7 @@ HeaterState HeaterControllerBase::GetNextState(HeaterState currentState, HeaterA
             #ifdef HEATER_FAST_HEATING_THRESHOLD_T
             if (sensorTemp >= HEATER_FAST_HEATING_THRESHOLD_T) {
                 // if sensor is already hot - we can start from higher heater voltage
-                rampVoltage = 7.5;
+                rampVoltage = 9;
 
                 // Reset the timer for the warmup phase
                 m_warmupTimer.reset();
@@ -87,8 +87,8 @@ HeaterState HeaterControllerBase::GetNextState(HeaterState currentState, HeaterA
             if (m_preheatTimer.hasElapsedSec(m_preheatTimeSec) || sensorTemp > closedLoopTemp)
             {
                 // If enough time has elapsed, start the ramp
-                // Start the ramp at 4 volts
-                rampVoltage = 4;
+                // Start the ramp at 7 volts
+                rampVoltage = 7;
 
                 // Reset the timer for the warmup phase
                 m_warmupTimer.reset();
@@ -139,12 +139,12 @@ float HeaterControllerBase::GetVoltageForState(HeaterState state, float sensorEs
     {
         case HeaterState::Preheat:
             // Max allowed during condensation phase (preheat) is 2v
-            return 1.5f;
+            return 2.0f;
         case HeaterState::WarmupRamp:
-            if (rampVoltage < 10)
+            if (rampVoltage < 12)
             {
-                // 0.3 volt per second, divided by battery voltage and update rate
-                constexpr float rampRateVoltPerSecond = 0.3f;
+                // 0.4 volt per second, divided by battery voltage and update rate
+                constexpr float rampRateVoltPerSecond = 0.4f;
                 constexpr float heaterFrequency = 1000.0f / HEATER_CONTROL_PERIOD;
                 rampVoltage += (rampRateVoltPerSecond / heaterFrequency);
             }
@@ -184,9 +184,9 @@ void HeaterControllerBase::Update(const ISampler& sampler, HeaterAllow heaterAll
     heaterState = GetNextState(heaterState, heaterAllowState, batteryVoltage, sensorTemperature);
     float heaterVoltage = GetVoltageForState(heaterState, sensorEsr);
 
-    // Limit to 11 volts
-    if (heaterVoltage > 11) {
-        heaterVoltage = 11;
+    // Limit to 12 volts
+    if (heaterVoltage > 12) {
+        heaterVoltage = 12;
     }
 
     // duty = (V_eff / V_batt) ^ 2
