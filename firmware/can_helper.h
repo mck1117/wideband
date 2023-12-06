@@ -74,3 +74,5 @@ void transmitStruct(uint32_t eid)
     // see CanTxMessage::~CanTxMessage()
     populateFrame(frame.get());
 }
+
+bool isTxIssue();

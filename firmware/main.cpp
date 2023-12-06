@@ -14,6 +14,7 @@
 #include "port.h"
 #include "tunerstudio.h"
 #include "indication.h"
+#include "can_helper.h"
 
 #include "wideband_config.h"
 
@@ -60,7 +61,11 @@ int main() {
         /* TODO: show EGT errors */
         auto fault = GetCurrentFault(0);
 
-        if (fault == Fault::None)
+        if (isTxIssue()) {
+            // temporary solution: light up both LEDs in case of TX error
+            palSetPad(LED_BLUE_PORT, LED_BLUE_PIN);
+            palSetPad(LED_BLUE_PORT, LED_GREEN_PIN);
+        } else if (fault == Fault::None)
         {
             // blue is off
             palClearPad(LED_BLUE_PORT, LED_BLUE_PIN);
