@@ -25,7 +25,7 @@ void CanTxThread(void*)
             SendCanForChannel(ch);
         }
 
-        chThdSleepMilliseconds(10);
+        chThdSleepMilliseconds(WBO_TX_PERIOD_MS);
     }
 }
 

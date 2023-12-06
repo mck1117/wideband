@@ -26,6 +26,9 @@
 #define WB_MGS_ECU_STATUS 0xEF5'0000
 #define WB_DATA_BASE_ADDR 0x190
 
+// we transmit every 10ms
+#define WBO_TX_PERIOD_MS 10
+
 namespace wbo
 {
 enum class Fault : uint8_t
