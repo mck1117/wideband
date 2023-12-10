@@ -20,7 +20,7 @@
 // *******************************
 //    Nernst voltage & ESR sense
 // *******************************
-#define NERNST_INPUT_GAIN (1 / 3.15f)
+#define NERNST_INPUT_GAIN (3.15f)
 #define NERNST_INPUT_OFFSET (0.247)
 
 // *******************************

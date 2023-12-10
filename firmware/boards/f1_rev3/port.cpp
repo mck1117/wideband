@@ -59,7 +59,7 @@ AnalogResult AnalogSample()
     {
         .ch = {
             {
-                .NernstVoltage = AverageSamples(adcBuffer, 2) * NERNST_INPUT_GAIN,
+                .NernstVoltage = AverageSamples(adcBuffer, 2) * (1.0 / NERNST_INPUT_GAIN),
                 .PumpCurrentVoltage = AverageSamples(adcBuffer, 1),
                 /* We also can measure output virtual ground voltage for diagnostic purposes */
                 //.VirtualGroundVoltageExt = AverageSamples(adcBuffer, 0) / VM_INPUT_DIVIDER,
