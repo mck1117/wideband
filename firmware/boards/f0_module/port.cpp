@@ -45,7 +45,7 @@ AnalogResult AnalogSample()
         .ch =
         {
             {
-                .NernstVoltage = AverageSamples(adcBuffer, 0) * NERNST_INPUT_GAIN,
+                .NernstVoltage = AverageSamples(adcBuffer, 0) * (1.0 / NERNST_INPUT_GAIN),
                 .PumpCurrentVoltage = AverageSamples(adcBuffer, 1),
                 .BatteryVoltage = 0,
             },

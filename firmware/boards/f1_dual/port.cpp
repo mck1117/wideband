@@ -109,13 +109,13 @@ AnalogResult AnalogSample()
         .ch = {
             {
                 /* left */
-                .NernstVoltage = AverageSamples(adcBuffer, 3) * NERNST_INPUT_GAIN,
+                .NernstVoltage = AverageSamples(adcBuffer, 3) * (1.0 / NERNST_INPUT_GAIN),
                 .PumpCurrentVoltage = AverageSamples(adcBuffer, 2),
                 .BatteryVoltage = l_heater_voltage,
             },
             {
                 /* right */
-                .NernstVoltage = AverageSamples(adcBuffer, 1) * NERNST_INPUT_GAIN,
+                .NernstVoltage = AverageSamples(adcBuffer, 1) * (1.0 / NERNST_INPUT_GAIN),
                 .PumpCurrentVoltage = AverageSamples(adcBuffer, 0),
                 .BatteryVoltage = r_heater_voltage,
             },

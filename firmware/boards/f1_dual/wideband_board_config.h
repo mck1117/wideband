@@ -16,7 +16,7 @@
 // *******************************
 //    Nernst voltage & ESR sense
 // *******************************
-#define NERNST_INPUT_GAIN (1 / 3.0f)
+#define NERNST_INPUT_GAIN (3.0f)
 
 // *******************************
 //        Battery Sensing

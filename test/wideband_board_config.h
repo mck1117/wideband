@@ -9,7 +9,7 @@
 // *******************************
 //    Nernst voltage & ESR sense
 // *******************************
-#define NERNST_INPUT_GAIN (1 / 2.7f)
+#define NERNST_INPUT_GAIN (2.7f)
 
 #define AFR_CHANNELS 1
 
