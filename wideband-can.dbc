@@ -49,7 +49,7 @@ BO_ 401 WidebandDiagData: 8 WidebandController
  SG_ Status : 40|8@1+ (1,0) [0|0] ""  ECU
  SG_ HeaterDuty : 48|8@1+ (0.392157,0) [0|100] "%"  ECU
 
-BO_ 2398420992 WidebandControl: 2 ECU
+BO_ 250937344 WidebandControl: 2 ECU
  SG_ BatteryVoltage : 0|8@1+ (0.1,0) [0|25] "volt"  WidebandController
  SG_ HeaterEnable : 8|8@1+ (1,0) [0|1] ""  WidebandController
 
