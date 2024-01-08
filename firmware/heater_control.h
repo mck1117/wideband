@@ -73,6 +73,7 @@ private:
     Timer m_batteryStableTimer;
     Timer m_preheatTimer;
     Timer m_warmupTimer;
+    Timer m_closedLoopStableTimer;
 
     static const int batteryStabTimeCounter = HEATER_BATTERY_STAB_TIME / HEATER_CONTROL_PERIOD;
 };
