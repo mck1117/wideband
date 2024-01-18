@@ -59,6 +59,13 @@ HeaterState HeaterControllerBase::GetNextState(HeaterState currentState, HeaterA
 
     if (!heaterAllowed)
     {
+        // if heater voltage too low to start pre-heat
+        if (batteryVoltage < HEATER_BATTETY_OFF_VOLTAGE)
+        {
+            SetFault(ch, Fault::SensorNoHeatSupply);
+            return HeaterState::NoHeaterSupply;
+        }
+        SetFault(ch, Fault::None);
         // ECU hasn't allowed preheat yet, reset timer, and force preheat state
         m_preheatTimer.reset();
         return HeaterState::Preheat;
