@@ -46,7 +46,8 @@ class CanTxTyped final : public CanTxMessage
     static_assert(sizeof(TData) <= sizeof(CANTxFrame::data8));
 
 public:
-    explicit CanTxTyped(uint32_t eid) : CanTxMessage(eid) { }
+    explicit CanTxTyped(uint32_t eid) : CanTxMessage(eid, sizeof(TData)) { }
+    explicit CanTxTyped(uint32_t eid, bool isExtended) : CanTxMessage(eid, sizeof(TData), isExtended) { }
 
     /**
      * Access members of the templated type.  
