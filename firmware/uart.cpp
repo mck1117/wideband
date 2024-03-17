@@ -39,7 +39,7 @@ static void UartThread(void*)
             float lambda = GetLambda(ch);
             int lambdaIntPart = lambda;
             int lambdaThousandths = (lambda - lambdaIntPart) * 1000;
-            int batteryVoltageMv = GetSampler(ch).GetInternalBatteryVoltage() * 1000;
+            int batteryVoltageMv = GetSampler(ch).GetInternalHeaterVoltage() * 1000;
             int duty = GetHeaterDuty(ch) * 100;
 
             size_t writeCount = chsnprintf(printBuffer, 200,

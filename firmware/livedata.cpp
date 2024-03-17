@@ -36,7 +36,7 @@ void SamplingUpdateLiveData()
         data->heaterState = (uint8_t)GetHeaterState(ch);
     }
 
-    livedata_common.vbatt = GetSampler(0).GetInternalBatteryVoltage();
+    livedata_common.vbatt = GetSampler(0).GetInternalHeaterVoltage();
 }
 
 template<>

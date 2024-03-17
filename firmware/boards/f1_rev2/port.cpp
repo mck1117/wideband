@@ -66,8 +66,11 @@ AnalogResult AnalogSample()
                 .PumpCurrentVoltage = AverageSamples(adcBuffer, 1),
                 /* We also can measure output virtual ground voltage for diagnostic purposes */
                 //.VirtualGroundVoltageExt = AverageSamples(adcBuffer, 0) / VM_INPUT_DIVIDER,
-                .BatteryVoltage = AverageSamples(adcBuffer, 3) / BATTERY_INPUT_DIVIDER,
-                /* .HeaterVoltage = AverageSamples(adcBuffer, 4) / HEATER_INPUT_DIVIDER, */
+                /* Heater measurement circuit has incorrect RC filter making inposible accurate
+                 * measurement when heater pwm has high duty
+                 * Assume WBO supply voltage == heater supply voltage */
+                .HeaterSupplyVoltage = AverageSamples(adcBuffer, 3) / BATTERY_INPUT_DIVIDER,
+                /* .HeaterSupplyVoltage = AverageSamples(adcBuffer, 4) / HEATER_INPUT_DIVIDER, */
             },
         },
         /* Rev 2 board has separate internal virtual ground = 3.3V / 2
