@@ -58,6 +58,8 @@ int Max3185x::spi_txrx(uint8_t tx[], uint8_t rx[], size_t n)
 	spiExchange(EGT_SPI_DRIVER, n, tx, rx);
 	/* Slave Select de-assertion. */
 	spiUnselect(EGT_SPI_DRIVER);
+	/* Bus deinit */
+	spiStop(EGT_SPI_DRIVER);
 	/* Ownership release. */
 	spiReleaseBus(EGT_SPI_DRIVER);
 
