@@ -9,7 +9,7 @@
 
 #if (EGT_CHANNELS > 0)
 
-static SPIConfig spi_config[2] =
+static const SPIConfig spi_config[EGT_CHANNELS] =
 {
 	{
 		.circular = false,
@@ -43,7 +43,7 @@ static SPIConfig spi_config[2] =
 	}
 };
 
-static Max3185x instances[] = {&spi_config[0], &spi_config[1]};
+static Max3185x instances[EGT_CHANNELS] = {Max3185x(&spi_config[0]), Max3185x(&spi_config[1])};
 
 static Max3185xThread EgtThread(instances);
 

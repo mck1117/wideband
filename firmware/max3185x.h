@@ -41,7 +41,7 @@ const struct livedata_egt_s * getEgtLiveDataStructAddr(const int ch);
 
 class Max3185x {
 public:
-    Max3185x(SPIConfig *spi) {
+    Max3185x(const SPIConfig *spi) {
         this->spi = spi;
     }
 	livedata_egt_s livedata;
@@ -51,7 +51,7 @@ public:
 	Max3185xType type;
 	int readPacket();
 private:
-    SPIConfig *spi;
+    const SPIConfig *spi;
     int detect();
 	int readPacket31855();
 	int readPacket31856();
