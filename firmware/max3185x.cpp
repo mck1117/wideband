@@ -90,7 +90,7 @@ int Max3185x::spi_rx32(uint32_t *data)
 // bits D17 and D3 are always expected to be zero
 #define MAX31855_RESERVED_BITS	0x20008
 
-int Max3185x::detect()
+Max3185xType Max3185x::detect()
 {
 	int ret;
 	uint8_t rx[4];
@@ -110,13 +110,13 @@ int Max3185x::detect()
 	// Stop any conversion
 	ret = spi_txrx(tx, rx, 2);
 	if (ret) {
-		return ret;
+		return UNKNOWN_TYPE;
 	}
 
 	// Apply notch frequency and averaging
 	ret = spi_txrx(tx, rx, 3);
 	if (ret) {
-		return ret;
+		return UNKNOWN_TYPE;
 	}
 
 	// Start Automatic Conversion mode
@@ -126,15 +126,14 @@ int Max3185x::detect()
 	tx[2] = (2 << 4) | (3 << 0);
 	ret = spi_txrx(tx, rx, 3);
 	if (ret) {
-		return ret;
+		return UNKNOWN_TYPE;
 	}
 
 	/* Now readback settings */
 	tx[0] = 0x00;
 	ret = spi_txrx(tx, rx, 4);
 	if ((rx[1] == tx[1]) && (rx[2] == tx[2])) {
-		type = MAX31856_TYPE;
-		return 0;
+		return MAX31856_TYPE;
 	}
 
 	/* in case of max31855 we get standart reply with few reserved, always zero bits */
@@ -145,20 +144,19 @@ int Max3185x::detect()
 
 	/* MISO is constantly low or high */
 	if ((data == 0xffffffff) || (data == 0x0)) {
-		return -1;
+		return UNKNOWN_TYPE;
 	}
 
 	if ((data & MAX31855_RESERVED_BITS) == 0x0) {
-		type = MAX31855_TYPE;
-		return 0;
+		return MAX31855_TYPE;
 	}
 
 	livedata.state = MAX3185X_NO_REPLY;
-	type = UNKNOWN_TYPE;
-	return -1;
+
+	return UNKNOWN_TYPE;
 }
 
-int Max3185x::readPacket31855()
+Max3185xState Max3185x::readPacket31855()
 {
 	uint32_t data;
 
@@ -169,55 +167,39 @@ int Max3185x::readPacket31855()
 
 	int ret = spi_rx32(&data);
 
-	if (((data & MAX31855_RESERVED_BITS) != 0) ||
+	if ((ret) ||
+		((data & MAX31855_RESERVED_BITS) != 0) ||
 		(data == 0x0) ||
 		(data == 0xffffffff)) {
-		livedata.state = MAX3185X_NO_REPLY;
-
-		ret = -1;
-	} else if (data & BIT(16)) {
+		return MAX3185X_NO_REPLY;
+	} else if (data & MAX33855_FAULT_BIT) {
 		if (data & MAX33855_OPEN_BIT) {
-			livedata.state = MAX3185X_OPEN_CIRCUIT;
+			return MAX3185X_OPEN_CIRCUIT;
 		} else if (data & MAX33855_GND_BIT) {
-			livedata.state = MAX3185X_SHORT_TO_GND;
+			return MAX3185X_SHORT_TO_GND;
 		} else if (data & MAX33855_VCC_BIT) {
-			livedata.state = MAX3185X_SHORT_TO_VCC;
+			return MAX3185X_SHORT_TO_VCC;
 		}
-
-		ret = -1;
 	}
 
-	if (ret) {
-		coldJunctionTemperature = NAN;
-		livedata.coldJunctionTemperature = 0;
-		temperature = NAN;
-		livedata.temperature = 0;
-	} else {
-		/* D[15:4] */
-		int16_t tmp = (data >> 4) & 0xfff;
-		/* extend sign */
-		tmp = tmp << 4;
-		tmp = tmp >> 4;	/* shifting right signed is not a good idea */
-		coldJunctionTemperature = (float)tmp * 0.0625;
+	/* D[15:4] */
+	int16_t tmp = (data >> 4) & 0xfff;
+	/* extend sign */
+	tmp = tmp << 4;
+	tmp = tmp >> 4;	/* shifting right signed is not a good idea */
+	coldJunctionTemperature = (float)tmp * 0.0625;
 
-		/* D[31:18] */
-		tmp = (data >> 18) & 0x3fff;
-		/* extend sign */
-		tmp = tmp << 2;
-		tmp = tmp >> 2;	/* shifting right signed is not a good idea */
-		temperature = (float) tmp * 0.25;
+	/* D[31:18] */
+	tmp = (data >> 18) & 0x3fff;
+	/* extend sign */
+	tmp = tmp << 2;
+	tmp = tmp >> 2;	/* shifting right signed is not a good idea */
+	temperature = (float) tmp * 0.25;
 
-		/* update livedata: float to int */
-		livedata.coldJunctionTemperature = coldJunctionTemperature;
-		livedata.temperature = temperature;
-
-		livedata.state = MAX3185X_OK;
-	}
-
-	return ret;
+	return MAX3185X_OK;
 }
 
-int Max3185x::readPacket31856()
+Max3185xState Max3185x::readPacket31856()
 {
 	uint8_t rx[1 + 6];
 	/* read one dummy byte, Cold-Junction temperature MSB, LSB, Linearized TC temperature 3 bytes and Fault Status */
@@ -226,52 +208,59 @@ int Max3185x::readPacket31856()
 	int ret = spi_txrx(tx, rx, sizeof(rx));
 
 	if (ret) {
-		livedata.state = MAX3185X_NO_REPLY;
-		/* Do not overwrite ret */
+		return MAX3185X_NO_REPLY;
 	} else if (rx[6] & BIT(0)) {
-		livedata.state = MAX3185X_OPEN_CIRCUIT;
-		ret = -1;
+		return MAX3185X_OPEN_CIRCUIT;
 	} else if (rx[6] & BIT(1)) {
-		livedata.state = MAX3185X_SHORT_TO_VCC;
-		ret = -1;
+		return MAX3185X_SHORT_TO_VCC;
 	}
 
-	if (ret) {
-		coldJunctionTemperature = NAN;
-		livedata.coldJunctionTemperature = 0;
-		temperature = NAN;
-		livedata.temperature = 0;
-	} else {
-		/* update livedata: float to int */
-		coldJunctionTemperature = (float)(rx[1] << 8 | rx[2]) / 256.0;
-		temperature = (float)((rx[3] << 11) | (rx[4] << 3) | (rx[5] >> 5)) / 128.0;
-		livedata.coldJunctionTemperature = coldJunctionTemperature;
-		livedata.temperature = temperature;
-
-		livedata.state = MAX3185X_OK;
+	if (1) {
+		// 10 bit before point and 7 bits after
+		int32_t tmp = (rx[3] << 11) | (rx[4] << 3) | (rx[5] >> 5);
+		/* extend sign: move top bit 18 to 31 */
+		tmp = tmp << 13;
+		tmp = tmp >> 13;	/* shifting right signed is not a good idea */
+		temperature = ((float)tmp) / 128.0;
+	}
+	if (1) {
+		int16_t tmp = (rx[1] << 6) | (rx[2] >> 2);
+		/* extend sign */
+		tmp = tmp << 2;
+		tmp = tmp >> 2;	/* shifting right signed is not a good idea */
+		coldJunctionTemperature = ((float)tmp) / 64.0;
 	}
 
-	return ret;
+	return MAX3185X_OK;
 }
 
-int Max3185x::readPacket()
+Max3185xState Max3185x::readPacket()
 {
-	int ret;
-
 	if (type == UNKNOWN_TYPE) {
-		ret = detect();
-		if (ret < 0) {
-			return ret;
+		type = detect();
+		if (type == UNKNOWN_TYPE) {
+			livedata.state = MAX3185X_NO_REPLY;
 		}
 	}
 
 	if (type == MAX31855_TYPE) {
-		return readPacket31855();
+		livedata.state = readPacket31855();
 	} else if (type == MAX31856_TYPE) {
-		return readPacket31856();
+		livedata.state = readPacket31856();
 	}
 
-	return -1;
+	if (livedata.state == MAX3185X_OK) {
+		/* update livedata: float to int */
+		livedata.coldJunctionTemperature = coldJunctionTemperature;
+		livedata.temperature = temperature;
+	} else {
+		coldJunctionTemperature = NAN;
+		livedata.coldJunctionTemperature = 0;
+		temperature = NAN;
+		livedata.temperature = 0;
+	}
+
+	return MAX3185X_OK;
 }
 
 void Max3185xThread::ThreadTask() {

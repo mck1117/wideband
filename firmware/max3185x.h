@@ -49,12 +49,12 @@ public:
 	float coldJunctionTemperature;
 	float temperature;
 	Max3185xType type;
-	int readPacket();
+	Max3185xState readPacket();
 private:
     const SPIConfig *spi;
-    int detect();
-	int readPacket31855();
-	int readPacket31856();
+    Max3185xType detect();
+	Max3185xState readPacket31855();
+	Max3185xState readPacket31856();
 	int spi_rx32(uint32_t *data);
 	int spi_txrx(uint8_t tx[], uint8_t rx[], size_t n);
 };
