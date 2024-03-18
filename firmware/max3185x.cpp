@@ -162,19 +162,25 @@ int Max3185x::readPacket31855()
 {
 	uint32_t data;
 
+	#define MAX33855_FAULT_BIT			BIT(16)
+	#define MAX33855_OPEN_BIT			BIT(0)
+	#define MAX33855_GND_BIT			BIT(1)
+	#define MAX33855_VCC_BIT			BIT(2)
+
 	int ret = spi_rx32(&data);
 
-	/* TODO: also check for 0x00000000? */
-	if ((ret) || (data == 0xffffffff)) {
+	if (((data & MAX31855_RESERVED_BITS) != 0) ||
+		(data == 0x0) ||
+		(data == 0xffffffff)) {
 		livedata.state = MAX3185X_NO_REPLY;
 
 		ret = -1;
 	} else if (data & BIT(16)) {
-		if (data & BIT(0)) {
+		if (data & MAX33855_OPEN_BIT) {
 			livedata.state = MAX3185X_OPEN_CIRCUIT;
-		} else if (data & BIT(1)) {
+		} else if (data & MAX33855_GND_BIT) {
 			livedata.state = MAX3185X_SHORT_TO_GND;
-		} else if (data & BIT(2)) {
+		} else if (data & MAX33855_VCC_BIT) {
 			livedata.state = MAX3185X_SHORT_TO_VCC;
 		}
 
