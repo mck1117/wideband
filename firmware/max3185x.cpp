@@ -215,6 +215,18 @@ Max3185xState Max3185x::readPacket31856()
 		return MAX3185X_SHORT_TO_VCC;
 	}
 
+	// Paranoid check.
+	bool allZero = true;
+	for (int i = 1; i < 6; i++) {
+		if (rx[i] != 0x00) {
+			allZero = false;
+			break;
+		}
+	}
+	if (allZero) {
+		return MAX3185X_NO_REPLY;
+	}
+
 	if (1) {
 		// 10 bit before point and 7 bits after
 		int32_t tmp = (rx[3] << 11) | (rx[4] << 3) | (rx[5] >> 5);
@@ -258,6 +270,12 @@ Max3185xState Max3185x::readPacket()
 		livedata.coldJunctionTemperature = 0;
 		temperature = NAN;
 		livedata.temperature = 0;
+	}
+
+	/* in case of communication problems - reinit */
+	if (livedata.state == MAX3185X_NO_REPLY) {
+		livedata.commErrors++;
+		type = UNKNOWN_TYPE;
 	}
 
 	return MAX3185X_OK;

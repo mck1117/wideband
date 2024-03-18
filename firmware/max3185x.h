@@ -26,6 +26,8 @@ struct livedata_egt_s {
 			float temperature;
 			float coldJunctionTemperature;
 			uint8_t state;
+			uint8_t pad0[3];
+			uint32_t commErrors;
 		} __attribute__((packed));
 		uint8_t pad[16];
 	};
