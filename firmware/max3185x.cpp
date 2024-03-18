@@ -219,13 +219,16 @@ int Max3185x::readPacket31855()
 
 int Max3185x::readPacket31856()
 {
-	uint8_t rx[7];
-	/* read Cold-Junction temperature MSB, LSB, Linearized TC temperature 3 bytes and Fault Status */
-	uint8_t tx[7] = {0x0a};
+	uint8_t rx[1 + 6];
+	/* read one dummy byte, Cold-Junction temperature MSB, LSB, Linearized TC temperature 3 bytes and Fault Status */
+	uint8_t tx[1 + 6] = {0x0a};
 
-	int ret = spi_txrx(tx, rx, 7);
+	int ret = spi_txrx(tx, rx, sizeof(rx));
 
-	if (rx[6] & BIT(0)) {
+	if (ret) {
+		livedata.state = MAX3185X_NO_REPLY;
+		/* Do not overwrite ret */
+	} else if (rx[6] & BIT(0)) {
 		livedata.state = MAX3185X_OPEN_CIRCUIT;
 		ret = -1;
 	} else if (rx[6] & BIT(1)) {
