@@ -56,7 +56,7 @@ private:
 	Max3185xState readPacket31855();
 	Max3185xState readPacket31856();
 	int spi_rx32(uint32_t *data);
-	int spi_txrx(uint8_t tx[], uint8_t rx[], size_t n);
+	int spi_txrx(const uint8_t tx[], uint8_t rx[], size_t n);
 };
 
 class Max3185xThread : public ThreadController<MAX3185X_THREAD_STACK> {

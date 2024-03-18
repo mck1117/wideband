@@ -47,7 +47,7 @@ static Max3185x instances[EGT_CHANNELS] = {Max3185x(&spi_config[0]), Max3185x(&s
 
 static Max3185xThread EgtThread(instances);
 
-int Max3185x::spi_txrx(uint8_t tx[], uint8_t rx[], size_t n)
+int Max3185x::spi_txrx(const uint8_t tx[], uint8_t rx[], size_t n)
 {
 	/* Acquire ownership of the bus. */
 	spiAcquireBus(EGT_SPI_DRIVER);
@@ -203,7 +203,7 @@ Max3185xState Max3185x::readPacket31856()
 {
 	uint8_t rx[1 + 6];
 	/* read one dummy byte, Cold-Junction temperature MSB, LSB, Linearized TC temperature 3 bytes and Fault Status */
-	uint8_t tx[1 + 6] = {0x0a};
+	const uint8_t tx[1 + 6] = {0x0a};
 
 	int ret = spi_txrx(tx, rx, sizeof(rx));
 
