@@ -87,38 +87,68 @@ int Max3185x::spi_rx32(uint32_t *data)
 	return 0;
 }
 
+// bits D17 and D3 are always expected to be zero
+#define MAX31855_RESERVED_BITS	0x20008
+
 int Max3185x::detect()
 {
+	int ret;
 	uint8_t rx[4];
-	/* read MASK, CJHF, CJLF */
-	uint8_t tx[4] = {0x02, 0x00, 0x00, 0x00};
-	uint32_t data;
+	uint8_t tx[4];
 
-	int ret = spi_txrx(tx, rx, 4);
-	if (ret)
+	/* try to apply settings to max31956 and then read back settings */
+	// Wr, register 0x00
+	tx[0] = 0x00 | BIT(7);
+	// CR0: 50Hz mode
+	// Change the notch frequency only while in the "Normally Off" mode - not in the Automatic
+	tx[1] = BIT(0);
+	// CR1: 4 samples average, K type
+	// The Thermocouple Voltage Conversion Averaging Mode settings should not be changed while
+	// conversions are taking place.
+	tx[2] = (2 << 4) | (3 << 0);
+
+	// Stop any conversion
+	ret = spi_txrx(tx, rx, 2);
+	if (ret) {
 		return ret;
-	data =	(rx[0] << 24) |
-			(rx[1] << 16) |
-			(rx[2] <<  8) |
-			(rx[3] <<  0);
-	/* MASK, CJHF, CJLF defaults: 0xff, 0x7f, 0xc0 */
-	if ((data & 0x00ffffff) == 0x00ff7fc0) {
-		/* configure */
-		/* CR0: 50 Hz mode
-		 * Change the notch frequency only while in the "Normally Off" mode - not in the Automatic
-		 * Conversion mode.*/
-		tx[0] = 0x80;
-		tx[1] = 0x01;
-		spi_txrx(tx, rx, 2);
-		/* CR0: Automatic Conversion mode, OCFAULT = 2, 50Hz mode */
-		tx[1] = BIT(7) | BIT(0) | 2 << 4;
-		/* CR1: 4 samples average, K type */
-		tx[2] = (2 << 4) | (3 << 0);
-		spi_txrx(tx, rx, 3);
+	}
+
+	// Apply notch frequency and averaging
+	ret = spi_txrx(tx, rx, 3);
+	if (ret) {
+		return ret;
+	}
+
+	// Start Automatic Conversion mode
+	// CR0: Automatic Conversion mode, OCFAULT = 2, 50Hz mode
+	tx[1] = BIT(7) | BIT(0) | (2 << 4);
+	// CR1: 4 samples average, K type
+	tx[2] = (2 << 4) | (3 << 0);
+	ret = spi_txrx(tx, rx, 3);
+	if (ret) {
+		return ret;
+	}
+
+	/* Now readback settings */
+	tx[0] = 0x00;
+	ret = spi_txrx(tx, rx, 4);
+	if ((rx[1] == tx[1]) && (rx[2] == tx[2])) {
 		type = MAX31856_TYPE;
 		return 0;
 	}
-	if (data != 0xffffffff) {
+
+	/* in case of max31855 we get standart reply with few reserved, always zero bits */
+	uint32_t data = (rx[0] << 24) |
+					(rx[1] << 16) |
+					(rx[2] <<  8) |
+					(rx[3] <<  0);
+
+	/* MISO is constantly low or high */
+	if ((data == 0xffffffff) || (data == 0x0)) {
+		return -1;
+	}
+
+	if ((data & MAX31855_RESERVED_BITS) == 0x0) {
 		type = MAX31855_TYPE;
 		return 0;
 	}
