@@ -50,7 +50,7 @@ public:
 	/* do we need float temperatures? */
 	float coldJunctionTemperature;
 	float temperature;
-	Max3185xType type;
+	Max3185xType type = UNKNOWN_TYPE;
 	Max3185xState readPacket();
 private:
     const SPIConfig *spi;
