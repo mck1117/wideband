@@ -38,7 +38,11 @@ static void PumpThread(void*)
             const auto& heater = GetHeaterController(ch);
 
             // Only actuate pump when running closed loop!
-            if (heater.IsRunningClosedLoop())
+            if (heater.IsRunningClosedLoop() ||
+#ifdef START_PUMP_TEMP_THRESHOLD
+                (sampler.GetSensorTemperature() >= START_PUMP_TEMP_THRESHOLD) ||
+#endif
+                (0))
             {
                 float nernstVoltage = sampler.GetNernstDc();
 

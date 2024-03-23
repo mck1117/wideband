@@ -17,3 +17,9 @@
 //    Nernst voltage & ESR sense
 // *******************************
 #define VM_RESISTOR_VALUE (10)
+
+// *******************************
+// Hack: allow pump driving above this temperature
+// to avoid Vnerns voltage clamp near 0V
+// *******************************
+#define START_PUMP_TEMP_THRESHOLD	(650.0)
