@@ -39,8 +39,8 @@ static void PumpThread(void*)
 
             // Only actuate pump when running closed loop!
             if (heater.IsRunningClosedLoop() ||
-#ifdef START_PUMP_TEMP_THRESHOLD
-                (sampler.GetSensorTemperature() >= START_PUMP_TEMP_THRESHOLD) ||
+#ifdef START_PUMP_TEMP_OFFSET
+                (sampler.GetSensorTemperature() >= heater.GetTargetTemp() - START_PUMP_TEMP_OFFSET) ||
 #endif
                 (0))
             {

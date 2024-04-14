@@ -19,7 +19,7 @@
 #define VM_RESISTOR_VALUE (10)
 
 // *******************************
-// Hack: allow pump driving above this temperature
-// to avoid Vnerns voltage clamp near 0V
+// Hack: allow pump driving above target temperature
+// minus this offset to avoid Vnerns voltage clamp near 0V
 // *******************************
-#define START_PUMP_TEMP_THRESHOLD	(650.0)
+#define START_PUMP_TEMP_OFFSET	(200.0)
