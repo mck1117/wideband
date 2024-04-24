@@ -40,6 +40,7 @@ enum class Fault : uint8_t
     SensorOverheat = 4,
     SensorUnderheat = 5,
     SensorNoHeatSupply = 6,
+    CanTxError = 7,
 };
 
 struct StandardData
@@ -78,6 +79,8 @@ static inline const char* describeFault(Fault fault) {
             return "Sensor underheat";
         case Fault::SensorNoHeatSupply:
             return "Sensor no heat supply";
+        case Fault::CanTxError:
+            return "CanTxError";
     }
 
     return "Unknown";

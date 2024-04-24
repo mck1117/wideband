@@ -1,7 +1,10 @@
 #include "can_helper.h"
 #include "timer.h"
+#include "fault.h"
 
 #include <cstring>
+
+using namespace wbo;
 
 CanTxMessage::CanTxMessage(uint32_t eid, uint8_t dlc, bool isExtended) {
     m_frame.IDE = isExtended ? CAN_IDE_EXT : CAN_IDE_STD;
@@ -11,24 +14,26 @@ CanTxMessage::CanTxMessage(uint32_t eid, uint8_t dlc, bool isExtended) {
     memset(m_frame.data8, 0, sizeof(m_frame.data8));
 }
 
-static int txFailureCounter = 0;
+static void onTxIssue() {
+    static int txFailureCounter = 0;
+    static Timer txFailureCounterReset;
 
-static Timer txFailureCounterReset;
-
-bool isTxIssue() {
+    txFailureCounter++;
     if (txFailureCounterReset.hasElapsedSec(10)) {
         txFailureCounterReset.reset();
         txFailureCounter = 0;
     }
     // 10 times 100ms timeout would take a second to enter error condition
-    return txFailureCounter > 10;
+    if (txFailureCounter > 10) {
+        SetFault(0, Fault::CanTxError);
+    }
 }
 
 CanTxMessage::~CanTxMessage() {
     // 100 ms timeout
     msg_t msg = canTransmitTimeout(&CAND1, CAN_ANY_MAILBOX, &m_frame, TIME_MS2I(100));
     if (msg != MSG_OK) {
-        txFailureCounter++;
+        onTxIssue();
     }
 }
 
