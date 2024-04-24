@@ -13,7 +13,7 @@ public:
     Dac(DACDriver& driver);
 
     void Start(DACConfig& config);
-    void SetVoltage(int channel, float volage);
+    void SetVoltage(int channel, float voltage);
     float GetLastVoltage(int channel);
 
 private:
