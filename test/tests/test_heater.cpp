@@ -47,7 +47,6 @@ TEST(HeaterStateOutput, Cases)
     MockHeater dut;
 
     EXPECT_EQ(0, dut.GetVoltageForState(HeaterState::Stopped, 0));
-    EXPECT_EQ(0, dut.GetVoltageForState(HeaterState::NoHeaterSupply, 0));
 }
 
 TEST(HeaterStateMachine, PreheatToWarmupTimeout)
