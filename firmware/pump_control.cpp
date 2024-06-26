@@ -37,7 +37,7 @@ static void PumpThread(void*)
             const auto& sampler = GetSampler(ch);
             const auto& heater = GetHeaterController(ch);
 
-            // Only actuate pump when running closed loop!
+            // Only actuate pump when hot enough to not hurt the sensor
             if (heater.IsRunningClosedLoop() ||
                 (sampler.GetSensorTemperature() >= heater.GetTargetTemp() - START_PUMP_TEMP_OFFSET))
             {
