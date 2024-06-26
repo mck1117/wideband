@@ -65,8 +65,8 @@ if [ $USE_OPENBLT = "yes" ]; then
   echo ""
   echo "Invoking hex2dfu for composite OpenBLT+Wideband image (for DFU util)"
   $HEX2DFU -i ${OPENBLT_HEX} -i build/wideband.hex -C 0x1C -o ${DELIVER_DIR}/wideband.dfu -b ${DELIVER_DIR}/wideband.bin
-  echo "Combining two hex files into composite hex file"
-  $SREC_CAT ${OPENBLT_HEX} -Intel build/wideband.hex -Intel -o ${DELIVER_DIR}/wideband.hex -Intel
+  echo "Creating composite hex file"
+  $SREC_CAT build/wideband.hex -binary -offset 0x20000000 -o ${DELIVER_DIR}/wideband.hex -Intel
 else
   echo "Bin for raw flashing"
   cp build/wideband.bin ${DELIVER_DIR}
