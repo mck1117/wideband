@@ -25,6 +25,7 @@ struct IHeaterController
     virtual bool IsRunningClosedLoop() const = 0;
     virtual float GetHeaterEffectiveVoltage() const = 0;
     virtual HeaterState GetHeaterState() const = 0;
+    virtual float GetTargetTemp() const = 0;
 };
 
 class HeaterControllerBase : public IHeaterController
@@ -37,6 +38,7 @@ public:
     bool IsRunningClosedLoop() const override;
     float GetHeaterEffectiveVoltage() const override;
     HeaterState GetHeaterState() const override;
+    float GetTargetTemp() const override;
 
     virtual void SetDuty(float duty) const = 0;
 

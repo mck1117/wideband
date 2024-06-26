@@ -27,6 +27,11 @@ bool HeaterControllerBase::IsRunningClosedLoop() const
     return heaterState == HeaterState::ClosedLoop;
 }
 
+float HeaterControllerBase::GetTargetTemp() const
+{
+    return m_targetTempC;
+}
+
 float HeaterControllerBase::GetHeaterEffectiveVoltage() const
 {
     return heaterVoltage;
