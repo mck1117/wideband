@@ -48,3 +48,9 @@
 #define HEATER_BATTERY_ON_VOLTAGE	9.5
 // mininal battery voltage to continue heating
 #define HEATER_BATTETY_OFF_VOLTAGE  8.5
+
+// *******************************
+// Start driving the pump just before we're at target temperature
+// minus this offset to avoid Vnerns voltage clamp near 0V
+// *******************************
+#define START_PUMP_TEMP_OFFSET	(200.0)
