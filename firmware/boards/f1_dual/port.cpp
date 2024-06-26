@@ -111,13 +111,13 @@ AnalogResult AnalogSample()
                 /* left */
                 .NernstVoltage = AverageSamples(adcBuffer, 3) * (1.0 / NERNST_INPUT_GAIN),
                 .PumpCurrentVoltage = AverageSamples(adcBuffer, 2),
-                .BatteryVoltage = l_heater_voltage,
+                .HeaterSupplyVoltage = l_heater_voltage,
             },
             {
                 /* right */
                 .NernstVoltage = AverageSamples(adcBuffer, 1) * (1.0 / NERNST_INPUT_GAIN),
                 .PumpCurrentVoltage = AverageSamples(adcBuffer, 0),
-                .BatteryVoltage = r_heater_voltage,
+                .HeaterSupplyVoltage = r_heater_voltage,
             },
         },
         /* Dual board has separate internal virtual ground = 3.3V / 2

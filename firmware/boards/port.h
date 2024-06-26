@@ -12,13 +12,14 @@ struct AnalogChannelResult
     float PumpCurrentVoltage;
     /* for dual version - this is voltage on Heater-, switches between zero and Vbatt with heater PWM,
         * used for both Vbatt measurement and Heater diagnostic */
-    float BatteryVoltage;
+    float HeaterSupplyVoltage;
 };
 
 struct AnalogResult
 {
     AnalogChannelResult ch[AFR_CHANNELS];
     float VirtualGroundVoltageInt;
+    /* TODO: add SupplyVoltage - some boards can measure supply voltage */
 };
 
 AnalogResult AnalogSample();

@@ -135,10 +135,10 @@ AnalogResult AnalogSample()
     }
     /* left */
     res.ch[0].PumpCurrentVoltage = AverageSamples(adcBuffer, 2);
-    res.ch[0].BatteryVoltage = l_heater_voltage;
+    res.ch[0].HeaterSupplyVoltage = l_heater_voltage;
     /* right */
     res.ch[1].PumpCurrentVoltage = AverageSamples(adcBuffer, 0);
-    res.ch[1].BatteryVoltage = r_heater_voltage;
+    res.ch[1].HeaterSupplyVoltage = r_heater_voltage;
 
     return res;
 }

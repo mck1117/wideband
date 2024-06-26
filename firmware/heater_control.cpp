@@ -42,7 +42,7 @@ HeaterState HeaterControllerBase::GetHeaterState() const
     return heaterState;
 }
 
-HeaterState HeaterControllerBase::GetNextState(HeaterState currentState, HeaterAllow heaterAllowState, float batteryVoltage, float sensorTemp)
+HeaterState HeaterControllerBase::GetNextState(HeaterState currentState, HeaterAllow heaterAllowState, float heaterSupplyVoltage, float sensorTemp)
 {
     bool heaterAllowed = heaterAllowState == HeaterAllow::Allowed;
 
@@ -50,14 +50,14 @@ HeaterState HeaterControllerBase::GetNextState(HeaterState currentState, HeaterA
     if (heaterAllowState == HeaterAllow::Unknown)
     {
         // measured voltage too low to auto-start heating
-        if (batteryVoltage < HEATER_BATTETY_OFF_VOLTAGE)
+        if (heaterSupplyVoltage < HEATER_BATTETY_OFF_VOLTAGE)
         {
             m_batteryStableTimer.reset();
             return HeaterState::NoHeaterSupply;
         }
-        else if (batteryVoltage > HEATER_BATTERY_ON_VOLTAGE)
+        else if (heaterSupplyVoltage > HEATER_BATTERY_ON_VOLTAGE)
         {
-            // measured voltage is high enougth to auto-start heating, wait some time to stabilize
+            // measured voltage is high enough to auto-start heating, wait some time to stabilize
             heaterAllowed = m_batteryStableTimer.hasElapsedSec(HEATER_BATTERY_STAB_TIME);
         }
     }
@@ -181,12 +181,12 @@ void HeaterControllerBase::Update(const ISampler& sampler, HeaterAllow heaterAll
 
     // If we haven't heard from the ECU, use the internally sensed
     // battery voltage instead of voltage over CAN.
-    float batteryVoltage = heaterAllowState == HeaterAllow::Unknown
-                                ? sampler.GetInternalBatteryVoltage()
+    float heaterSupplyVoltage = heaterAllowState == HeaterAllow::Unknown
+                                ? sampler.GetInternalHeaterVoltage()
                                 : GetRemoteBatteryVoltage();
 
     // Run the state machine
-    heaterState = GetNextState(heaterState, heaterAllowState, batteryVoltage, sensorTemperature);
+    heaterState = GetNextState(heaterState, heaterAllowState, heaterSupplyVoltage, sensorTemperature);
     float heaterVoltage = GetVoltageForState(heaterState, sensorEsr);
 
     // Limit to 12 volts
@@ -195,7 +195,7 @@ void HeaterControllerBase::Update(const ISampler& sampler, HeaterAllow heaterAll
     }
 
     // duty = (V_eff / V_batt) ^ 2
-    float voltageRatio = (batteryVoltage < 1.0f) ? 0 : heaterVoltage / batteryVoltage;
+    float voltageRatio = (heaterSupplyVoltage < 1.0f) ? 0 : heaterVoltage / heaterSupplyVoltage;
     float duty = voltageRatio * voltageRatio;
 
     #ifdef HEATER_MAX_DUTY
@@ -208,7 +208,7 @@ void HeaterControllerBase::Update(const ISampler& sampler, HeaterAllow heaterAll
     }
     #endif
 
-    if (batteryVoltage >= 23)
+    if (heaterSupplyVoltage >= 23)
     {
         duty = 0;
         heaterVoltage = 0;
