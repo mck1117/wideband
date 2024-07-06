@@ -20,6 +20,7 @@ void HeaterControllerBase::Configure(float targetTempC, float targetEsr)
     m_preheatTimer.reset();
     m_warmupTimer.reset();
     m_batteryStableTimer.reset();
+    m_closedLoopStableTimer.reset();
 }
 
 bool HeaterControllerBase::IsRunningClosedLoop() const
@@ -106,6 +107,7 @@ HeaterState HeaterControllerBase::GetNextState(HeaterState currentState, HeaterA
         case HeaterState::WarmupRamp:
             if (sensorTemp > closedLoopTemp)
             {
+                m_closedLoopStableTimer.reset();
                 return HeaterState::ClosedLoop;
             }
             else if (m_warmupTimer.hasElapsedSec(m_warmupTimeSec))
@@ -116,16 +118,22 @@ HeaterState HeaterControllerBase::GetNextState(HeaterState currentState, HeaterA
 
             break;
         case HeaterState::ClosedLoop:
-            // Check that the sensor's ESR is acceptable for normal operation
-            if (sensorTemp > overheatTemp)
-            {
-                SetFault(ch, Fault::SensorOverheat);
-                return HeaterState::Stopped;
-            }
-            else if (sensorTemp < underheatTemp)
-            {
-                SetFault(ch, Fault::SensorUnderheat);
-                return HeaterState::Stopped;
+            if (m_closedLoopStableTimer.hasElapsedSec(HEATER_CLOSED_LOOP_STAB_TIME)) {
+                // Check that the sensor's ESR is acceptable for normal operation
+                if (sensorTemp > overheatTemp)
+                {
+                    SetFault(ch, Fault::SensorOverheat);
+                    return HeaterState::Stopped;
+                }
+                else if (sensorTemp < underheatTemp)
+                {
+                    SetFault(ch, Fault::SensorUnderheat);
+                    return HeaterState::Stopped;
+                }
+            } else {
+                // give some time for stabilization...
+                // looks like heavy ramped Ipump affects sensorTemp measure
+                // and right after switch to closed loop sensorTemp drops below underhead threshold
             }
 
             break;
