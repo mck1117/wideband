@@ -144,7 +144,18 @@ void SendRusefiFormat(uint8_t ch)
     const auto& sampler = GetSampler(ch);
     const auto& heater = GetHeaterController(ch);
 
-    float nernstDc = sampler.GetNernstDc();
+    auto nernstDc = sampler.GetNernstDc();
+    auto pumpDuty = GetPumpOutputDuty(ch);
+    auto lambda = GetLambda(ch);
+
+    // Lambda is valid if:
+    // 1. Nernst voltage is near target
+    // 2. Pump driver isn't slammed in to the stop
+    // 3. Lambda is >0.6 (sensor isn't specified below that)
+    bool lambdaValid =
+            nernstDc > (NERNST_TARGET - 0.1f) && nernstDc < (NERNST_TARGET + 0.1f) &&
+            pumpDuty > 0.1f && pumpDuty < 0.9f &&
+            lambda > 0.6f;
 
     {
         CanTxTyped<wbo::StandardData> frame(baseAddress + 0);
@@ -152,22 +163,19 @@ void SendRusefiFormat(uint8_t ch)
         // The same header is imported by the ECU and checked against this data in the frame
         frame.get().Version = RUSEFI_WIDEBAND_VERSION;
 
-        uint16_t lambda = GetLambda(ch) * 10000;
-        frame.get().Lambda = lambda;
+        uint16_t lambdaInt = lambdaValid ? (lambda * 10000) : 0;
+        frame.get().Lambda = lambdaInt;
         frame.get().TemperatureC = sampler.GetSensorTemperature();
         bool heaterClosedLoop = heater.IsRunningClosedLoop();
-        bool nernstValid = nernstDc > (NERNST_TARGET - 0.1f) && nernstDc < (NERNST_TARGET + 0.1f);
-        frame.get().Valid = (heaterClosedLoop && nernstValid) ? 0x01 : 0x00;
+        frame.get().Valid = (heaterClosedLoop && lambdaValid) ? 0x01 : 0x00;
     }
 
     {
-        auto esr = sampler.GetSensorInternalResistance();
-
         CanTxTyped<wbo::DiagData> frame(baseAddress + 1);
 
-        frame.get().Esr = esr;
+        frame.get().Esr = sampler.GetSensorInternalResistance();
         frame.get().NernstDc = nernstDc * 1000;
-        frame.get().PumpDuty = GetPumpOutputDuty(ch) * 255;
+        frame.get().PumpDuty = pumpDuty * 255;
         frame.get().Status = GetCurrentFault(ch);
         frame.get().HeaterDuty = GetHeaterDuty(ch) * 255;
     }
