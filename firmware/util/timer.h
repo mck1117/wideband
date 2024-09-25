@@ -29,6 +29,7 @@ public:
 	float getElapsedSecondsAndReset();
 
 	static void setMockTime(int64_t stamp);
+	static void advanceMockTime(int64_t increment);
 
 private:
 	int64_t getTimestamp() const;

@@ -24,6 +24,10 @@ int64_t Timer::getTimestamp() const {
 	Timer::mockTimeStamp = stamp;
 }
 
+/*static*/ void Timer::advanceMockTime(int64_t increment) {
+	Timer::mockTimeStamp += increment;
+}
+
 #else
 #include "ch.hpp"
 
