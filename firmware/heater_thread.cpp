@@ -48,7 +48,15 @@ HeaterController heaterControllers[AFR_CHANNELS] =
     { 0, HEATER_PWM_CHANNEL_0 },
 
 #if AFR_CHANNELS >= 2
-    { 1, HEATER_PWM_CHANNEL_1 }
+    { 1, HEATER_PWM_CHANNEL_1 },
+#endif
+
+#if AFR_CHANNELS >= 3
+    { 1, HEATER_PWM_CHANNEL_2 },
+#endif
+
+#if AFR_CHANNELS >= 4
+    { 1, HEATER_PWM_CHANNEL_3 },
 #endif
 };
 
