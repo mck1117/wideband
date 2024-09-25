@@ -117,12 +117,22 @@ HeaterState HeaterControllerBase::GetNextState(HeaterState currentState, HeaterA
             break;
         case HeaterState::ClosedLoop:
             // Check that the sensor's ESR is acceptable for normal operation
-            if (sensorTemp > overheatTemp)
+            if (sensorTemp <= overheatTemp)
+            {
+                m_overheatTimer.reset();
+            }
+
+            if (sensorTemp >= underheatTemp)
+            {
+                m_underheatTimer.reset();
+            }
+
+            if (m_overheatTimer.hasElapsedSec(0.5f))
             {
                 SetFault(ch, Fault::SensorOverheat);
                 return HeaterState::Stopped;
             }
-            else if (sensorTemp < underheatTemp)
+            else if (m_underheatTimer.hasElapsedSec(0.5f))
             {
                 SetFault(ch, Fault::SensorUnderheat);
                 return HeaterState::Stopped;

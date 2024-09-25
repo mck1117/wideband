@@ -76,6 +76,12 @@ private:
     Timer m_preheatTimer;
     Timer m_warmupTimer;
 
+    // Stores the time since a non-over/underheat condition
+    // If the timer reaches a threshold, an over/underheat has
+    //    occured
+    Timer m_underheatTimer;
+    Timer m_overheatTimer;
+
     static const int batteryStabTimeCounter = HEATER_BATTERY_STAB_TIME / HEATER_CONTROL_PERIOD;
 };
 
