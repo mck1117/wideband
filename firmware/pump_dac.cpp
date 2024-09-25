@@ -30,8 +30,17 @@ static const PWMConfig pumpDacConfig = {
 
 static const uint8_t pumpDacPwmCh[] = {
     PUMP_DAC_PWM_CHANNEL_0,
-#if (AFR_CHANNELS > 1)
+
+#if (AFR_CHANNELS >= 2)
     PUMP_DAC_PWM_CHANNEL_1,
+#endif
+
+#if (AFR_CHANNELS >= 3)
+    PUMP_DAC_PWM_CHANNEL_2,
+#endif
+
+#if (AFR_CHANNELS >= 4)
+    PUMP_DAC_PWM_CHANNEL_3,
 #endif
 };
 
