@@ -12,18 +12,6 @@
 // this same header is imported by rusEFI to get struct layouts and firmware version
 #include "../for_rusefi/wideband_can.h"
 
-#ifdef STM32G4XX
-#define CAN_EXT(f) ((f).common.XTD)
-#define CAN_SID(f) ((f).std.SID)
-#define CAN_EID(f) ((f).ext.EID)
-#define CAN_ID(f) ((f).common.XTD ? CAN_EID(f) : CAN_SID(f))
-#else
-#define CAN_EXT(f) ((f).IDE)
-#define CAN_SID(f) ((f).SID)
-#define CAN_EID(f) ((f).EID)
-#define CAN_ID(f) ((f).IDE ? CAN_EID(f) : CAN_SID(f))
-#endif
-
 static Configuration* configuration;
 
 static THD_WORKING_AREA(waCanTxThread, 256);

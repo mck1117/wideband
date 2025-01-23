@@ -2,10 +2,23 @@
 
 #include <cstring>
 
+#include "can.h"
+
 CanTxMessage::CanTxMessage(uint32_t eid, uint8_t dlc, bool isExtended) {
-    m_frame.IDE = isExtended ? CAN_IDE_EXT : CAN_IDE_STD;
-    m_frame.EID = eid;
+    CAN_EXT(m_frame) = isExtended ? CAN_IDE_EXT : CAN_IDE_STD;
+
+    #ifdef STM32G4XX
+    m_frame.common.RTR = 0;
+    #else // Not CAN FD
     m_frame.RTR = CAN_RTR_DATA;
+    #endif
+
+    if (isExtended) {
+        CAN_EID(m_frame) = eid;
+    } else {
+        CAN_SID(m_frame) = eid;
+    }
+
     m_frame.DLC = dlc;
     memset(m_frame.data8, 0, sizeof(m_frame.data8));
 }
