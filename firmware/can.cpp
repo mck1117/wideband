@@ -12,6 +12,18 @@
 // this same header is imported by rusEFI to get struct layouts and firmware version
 #include "../for_rusefi/wideband_can.h"
 
+#ifdef STM32G4XX
+#define CAN_EXT(f) ((f).common.XTD)
+#define CAN_SID(f) ((f).std.SID)
+#define CAN_EID(f) ((f).ext.EID)
+#define CAN_ID(f) ((f).common.XTD ? CAN_EID(f) : CAN_SID(f))
+#else
+#define CAN_EXT(f) ((f).IDE)
+#define CAN_SID(f) ((f).SID)
+#define CAN_EID(f) ((f).EID)
+#define CAN_ID(f) ((f).IDE ? CAN_EID(f) : CAN_SID(f))
+#endif
+
 static Configuration* configuration;
 
 static THD_WORKING_AREA(waCanTxThread, 256);
@@ -33,9 +45,14 @@ static void SendAck()
 {
     CANTxFrame frame;
 
-    frame.IDE = CAN_IDE_EXT;
-    frame.EID = WB_ACK;
+#ifdef STM32G4XX
+    frame.common.RTR = 0;
+#else // Not CAN FD
     frame.RTR = CAN_RTR_DATA;
+#endif
+
+    CAN_EXT(frame) = 1;
+    CAN_EID(frame) = WB_ACK;
     frame.DLC = 0;
 
     canTransmitTimeout(&CAND1, CAN_ANY_MAILBOX, &frame, TIME_INFINITE);
@@ -63,12 +80,12 @@ void CanRxThread(void*)
         }
 
         // Ignore std frames, only listen to ext
-        if (frame.IDE != CAN_IDE_EXT)
+        if (!CAN_EXT(frame))
         {
             continue;
         }
 
-        if (frame.DLC == 2 && frame.EID == WB_MGS_ECU_STATUS) {
+        if (frame.DLC == 2 && CAN_ID(frame) == WB_MGS_ECU_STATUS) {
             // This is status from ECU - battery voltage and heater enable signal
 
             // data1 contains heater enable bit
@@ -94,7 +111,7 @@ void CanRxThread(void*)
             }
         }
         // If it's a bootloader entry request, reboot to the bootloader!
-        else if ((frame.DLC == 0 || frame.DLC == 1) && frame.EID == WB_BL_ENTER)
+        else if ((frame.DLC == 0 || frame.DLC == 1) && CAN_ID(frame) == WB_BL_ENTER)
         {
             // If 0xFF (force update all) or our ID, reset to bootloader, otherwise ignore
             if (frame.DLC == 0 || frame.data8[0] == 0xFF || frame.data8[0] == GetConfiguration()->CanIndexOffset)
@@ -108,7 +125,7 @@ void CanRxThread(void*)
             }
         }
         // Check if it's an "index set" message
-        else if (frame.DLC == 1 && frame.EID == WB_MSG_SET_INDEX)
+        else if (frame.DLC == 1 && CAN_ID(frame) == WB_MSG_SET_INDEX)
         {
             configuration = GetConfiguration();
             configuration->CanIndexOffset = frame.data8[0];
