@@ -24,10 +24,20 @@ static struct pump_control_state state[AFR_CHANNELS] =
     {
         Pid(pumpPidConfig),
     },
-#if (AFR_CHANNELS > 1)
+#if (AFR_CHANNELS >= 2)
     {
         Pid(pumpPidConfig),
-    }
+    },
+#endif
+#if (AFR_CHANNELS >= 3)
+    {
+        Pid(pumpPidConfig),
+    },
+#endif
+#if (AFR_CHANNELS >= 4)
+    {
+        Pid(pumpPidConfig),
+    },
 #endif
 };
 
