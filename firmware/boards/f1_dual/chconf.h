@@ -28,13 +28,28 @@
 #ifndef CHCONF_H
 #define CHCONF_H
 
-#ifndef __ASSEMBLER__
-// HACK: some compilers have a problem with syscalls_cpp.cpp not being able to find pid_t
-typedef int pid_t;
-#endif
-
 #define _CHIBIOS_RT_CONF_
 #define _CHIBIOS_RT_CONF_VER_7_0_
+
+/*===========================================================================*/
+/**
+ * @name System settings
+ * @{
+ */
+/*===========================================================================*/
+
+/**
+ * @brief   Handling of instances.
+ * @note    If enabled then threads assigned to various instances can
+ *          interact each other using the same synchronization objects.
+ *          If disabled then each OS instance is a separate world, no
+ *          direct interactions are handled by the OS.
+ */
+#if !defined(CH_CFG_SMP_MODE)
+#define CH_CFG_SMP_MODE                     FALSE
+#endif
+
+/** @} */
 
 /*===========================================================================*/
 /**
@@ -45,7 +60,7 @@ typedef int pid_t;
 
 /**
  * @brief   System time counter resolution.
- * @note    Allowed values are 16 or 32 bits.
+ * @note    Allowed values are 16, 32 or 64 bits.
  */
 #if !defined(CH_CFG_ST_RESOLUTION)
 #define CH_CFG_ST_RESOLUTION                16
@@ -167,8 +182,7 @@ typedef int pid_t;
 
 /**
  * @brief   Time Stamps APIs.
- * @details If enabled then the time time stamps APIs are included in
- *          the kernel.
+ * @details If enabled then the time stamps APIs are included in the kernel.
  *
  * @note    The default is @p TRUE.
  */
@@ -643,21 +657,35 @@ typedef int pid_t;
 /*===========================================================================*/
 
 /**
- * @brief   OS instance structure extension.
+ * @brief   System structure extension.
  * @details User fields added to the end of the @p ch_system_t structure.
+ */
+#define CH_CFG_SYSTEM_EXTRA_FIELDS                                          \
+  /* Add system custom fields here.*/
+
+/**
+ * @brief   System initialization hook.
+ * @details User initialization code added to the @p chSysInit() function
+ *          just before interrupts are enabled globally.
+ */
+#define CH_CFG_SYSTEM_INIT_HOOK() {                                         \
+  /* Add system initialization code here.*/                                 \
+}
+
+/**
+ * @brief   OS instance structure extension.
+ * @details User fields added to the end of the @p os_instance_t structure.
  */
 #define CH_CFG_OS_INSTANCE_EXTRA_FIELDS                                     \
   /* Add OS instance custom fields here.*/
 
 /**
  * @brief   OS instance initialization hook.
- * @details User initialization code added to the @p chSysInit() function
- *          just before interrupts are enabled globally.
  *
  * @param[in] oip       pointer to the @p os_instance_t structure
  */
 #define CH_CFG_OS_INSTANCE_INIT_HOOK(oip) {                                 \
-  /* Add system instance initialization code here.*/                        \
+  /* Add OS instance initialization code here.*/                            \
 }
 
 /**
@@ -768,6 +796,14 @@ typedef int pid_t;
  */
 #define CH_CFG_TRACE_HOOK(tep) {                                            \
   /* Trace code here.*/                                                     \
+}
+
+/**
+ * @brief   Runtime Faults Collection Unit hook.
+ * @details This hook is invoked each time new faults are collected and stored.
+ */
+#define CH_CFG_RUNTIME_FAULTS_HOOK(mask) {                                  \
+  /* Faults handling code here.*/                                           \
 }
 
 /** @} */
