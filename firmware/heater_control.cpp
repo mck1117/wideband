@@ -15,10 +15,10 @@ static const PidConfig heaterPidConfig =
 };
 
 HeaterControllerBase::HeaterControllerBase(int ch, int preheatTimeSec, int warmupTimeSec)
-    : ch(ch)
+    : m_pid(heaterPidConfig)
+    , ch(ch)
     , m_preheatTimeSec(preheatTimeSec)
     , m_warmupTimeSec(warmupTimeSec)
-    , m_pid(heaterPidConfig)
 {
 }
 
