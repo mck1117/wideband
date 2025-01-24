@@ -1,5 +1,6 @@
-#include "can.h"
 #include "hal.h"
+
+#include "can.h"
 
 #include "fault.h"
 #include "can_helper.h"
