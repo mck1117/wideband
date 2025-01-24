@@ -29,7 +29,7 @@
 #define HALCONF_H
 
 #define _CHIBIOS_HAL_CONF_
-#define _CHIBIOS_HAL_CONF_VER_7_1_
+#define _CHIBIOS_HAL_CONF_VER_8_4_
 
 #include "mcuconf.h"
 
@@ -471,11 +471,10 @@
 #endif
 
 /**
- * @brief   Enables circular transfers APIs.
- * @note    Disabling this option saves both code and data space.
+ * @brief   Inserts an assertion on function errors before returning.
  */
-#if !defined(SPI_USE_CIRCULAR) || defined(__DOXYGEN__)
-#define SPI_USE_CIRCULAR                    FALSE
+#if !defined(SPI_USE_ASSERT_ON_ERROR) || defined(__DOXYGEN__)
+#define SPI_USE_ASSERT_ON_ERROR             TRUE
 #endif
 
 /**
