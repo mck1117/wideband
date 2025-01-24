@@ -42,7 +42,7 @@ static void UartThread(void*)
             int batteryVoltageMv = GetSampler(ch).GetInternalHeaterVoltage() * 1000;
             int duty = GetHeaterDuty(ch) * 100;
 
-            size_t writeCount = chsnprintf(printBuffer, 200,
+            size_t writeCount = chsnprintf(printBuffer, sizeof(printBuffer),
                 "[AFR%d]: %d.%03d DC: %4d mV AC: %4d mV ESR: %5d T: %4d C Ipump: %6d uA Vheater: %5d heater: %s (%d)\tfault: %s\r\n",
                 ch,
                 lambdaIntPart, lambdaThousandths,
@@ -59,7 +59,7 @@ static void UartThread(void*)
 
 #if (EGT_CHANNELS > 0)
         for (ch = 0; ch < EGT_CHANNELS; ch++) {
-            size_t writeCount = chsnprintf(printBuffer, 200,
+            size_t writeCount = chsnprintf(printBuffer, sizeof(printBuffer),
                 "EGT[%d]: %d C (int %d C)\r\n",
                 (int)getEgtDrivers()[ch].temperature,
                 (int)getEgtDrivers()[ch].coldJunctionTemperature);
