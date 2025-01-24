@@ -5,10 +5,20 @@
 
 using namespace wbo;
 
+static const PidConfig heaterPidConfig =
+{
+    .kP = 0.3f,      // kP
+    .kI = 0.3f,      // kI
+    .kD = 0.01f,     // kD
+    .clamp = 3.0f,      // Integrator clamp (volts)
+    .periodMs = HEATER_CONTROL_PERIOD,
+};
+
 HeaterControllerBase::HeaterControllerBase(int ch, int preheatTimeSec, int warmupTimeSec)
     : ch(ch)
     , m_preheatTimeSec(preheatTimeSec)
     , m_warmupTimeSec(warmupTimeSec)
+    , m_pid(heaterPidConfig)
 {
 }
 
@@ -170,7 +180,7 @@ float HeaterControllerBase::GetVoltageForState(HeaterState state, float sensorEs
             // Negated because lower resistance -> hotter
 
             // TODO: heater PID should operate on temperature, not ESR
-            return 7.5f - heaterPid.GetOutput(m_targetEsr, sensorEsr);
+            return 7.5f - m_pid.GetOutput(m_targetEsr, sensorEsr);
         case HeaterState::Stopped:
             // Something has gone wrong, turn off the heater.
             return 0;

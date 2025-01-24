@@ -48,14 +48,7 @@ public:
     float GetVoltageForState(HeaterState state, float sensorEsr);
 
 private:
-    Pid heaterPid =
-        {
-            0.3f,      // kP
-            0.3f,      // kI
-            0.01f,     // kD
-            3.0f,      // Integrator clamp (volts)
-            HEATER_CONTROL_PERIOD
-        };
+    Pid m_pid;
 
     float rampVoltage = 0;
     float heaterVoltage = 0;
