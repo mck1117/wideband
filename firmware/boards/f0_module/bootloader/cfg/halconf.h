@@ -230,7 +230,7 @@
  * @note    Disabling this option saves both code and data space.
  */
 #if !defined(ADC_USE_WAIT) || defined(__DOXYGEN__)
-#define ADC_USE_WAIT                        TRUE
+#define ADC_USE_WAIT                        FALSE
 #endif
 
 /**
@@ -292,14 +292,14 @@
  * @note    Disabling this option saves both code and data space.
  */
 #if !defined(SPI_USE_WAIT) || defined(__DOXYGEN__)
-#define SPI_USE_WAIT                        TRUE
+#define SPI_USE_WAIT                        FALSE
 #endif
 
 /**
  * @brief   Inserts an assertion on function errors before returning.
  */
 #if !defined(SPI_USE_ASSERT_ON_ERROR) || defined(__DOXYGEN__)
-#define SPI_USE_ASSERT_ON_ERROR             TRUE
+#define SPI_USE_ASSERT_ON_ERROR             FALSE
 #endif
 
 /**
@@ -307,7 +307,7 @@
  * @note    Disabling this option saves both code and data space.
  */
 #if !defined(SPI_USE_MUTUAL_EXCLUSION) || defined(__DOXYGEN__)
-#define SPI_USE_MUTUAL_EXCLUSION            TRUE
+#define SPI_USE_MUTUAL_EXCLUSION            FALSE
 #endif
 
 /**
