@@ -44,7 +44,7 @@ jobs:
         run: ./build_wideband.sh
 
       - name: Attach binaries
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: Wideband ${{matrix.build-target}}
           path: ./firmware/deliver/${{matrix.build-target}}/wideband*
