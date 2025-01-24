@@ -18,7 +18,7 @@
 SerialConfig cfg = {
     .speed = DEBUG_SERIAL_BAUDRATE,
     .cr1 = 0,
-    .cr2 = USART_CR2_STOP1_BITS | USART_CR2_LINEN,
+    .cr2 = USART_CR2_STOP1_BITS,
     .cr3 = 0
 };
 
