@@ -39,7 +39,7 @@ static void UartThread(void*)
             float lambda = GetLambda(ch);
             int lambdaIntPart = lambda;
             int lambdaThousandths = (lambda - lambdaIntPart) * 1000;
-            int batteryVoltageMv = GetSampler(ch).GetInternalHeaterVoltage() * 1000;
+            int heaterVoltageMv = GetSampler(ch).GetInternalHeaterVoltage() * 1000;
             int duty = GetHeaterDuty(ch) * 100;
 
             size_t writeCount = chsnprintf(printBuffer, sizeof(printBuffer),
@@ -51,7 +51,7 @@ static void UartThread(void*)
                 (int)GetSampler(ch).GetSensorInternalResistance(),
                 (int)GetSampler(ch).GetSensorTemperature(),
                 (int)(GetSampler(ch).GetPumpNominalCurrent() * 1000),
-                batteryVoltageMv,
+                heaterVoltageMv,
                 describeHeaterState(GetHeaterState(ch)), duty,
                 describeFault(GetCurrentFault(ch)));
             chnWrite(&SD1, (const uint8_t *)printBuffer, writeCount);
