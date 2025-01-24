@@ -11,14 +11,22 @@ struct pump_control_state {
     Pid pumpPid;
 };
 
+PidConfig pumpPidConfig = {
+    .kP = 50,
+    .kI = 10000,
+    .kD = 0,
+    .clamp = 10,
+    .periodMs = 2,
+};
+
 static struct pump_control_state state[AFR_CHANNELS] =
 {
     {
-        Pid(50.0f, 10000.0f, 0.0f, 10.0f, 2),
+        Pid(pumpPidConfig),
     },
 #if (AFR_CHANNELS > 1)
     {
-        Pid(50.0f, 10000.0f, 0.0f, 10.0f, 2),
+        Pid(pumpPidConfig),
     }
 #endif
 };
