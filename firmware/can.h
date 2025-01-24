@@ -1,7 +1,5 @@
 #pragma once
 
-#include "hal.h"
-
 #include <cstdint>
 
 void InitCan();
