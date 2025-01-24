@@ -13,12 +13,16 @@
 #include "tunerstudio_io.h"
 #include "wideband_board_config.h"
 
+#ifndef PORT_EXTRA_SERIAL_CR2
+#define PORT_EXTRA_SERIAL_CR2 0
+#endif
+
 #ifdef DEBUG_SERIAL_PORT
 
 SerialConfig cfg = {
     .speed = DEBUG_SERIAL_BAUDRATE,
     .cr1 = 0,
-    .cr2 = USART_CR2_STOP1_BITS,
+    .cr2 = USART_CR2_STOP1_BITS | PORT_EXTRA_SERIAL_CR2,
     .cr3 = 0
 };
 
