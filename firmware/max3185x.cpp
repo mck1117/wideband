@@ -13,7 +13,9 @@ static SPIConfig spi_config[2] =
 {
 	{
 		.circular = false,
-		.end_cb = NULL,
+		.slave = false,
+		.data_cb = nullptr,
+		.error_cb = nullptr,
 		.ssport = EGT_CS0_PORT,
 		.sspad = EGT_CS0_PIN,
 		.cr1 =
@@ -26,7 +28,9 @@ static SPIConfig spi_config[2] =
 	},
 	{
 		.circular = false,
-		.end_cb = NULL,
+		.slave = false,
+		.data_cb = nullptr,
+		.error_cb = nullptr,
 		.ssport = EGT_CS1_PORT,
 		.sspad = EGT_CS1_PIN,
 		.cr1 =

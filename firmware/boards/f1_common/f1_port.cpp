@@ -40,6 +40,7 @@ static const MFSConfig mfscfg1 = {
 };
 
 static MFSDriver mfs1;
+static mfs_nocache_buffer_t __nocache_mfsbuf;
 
 // Settings
 static Configuration cfg;
@@ -77,7 +78,7 @@ int InitConfiguration()
     /* Starting EFL driver.*/
     eflStart(&EFLD1, NULL);
 
-    mfsObjectInit(&mfs1);
+    mfsObjectInit(&mfs1, &__nocache_mfsbuf);
 
     mfs_error_t err = mfsStart(&mfs1, &mfscfg1);
     if (err != MFS_NO_ERROR) {
