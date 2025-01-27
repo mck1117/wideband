@@ -3,13 +3,14 @@
 float Pid::GetOutput(float setpoint, float observation)
 {
     float error = setpoint - observation;
+    float periodSec = 1e-3 * m_config->periodMs;
 
     // Integrate error
-    m_integrator += error * m_config->periodMs * m_config->kI;
+    m_integrator += error * periodSec * m_config->kI;
 
     // Differentiate error
     float errorDelta = error - m_lastError;
-    float dEdt = errorDelta / m_config->periodMs;
+    float dEdt = errorDelta / periodSec;
     m_lastError = error;
 
     // Clamp to +- 1
