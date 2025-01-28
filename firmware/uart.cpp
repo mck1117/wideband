@@ -39,6 +39,18 @@ static void UartThread(void*)
     {
         int ch;
 
+        #ifdef BOARD_HAS_VOLTAGE_SENSE
+        {
+            float vbatt = GetSupplyVoltage();
+
+            int vbattIntPart = vbatt;
+            int vbattTenths = (vbatt - vbattIntPart) * 10;
+
+            size_t writeCount = chsnprintf(printBuffer, sizeof(printBuffer), "Board: VBatt %d.%01d\r\n", vbattIntPart, vbattTenths);
+            chnWrite(&SD1, (const uint8_t *)printBuffer, writeCount);
+        }
+        #endif
+
         for (ch = 0; ch < AFR_CHANNELS; ch++) {
             float lambda = GetLambda(ch);
             int lambdaIntPart = lambda;

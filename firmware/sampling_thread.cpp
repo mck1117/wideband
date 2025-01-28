@@ -16,6 +16,15 @@ const ISampler& GetSampler(int ch)
 
 static THD_WORKING_AREA(waSamplingThread, 256);
 
+#ifdef BOARD_HAS_VOLTAGE_SENSE
+static float supplyVoltage = 0;
+
+float GetSupplyVoltage()
+{
+    return supplyVoltage;
+}
+#endif
+
 static void SamplingThread(void*)
 {
     chRegSetThreadName("Sampling");
@@ -31,6 +40,10 @@ static void SamplingThread(void*)
 
         // Toggle the pin after sampling so that any switching noise occurs while we're doing our math instead of when sampling
         ToggleESRDriver(GetSensorType());
+
+        #ifdef BOARD_HAS_VOLTAGE_SENSE
+        supplyVoltage = result.SupplyVoltage;
+        #endif
 
         for (int ch = 0; ch < AFR_CHANNELS; ch++)
         {
