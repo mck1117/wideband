@@ -5,6 +5,11 @@
 
 #include "hal.h"
 
+void PortPrepareAnalogSampling()
+{
+    adcStart(&ADCD1, nullptr);
+}
+
 #define ADC_CHANNEL_COUNT 8
 #define ADC_SAMPLE ADC_SAMPLE_7P5
 

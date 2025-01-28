@@ -64,6 +64,7 @@ void StartSampling()
         samplers[i].Init();
     }
 
-    adcStart(&ADCD1, nullptr);
+    PortPrepareAnalogSampling();
+
     chThdCreateStatic(waSamplingThread, sizeof(waSamplingThread), NORMALPRIO + 5, SamplingThread, nullptr);
 }

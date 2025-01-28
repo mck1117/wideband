@@ -7,6 +7,11 @@
 
 #define ADC_CHANNEL_COUNT 3
 
+void PortPrepareAnalogSampling()
+{
+    adcStart(&ADCD1, nullptr);
+}
+
 static adcsample_t adcBuffer[ADC_CHANNEL_COUNT * ADC_OVERSAMPLE];
 
 const ADCConversionGroup convGroup =
