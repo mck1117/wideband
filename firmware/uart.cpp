@@ -8,6 +8,7 @@
 #include "max3185x.h"
 #include "fault.h"
 #include "uart.h"
+#include "pump_dac.h"
 
 #include "tunerstudio.h"
 #include "tunerstudio_io.h"
@@ -56,10 +57,11 @@ static void UartThread(void*)
             int lambdaIntPart = lambda;
             int lambdaThousandths = (lambda - lambdaIntPart) * 1000;
             int heaterVoltageMv = GetSampler(ch).GetInternalHeaterVoltage() * 1000;
-            int duty = GetHeaterDuty(ch) * 100;
+            int heaterDuty = GetHeaterDuty(ch) * 100;
+            int pumpDuty = GetPumpOutputDuty(ch) * 100;
 
             size_t writeCount = chsnprintf(printBuffer, sizeof(printBuffer),
-                "[AFR%d]: %d.%03d DC: %4d mV AC: %4d mV ESR: %5d T: %4d C Ipump: %6d uA Vheater: %5d heater: %s (%d)\tfault: %s\r\n",
+                "[AFR%d]: %d.%03d DC: %4d mV AC: %4d mV ESR: %5d T: %4d C Ipump: %6d uA PumpDac: %3d Vheater: %5d heater: %s (%d)\tfault: %s\r\n",
                 ch,
                 lambdaIntPart, lambdaThousandths,
                 (int)(GetSampler(ch).GetNernstDc() * 1000.0),
@@ -67,8 +69,9 @@ static void UartThread(void*)
                 (int)GetSampler(ch).GetSensorInternalResistance(),
                 (int)GetSampler(ch).GetSensorTemperature(),
                 (int)(GetSampler(ch).GetPumpNominalCurrent() * 1000),
+                pumpDuty,
                 heaterVoltageMv,
-                describeHeaterState(GetHeaterState(ch)), duty,
+                describeHeaterState(GetHeaterState(ch)), heaterDuty,
                 describeFault(GetCurrentFault(ch)));
             chnWrite(&SD1, (const uint8_t *)printBuffer, writeCount);
         }
