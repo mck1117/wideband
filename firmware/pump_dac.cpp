@@ -11,6 +11,7 @@
 
 // 48MHz / 1024 = 46.8khz PWM
 // 64MHz / 1024 = 62.5khz PWM
+// 160MHz / 1024 = 156.25khz PWM
 static const PWMConfig pumpDacConfig = {
     STM32_SYSCLK,
     1024,
