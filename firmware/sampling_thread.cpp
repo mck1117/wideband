@@ -25,6 +25,12 @@ float GetSupplyVoltage()
 }
 #endif
 
+static float mcuTemp = 0;
+float GetMcuTemperature()
+{
+    return mcuTemp;
+}
+
 static void SamplingThread(void*)
 {
     chRegSetThreadName("Sampling");
@@ -44,6 +50,7 @@ static void SamplingThread(void*)
         #ifdef BOARD_HAS_VOLTAGE_SENSE
         supplyVoltage = result.SupplyVoltage;
         #endif
+        mcuTemp = result.McuTemp;
 
         for (int ch = 0; ch < AFR_CHANNELS; ch++)
         {

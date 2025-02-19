@@ -47,7 +47,9 @@ static void UartThread(void*)
             int vbattIntPart = vbatt;
             int vbattTenths = (vbatt - vbattIntPart) * 10;
 
-            size_t writeCount = chsnprintf(printBuffer, sizeof(printBuffer), "Board: VBatt %d.%01d\r\n", vbattIntPart, vbattTenths);
+            int tempC = GetMcuTemperature();
+
+            size_t writeCount = chsnprintf(printBuffer, sizeof(printBuffer), "Board: VBatt %d.%01d Temp %d deg C\r\n", vbattIntPart, vbattTenths, tempC);
             chnWrite(&SD1, (const uint8_t *)printBuffer, writeCount);
         }
         #endif

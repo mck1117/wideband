@@ -79,6 +79,9 @@ AnalogResult AnalogSample()
          * VirtualGroundVoltageInt is used to calculate Ip current only as it
          * is used as offset for diffirential amp */
         .VirtualGroundVoltageInt = HALF_VCC,
+
+        // TODO!
+        .McuTemp = 0,
     };
 }
 

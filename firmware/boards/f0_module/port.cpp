@@ -56,6 +56,9 @@ AnalogResult AnalogSample()
             },
         },
         .VirtualGroundVoltageInt = AverageSamples(adcBuffer, 2),
+
+        // TODO!
+        .McuTemp = 0,
     };
 }
 

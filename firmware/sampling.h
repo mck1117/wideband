@@ -51,4 +51,6 @@ const ISampler& GetSampler(int ch);
 float GetSupplyVoltage();
 #endif
 
+float GetMcuTemperature();
+
 void StartSampling();

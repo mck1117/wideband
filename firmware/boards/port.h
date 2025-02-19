@@ -23,6 +23,8 @@ struct AnalogResult
     #ifdef BOARD_HAS_VOLTAGE_SENSE
     float SupplyVoltage;
     #endif
+
+    float McuTemp;
 };
 
 // Enable ADCs, configure pins, etc
