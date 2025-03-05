@@ -25,7 +25,8 @@ void CanTxThread(void*)
 
     while(1)
     {
-        for (int ch = 0; ch < AFR_CHANNELS; ch++) {
+        for (int ch = 0; ch < AFR_CHANNELS; ch++)
+        {
             SendCanForChannel(ch);
         }
 
@@ -77,7 +78,8 @@ void CanRxThread(void*)
             continue;
         }
 
-        if (frame.DLC == 2 && CAN_ID(frame) == WB_MGS_ECU_STATUS) {
+        if (frame.DLC == 2 && CAN_ID(frame) == WB_MGS_ECU_STATUS)
+        {
             // This is status from ECU - battery voltage and heater enable signal
 
             // data1 contains heater enable bit
