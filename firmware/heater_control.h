@@ -14,7 +14,6 @@ enum class HeaterState
     WarmupRamp,
     ClosedLoop,
     Stopped,
-    NoHeaterSupply,
 };
 
 struct ISampler;
