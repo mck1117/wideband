@@ -13,14 +13,14 @@ class Pid
 {
 public:
     Pid(const PidConfig& config) 
-        : m_config(&config)
+        : m_config(config)
     {
     }
 
     float GetOutput(float setpoint, float observation);
 
 private:
-    const PidConfig* const m_config;
+    const PidConfig& m_config;
 
     float m_lastError = 0;
     float m_integrator = 0;
