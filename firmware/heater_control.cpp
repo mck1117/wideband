@@ -11,11 +11,10 @@ static const PidConfig heaterPidConfig =
     .kI = 0.3f,      // kI
     .kD = 0.01f,     // kD
     .clamp = 3.0f,      // Integrator clamp (volts)
-    .periodMs = HEATER_CONTROL_PERIOD,
 };
 
 HeaterControllerBase::HeaterControllerBase(int ch, int preheatTimeSec, int warmupTimeSec)
-    : m_pid(heaterPidConfig)
+    : m_pid(heaterPidConfig, HEATER_CONTROL_PERIOD)
     , ch(ch)
     , m_preheatTimeSec(preheatTimeSec)
     , m_warmupTimeSec(warmupTimeSec)

@@ -6,14 +6,14 @@ struct PidConfig
     float kI;
     float kD;
     float clamp;
-    int periodMs;
 };
 
 class Pid
 {
 public:
-    Pid(const PidConfig& config) 
+    Pid(const PidConfig& config, float periodMs) 
         : m_config(config)
+        , m_periodSec(1e-3 * periodMs)
     {
     }
 
@@ -21,6 +21,7 @@ public:
 
 private:
     const PidConfig& m_config;
+    const float m_periodSec;
 
     float m_lastError = 0;
     float m_integrator = 0;

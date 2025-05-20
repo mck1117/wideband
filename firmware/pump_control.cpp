@@ -16,27 +16,26 @@ PidConfig pumpPidConfig = {
     .kI = 10000,
     .kD = 0,
     .clamp = 10,
-    .periodMs = 2,
 };
 
 static struct pump_control_state state[AFR_CHANNELS] =
 {
     {
-        Pid(pumpPidConfig),
+        Pid(pumpPidConfig, PUMP_CONTROL_PERIOD),
     },
 #if (AFR_CHANNELS >= 2)
     {
-        Pid(pumpPidConfig),
+        Pid(pumpPidConfig, PUMP_CONTROL_PERIOD),
     },
 #endif
 #if (AFR_CHANNELS >= 3)
     {
-        Pid(pumpPidConfig),
+        Pid(pumpPidConfig, PUMP_CONTROL_PERIOD),
     },
 #endif
 #if (AFR_CHANNELS >= 4)
     {
-        Pid(pumpPidConfig),
+        Pid(pumpPidConfig, PUMP_CONTROL_PERIOD),
     },
 #endif
 };
@@ -74,7 +73,7 @@ static void PumpThread(void*)
         }
 
         // Run at 500hz
-        chThdSleepMilliseconds(2);
+        chThdSleepMilliseconds(PUMP_CONTROL_PERIOD);
     }
 }
 

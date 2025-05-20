@@ -35,6 +35,8 @@
 // *******************************
 #define NERNST_TARGET (0.45f)
 
+#define PUMP_CONTROL_PERIOD 2
+
 // *******************************
 //    Heater controller config
 // *******************************
