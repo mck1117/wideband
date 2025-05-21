@@ -17,6 +17,12 @@
 #define WB_BL_BASE (WB_BL_HEADER << 4)
 #define WB_BL_CMD(opcode, extra) (((WB_BL_BASE | (opcode)) << 16) | (extra))
 
+#define WB_BL_CMD_MASK  0X0FFF0000
+
+#define WB_MSG_GET_HEADER(id)   (((id) >> 20) & 0XFFF)
+#define WB_MSG_GET_OPCODE(id)   (((id) >> 16) & 0XF)
+#define WB_MSG_GET_EXTRA(id)    ((id) & 0XFFFF)
+
 // 0xEF0'0000
 #define WB_BL_ENTER WB_BL_CMD(WB_OPCODE_START, 0)
 // 0xEF1'5A5A
