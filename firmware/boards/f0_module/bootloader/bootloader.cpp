@@ -182,7 +182,7 @@ void RunBootloaderLoop()
                 }
 
                 break;
-            case 0x02: // opcode 2 is "write flash data"
+            case WB_OPCODE_DATA: // opcode 2 is "write flash data"
                 // Embedded data is the flash address
 
                 // Don't allow misaligned writes
