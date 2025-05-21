@@ -13,6 +13,7 @@
 #define WB_OPCODE_REBOOT 3
 #define WB_OPCODE_SET_INDEX 4
 #define WB_OPCODE_ECU_STATUS 5
+#define WB_OPCODE_PING 6
 
 #define WB_BL_BASE (WB_BL_HEADER << 4)
 #define WB_BL_CMD(opcode, extra) (((WB_BL_BASE | (opcode)) << 16) | (extra))
@@ -35,6 +36,8 @@
 #define WB_MSG_SET_INDEX WB_BL_CMD(WB_OPCODE_SET_INDEX, 0)
 // 0xEF5'0000
 #define WB_MSG_ECU_STATUS WB_BL_CMD(WB_OPCODE_ECU_STATUS, 0)
+// 0xEF6'0000
+#define WB_MSG_PING WB_BL_CMD(WB_OPCODE_PING, 0)
 
 #define WB_DATA_BASE_ADDR 0x190
 
@@ -82,6 +85,19 @@ struct DiagData
 
     uint8_t HeaterDuty;
     uint8_t pad;
+};
+
+struct PongData
+{
+    uint8_t hwId;
+    uint8_t Version;
+
+    // FW build date
+    uint8_t year; // starting from 2000
+    uint8_t month;
+    uint8_t day;
+
+    uint8_t reserved[3];
 };
 
 static inline const char* describeStatus(Status status) {
