@@ -63,13 +63,35 @@ public:
     // Actual configuration data
     union {
         struct {
-            uint8_t CanIndexOffset = 0;
+            uint8_t NoLongerUsed0 = 0;
             // AUX0 and AUX1 curves
             float auxOutBins[2][8];
             float auxOutValues[2][8];
             AuxOutputMode auxOutputSource[2];
 
             SensorType sensorType;
+
+            // per AFR channel settings
+            struct {
+                bool RusEfiTx:1;
+                bool RusEfiTxDiag:1;
+                bool AemNetTx:1;
+
+                uint8_t RusEfiIdOffset;
+                uint8_t AemNetIdOffset;
+                uint8_t pad[5];
+            } afr[2];
+
+            // per EGT channel settings
+            struct {
+                bool RusEfiTx:1;
+                bool RusEfiTxDiag:1;
+                bool AemNetTx:1;
+
+                uint8_t RusEfiIdOffset;
+                uint8_t AemNetIdOffset;
+                uint8_t pad[5];
+            } egt[2];
         } __attribute__((packed));
 
         // pad to 256 bytes including tag
