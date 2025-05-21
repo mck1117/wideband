@@ -81,6 +81,12 @@ void CanRxThread(void*)
             continue;
         }
 
+        // Ignore not ours frames
+        if (WB_MSG_GET_HEADER(CAN_ID(frame)) != WB_BL_HEADER)
+        {
+            continue;
+        }
+
         if (frame.DLC >= 2 && CAN_ID(frame) == WB_MSG_ECU_STATUS)
         {
             // This is status from ECU
