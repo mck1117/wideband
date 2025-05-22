@@ -154,7 +154,7 @@ void RunBootloaderLoop()
         //  y = opcode
         // zzzz = extra 2 data bytes hidden in the address!
 
-        uint16_t header = frame.EID >> 20;
+        uint16_t header = WB_MSG_GET_HEADER(frame.EID);
 
         // All rusEfi bootloader packets start with 0x0EF, ignore other traffic on the bus
         if (header != WB_BL_HEADER)
@@ -162,8 +162,8 @@ void RunBootloaderLoop()
             continue;
         }
 
-        uint8_t opcode = (frame.EID >> 16) & 0x0F;
-        uint16_t embeddedData = frame.EID & 0xFFFF;
+        uint8_t opcode = WB_MSG_GET_OPCODE(frame.EID);
+        uint16_t embeddedData = WB_MSG_GET_EXTRA(frame.EID);
 
         switch (opcode) {
             case WB_OPCODE_START: // opcode 0 is simply the "enter BL" command, but we're already here.  Send an ack.
@@ -182,7 +182,7 @@ void RunBootloaderLoop()
                 }
 
                 break;
-            case 0x02: // opcode 2 is "write flash data"
+            case WB_OPCODE_DATA: // opcode 2 is "write flash data"
                 // Embedded data is the flash address
 
                 // Don't allow misaligned writes
