@@ -15,7 +15,7 @@
 
 static Configuration* configuration;
 
-static THD_WORKING_AREA(waCanTxThread, 256);
+static THD_WORKING_AREA(waCanTxThread, 512);
 void CanTxThread(void*)
 {
     chRegSetThreadName("CAN Tx");
