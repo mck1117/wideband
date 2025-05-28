@@ -40,9 +40,12 @@ static void SamplingThread(void*)
     /* GD32: Insert 20us delay after ADC enable */
     chThdSleepMilliseconds(1);
 
+    AnalogSampleStart();
+
     while(true)
     {
-        auto result = AnalogSample();
+        auto result = AnalogSampleFinish();
+        AnalogSampleStart();
 
         // Toggle the pin after sampling so that any switching noise occurs while we're doing our math instead of when sampling
         ToggleESRDriver(GetSensorType());

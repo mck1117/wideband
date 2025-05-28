@@ -218,7 +218,7 @@
  * @note    The default is @p TRUE.
  */
 #if !defined(CH_CFG_USE_SEMAPHORES)
-#define CH_CFG_USE_SEMAPHORES               FALSE
+#define CH_CFG_USE_SEMAPHORES               TRUE
 #endif
 
 /**
