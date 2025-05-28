@@ -89,6 +89,9 @@ const char *getTsSignature();
 
 void rebootNow();
 void rebootToOpenblt();
+void rebootToDfu();
+
+extern "C" void checkDfuAndJump();
 
 // LSU4.2, LSU4.9 or LSU_ADV
 SensorType GetSensorType();
