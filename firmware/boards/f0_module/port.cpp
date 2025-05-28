@@ -121,15 +121,15 @@ Configuration* GetConfiguration()
 
     // See https://github.com/mck1117/wideband/issues/11 to explain this madness
     switch (3 * sel1 + sel2) {
-        case 0: config.CanIndexOffset = 2; break;
-        case 1: config.CanIndexOffset = 0; break;
-        case 2: config.CanIndexOffset = 3; break;
-        case 3: config.CanIndexOffset = 4; break;
+        case 0: config.afr[0].RusEfiIdOffset = 2; break;
+        case 1: config.afr[0].RusEfiIdOffset = 0; break;
+        case 2: config.afr[0].RusEfiIdOffset = 3; break;
+        case 3: config.afr[0].RusEfiIdOffset = 4; break;
         case 4: /* both floating, do nothing */ break;
-        case 5: config.CanIndexOffset = 1; break;
-        case 6: config.CanIndexOffset = 5; break;
-        case 7: config.CanIndexOffset = 6; break;
-        case 8: config.CanIndexOffset = 7; break;
+        case 5: config.afr[0].RusEfiIdOffset = 1; break;
+        case 6: config.afr[0].RusEfiIdOffset = 5; break;
+        case 7: config.afr[0].RusEfiIdOffset = 6; break;
+        case 8: config.afr[0].RusEfiIdOffset = 7; break;
         default: break;
     }
 
