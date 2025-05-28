@@ -29,7 +29,8 @@ struct AnalogResult
 
 // Enable ADCs, configure pins, etc
 void PortPrepareAnalogSampling();
-AnalogResult AnalogSample();
+void AnalogSampleStart();
+AnalogResult AnalogSampleFinish();
 
 enum class SensorType : uint8_t {
     LSU49 = 0,
