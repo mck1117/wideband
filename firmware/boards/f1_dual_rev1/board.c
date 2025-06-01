@@ -17,6 +17,9 @@
 #include "hal.h"
 #include "io_pins.h"
 
+//#include "port.h"
+extern void checkDfuAndJump();
+
 /**
  * @brief   PAL setup.
  * @details Digital I/O ports static configuration as defined in @p board.h.
@@ -41,6 +44,9 @@ const PALConfig pal_default_config =
  * any other initialization.
  */
 void __early_init(void) {
+  /* Check if requested to jump to DFU */
+  checkDfuAndJump();
+
   stm32_clock_init();
 }
 
