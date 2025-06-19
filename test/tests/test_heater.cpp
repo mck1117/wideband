@@ -1,6 +1,10 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
+#define EFI_UNIT_TEST 1
+
+#include <rusefi/rusefi_time_math.h>
+
 #include "heater_control.h"
 
 struct MockHeater : public HeaterControllerBase
@@ -53,26 +57,26 @@ TEST(HeaterStateOutput, Cases)
 TEST(HeaterStateMachine, PreheatToWarmupTimeout)
 {
     MockHeater dut;
-    Timer::setMockTime(0);
+    setTimeNowUs(0);
     dut.Configure(780, 300);
 
     // For a while it should stay in preheat
-    Timer::setMockTime(1e6);
+    setTimeNowUs(1e6);
     EXPECT_EQ(HeaterState::Preheat, dut.GetNextState(HeaterState::Preheat, HeaterAllow::Allowed, 12, 500));
-    Timer::setMockTime(2e6);
+    setTimeNowUs(2e6);
     EXPECT_EQ(HeaterState::Preheat, dut.GetNextState(HeaterState::Preheat, HeaterAllow::Allowed, 12, 500));
-    Timer::setMockTime(4.9e6);
+    setTimeNowUs(4.9e6);
     EXPECT_EQ(HeaterState::Preheat, dut.GetNextState(HeaterState::Preheat, HeaterAllow::Allowed, 12, 500));
 
     // Timer expired, transition to warmup ramp
-    Timer::setMockTime(5.1e6);
+    setTimeNowUs(5.1e6);
     EXPECT_EQ(HeaterState::WarmupRamp, dut.GetNextState(HeaterState::Preheat, HeaterAllow::Allowed, 12, 500));
 }
 
 TEST(HeaterStateMachine, PreheatToWarmupAlreadyWarm)
 {
     MockHeater dut;
-    Timer::setMockTime(0);
+    setTimeNowUs(0);
     dut.Configure(780, 300);
 
     // Preheat for a little while
@@ -88,7 +92,7 @@ TEST(HeaterStateMachine, PreheatToWarmupAlreadyWarm)
 TEST(HeaterStateMachine, WarmupToClosedLoop)
 {
     MockHeater dut;
-    Timer::setMockTime(0);
+    setTimeNowUs(0);
     dut.Configure(780, 300);
 
     // Warm up for a little while
@@ -104,54 +108,54 @@ TEST(HeaterStateMachine, WarmupToClosedLoop)
 TEST(HeaterStateMachine, WarmupTimeout)
 {
     MockHeater dut;
-    Timer::setMockTime(0);
+    setTimeNowUs(0);
     dut.Configure(780, 300);
 
     // For a while it should stay in warmup
-    Timer::setMockTime(1e6);
+    setTimeNowUs(1e6);
     EXPECT_EQ(HeaterState::WarmupRamp, dut.GetNextState(HeaterState::WarmupRamp, HeaterAllow::Allowed, 12, 500));
-    Timer::setMockTime(2e6);
+    setTimeNowUs(2e6);
     EXPECT_EQ(HeaterState::WarmupRamp, dut.GetNextState(HeaterState::WarmupRamp, HeaterAllow::Allowed, 12, 500));
-    Timer::setMockTime(9.9e6);
+    setTimeNowUs(9.9e6);
     EXPECT_EQ(HeaterState::WarmupRamp, dut.GetNextState(HeaterState::WarmupRamp, HeaterAllow::Allowed, 12, 500));
 
     // Warmup times out, sensor transitions to stopped
-    Timer::setMockTime(10.1e6);
+    setTimeNowUs(10.1e6);
     EXPECT_EQ(HeaterState::Stopped, dut.GetNextState(HeaterState::WarmupRamp, HeaterAllow::Allowed, 12, 500));
 }
 
 TEST(HeaterStateMachine, ClosedLoop)
 {
     MockHeater dut;
-    Timer::setMockTime(0);
+    setTimeNowUs(0);
     dut.Configure(780, 300);
 
     // Temperature is reasonable, stay in closed loop
     EXPECT_EQ(HeaterState::ClosedLoop, dut.GetNextState(HeaterState::ClosedLoop, HeaterAllow::Allowed, 12, 780));
-    Timer::advanceMockTime(10e6);
+    advanceTimeUs(10e6);
     EXPECT_EQ(HeaterState::ClosedLoop, dut.GetNextState(HeaterState::ClosedLoop, HeaterAllow::Allowed, 12, 780));
 
     // Allow too hot briefly
     EXPECT_EQ(HeaterState::ClosedLoop, dut.GetNextState(HeaterState::ClosedLoop, HeaterAllow::Allowed, 12, 1000));
-    Timer::advanceMockTime(0.1e6);
+    advanceTimeUs(0.1e6);
     EXPECT_EQ(HeaterState::ClosedLoop, dut.GetNextState(HeaterState::ClosedLoop, HeaterAllow::Allowed, 12, 1000));
 
     // Wait too long, overheat not allowed
-    Timer::advanceMockTime(1e6);
+    advanceTimeUs(1e6);
     EXPECT_EQ(HeaterState::Stopped, dut.GetNextState(HeaterState::ClosedLoop, HeaterAllow::Allowed, 12, 1000));
 
     // Back to normal
     dut.GetNextState(HeaterState::ClosedLoop, HeaterAllow::Allowed, 12, 780);
-    Timer::advanceMockTime(1e6);
+    advanceTimeUs(1e6);
     EXPECT_EQ(HeaterState::ClosedLoop, dut.GetNextState(HeaterState::ClosedLoop, HeaterAllow::Allowed, 12, 780));
 
     // Allow too cold briefly
     EXPECT_EQ(HeaterState::ClosedLoop, dut.GetNextState(HeaterState::ClosedLoop, HeaterAllow::Allowed, 12, 600));
-    Timer::advanceMockTime(0.1e6);
+    advanceTimeUs(0.1e6);
     EXPECT_EQ(HeaterState::ClosedLoop, dut.GetNextState(HeaterState::ClosedLoop, HeaterAllow::Allowed, 12, 600));
 
     // Wait too long, underheat not allowed
-    Timer::advanceMockTime(1e6);
+    advanceTimeUs(1e6);
     EXPECT_EQ(HeaterState::Stopped, dut.GetNextState(HeaterState::ClosedLoop, HeaterAllow::Allowed, 12, 600));
 }
 

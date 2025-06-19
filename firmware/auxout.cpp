@@ -10,7 +10,7 @@
 
 #include "hal.h"
 
-#include <rusefi/math.h>
+#include <rusefi/rusefi_math.h>
 #include <rusefi/interpolation.h>
 
 #ifdef AUXOUT_DAC_PWM_DEVICE

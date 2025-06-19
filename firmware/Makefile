@@ -144,6 +144,7 @@ CPPSRC = $(ALLCPPSRC) \
           $(BOARDDIR)/port.cpp \
           $(BOARDDIR)/port_shared.cpp \
           $(RUSEFI_LIB_CPP) \
+          $(RUSEFI_LIB)/util/src/timer.cpp \
           $(WIDEBANDSRC) \
           shared/flash.cpp \
           can.cpp \
@@ -160,7 +161,10 @@ CPPSRC = $(ALLCPPSRC) \
           indication.cpp \
           sampling_thread.cpp \
           heater_thread.cpp \
+          global.cpp \
           main.cpp
+
+DDEFS += -DEFI_UNIT_TEST=0 -DTS_ENABLED=0
 
 ifneq ($(ENABLE_TS),)
 CPPSRC += console/binary/tunerstudio.cpp \
