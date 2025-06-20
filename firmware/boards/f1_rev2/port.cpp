@@ -4,6 +4,7 @@
 #include "wideband_config.h"
 
 #include "hal.h"
+#include "ch.hpp"
 
 void PortPrepareAnalogSampling()
 {
@@ -15,11 +16,18 @@ void PortPrepareAnalogSampling()
 
 static adcsample_t adcBuffer[ADC_CHANNEL_COUNT * ADC_OVERSAMPLE];
 
+static chibios_rt::BinarySemaphore adcDoneSemaphore(/* taken =*/ true);
+
+static void adcDoneCallback(ADCDriver*)
+{
+    adcDoneSemaphore.signal();
+}
+
 const ADCConversionGroup convGroup =
 {
     .circular = false,
     .num_channels = ADC_CHANNEL_COUNT,
-    .end_cb = nullptr,
+    .end_cb = adcDoneCallback,
     .error_cb = nullptr,
     .cr1 = 0,
     .cr2 =
@@ -59,9 +67,14 @@ static float AverageSamples(adcsample_t* buffer, size_t idx)
     return (float)sum * scale;
 }
 
-AnalogResult AnalogSample()
+void AnalogSampleStart()
 {
-    adcConvert(&ADCD1, &convGroup, adcBuffer, ADC_OVERSAMPLE);
+    adcStartConversion(&ADCD1, &convGroup, adcBuffer, ADC_OVERSAMPLE);
+}
+
+AnalogResult AnalogSampleFinish()
+{
+    adcDoneSemaphore.wait(TIME_INFINITE);
 
     return
     {

@@ -4,6 +4,7 @@
 #include "wideband_config.h"
 
 #include "hal.h"
+#include "ch.hpp"
 
 void PortPrepareAnalogSampling()
 {
@@ -15,11 +16,18 @@ void PortPrepareAnalogSampling()
 
 static adcsample_t adcBuffer[ADC_CHANNEL_COUNT * ADC_OVERSAMPLE];
 
+static chibios_rt::BinarySemaphore adcDoneSemaphore(/* taken =*/ true);
+
+static void adcDoneCallback(ADCDriver*)
+{
+    adcDoneSemaphore.signal();
+}
+
 const ADCConversionGroup convGroup =
 {
     .circular = false,
     .num_channels = ADC_CHANNEL_COUNT,
-    .end_cb = nullptr,
+    .end_cb = adcDoneCallback,
     .error_cb = nullptr,
     .cr1 = 0,
     .cr2 =
@@ -97,16 +105,23 @@ static float GetMaxSample(adcsample_t* buffer, size_t idx)
 static float l_heater_voltage = 0;
 static float r_heater_voltage = 0;
 
-AnalogResult AnalogSample()
+static bool l_heater;
+static bool r_heater;
+
+void AnalogSampleStart()
 {
-    AnalogResult res;
     /* TODO: remove Vbat measurement through heaters
      * TODO: keep heater voltage measurement for optional source for pwm calculation
      * TODO: add aux output voltage measurement for diagnostic (use slow ADC?) */
-    bool l_heater = !palReadPad(L_HEATER_PORT, L_HEATER_PIN);
-    bool r_heater = !palReadPad(R_HEATER_PORT, R_HEATER_PIN);
+    l_heater = !palReadPad(L_HEATER_PORT, L_HEATER_PIN);
+    r_heater = !palReadPad(R_HEATER_PORT, R_HEATER_PIN);
 
-    adcConvert(&ADCD1, &convGroup, adcBuffer, ADC_OVERSAMPLE);
+    adcStartConversion(&ADCD1, &convGroup, adcBuffer, ADC_OVERSAMPLE);
+}
+
+AnalogResult AnalogSampleFinish()
+{
+    adcDoneSemaphore.wait(TIME_INFINITE);
 
     bool l_heater_new = !palReadPad(L_HEATER_PORT, L_HEATER_PIN);
     bool r_heater_new = !palReadPad(R_HEATER_PORT, R_HEATER_PIN);
@@ -122,6 +137,8 @@ AnalogResult AnalogSample()
         float vbatt_raw = GetMaxSample(adcBuffer, 7) / HEATER_INPUT_DIVIDER;
         r_heater_voltage = HEATER_FILTER_ALPHA * vbatt_raw + (1.0 - HEATER_FILTER_ALPHA) * r_heater_voltage;
     }
+
+    AnalogResult res;
 
     /* Dual board has separate internal virtual ground = 3.3V / 2
      * VirtualGroundVoltageInt is used to calculate Ip current only as it
