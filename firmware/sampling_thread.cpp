@@ -45,10 +45,11 @@ static void SamplingThread(void*)
     while(true)
     {
         auto result = AnalogSampleFinish();
-        AnalogSampleStart();
 
         // Toggle the pin after sampling so that any switching noise occurs while we're doing our math instead of when sampling
         ToggleESRDriver(GetSensorType());
+
+        AnalogSampleStart();
 
         #ifdef BOARD_HAS_VOLTAGE_SENSE
         supplyVoltage = result.SupplyVoltage;
