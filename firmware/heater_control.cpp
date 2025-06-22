@@ -62,7 +62,6 @@ HeaterState HeaterControllerBase::GetNextState(HeaterState currentState, HeaterA
         if (heaterSupplyVoltage < HEATER_BATTETY_OFF_VOLTAGE)
         {
             m_batteryStableTimer.reset();
-            return HeaterState::NoHeaterSupply;
         }
         else if (heaterSupplyVoltage > HEATER_BATTERY_ON_VOLTAGE)
         {
@@ -149,8 +148,6 @@ HeaterState HeaterControllerBase::GetNextState(HeaterState currentState, HeaterA
 
             break;
         case HeaterState::Stopped:
-        case HeaterState::NoHeaterSupply:
-            /* nop */
             break;
     }
 
@@ -182,9 +179,6 @@ float HeaterControllerBase::GetVoltageForState(HeaterState state, float sensorEs
             return 7.5f - m_pid.GetOutput(m_targetEsr, sensorEsr);
         case HeaterState::Stopped:
             // Something has gone wrong, turn off the heater.
-            return 0;
-        case HeaterState::NoHeaterSupply:
-            // No/too low heater supply - disable output
             return 0;
     }
 
@@ -252,8 +246,6 @@ const char* describeHeaterState(HeaterState state)
             return "ClosedLoop";
         case HeaterState::Stopped:
             return "Stopped";
-        case HeaterState::NoHeaterSupply:
-            return "NoHeaterSupply";
     }
 
     return "Unknown";
