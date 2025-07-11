@@ -6,11 +6,12 @@
 #include "ch.hpp"
 #include "hal.h"
 
-#define ADC_CHANNEL_COUNT 3
+#define ADC_CHANNEL_COUNT (3 + 1) // 3 channels + mcutemp
 
 void PortPrepareAnalogSampling()
 {
     adcStart(&ADCD1, nullptr);
+    adcSTM32EnableTS(&ADCD1);
 }
 
 static adcsample_t adcBuffer[ADC_CHANNEL_COUNT * ADC_OVERSAMPLE];
@@ -31,7 +32,7 @@ const ADCConversionGroup convGroup =
     ADC_CFGR1_CONT | ADC_CFGR1_RES_12BIT,                  // CFGR1
     ADC_TR(0, 0),       // TR
     ADC_SMPR_SMP_7P5,      // SMPR
-    ADC_CHSELR_CHSEL0 | ADC_CHSELR_CHSEL2 | ADC_CHSELR_CHSEL3
+    ADC_CHSELR_CHSEL0 | ADC_CHSELR_CHSEL2 | ADC_CHSELR_CHSEL3 | ADC_CHSELR_CHSEL16
 };
 
 static float AverageSamples(adcsample_t* buffer, size_t idx)
@@ -58,6 +59,9 @@ AnalogResult AnalogSampleFinish()
 {
     adcDoneSemaphore.wait(TIME_INFINITE);
 
+    float ts_cal1 = *TS_CAL1_ADDR;
+    float ts_cal2 = *TS_CAL2_ADDR;
+
     return
     {
         .ch =
@@ -70,8 +74,7 @@ AnalogResult AnalogSampleFinish()
         },
         .VirtualGroundVoltageInt = AverageSamples(adcBuffer, 2),
 
-        // TODO!
-        .McuTemp = 0,
+        .McuTemp = ((AverageSamples(adcBuffer, 3) - ts_cal1) * (TS_CAL2_TEMP - TS_CAL1_TEMP) / (ts_cal2 - ts_cal1) + TS_CAL1_TEMP),
     };
 }
 
