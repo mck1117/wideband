@@ -13,8 +13,8 @@ struct pump_control_state
 };
 
 PidConfig pumpPidConfig = {
-    .kP = 50,
-    .kI = 10000,
+    .kP = 25,
+    .kI = 5000,
     .kD = 0,
     .clamp = 10,
 };
