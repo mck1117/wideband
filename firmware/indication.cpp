@@ -43,13 +43,13 @@ static void IndicationThread(void *ptr)
     {
         auto status = GetCurrentStatus(data->idx);
 
-        if (status == Status::None)
+        if (status < Status::SensorDidntHeat)
         {
             // Green is blinking
             palToggleLine(data->line);
 
             // Slow blink if closed loop, fast if not
-            chThdSleepMilliseconds(GetHeaterController(data->idx).IsRunningClosedLoop() ? LED_BLINK_SLOW : LED_BLINK_FAST);
+            chThdSleepMilliseconds(status == Status::RunningClosedLoop ? LED_BLINK_SLOW : LED_BLINK_FAST);
         }
         else
         {
