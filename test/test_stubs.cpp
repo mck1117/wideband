@@ -1,7 +1,7 @@
-#include "fault.h"
+#include "status.h"
 #include "can.h"
 
-void SetFault(int, wbo::Fault)
+void SetStatus(int, wbo::Status)
 {
 }
 

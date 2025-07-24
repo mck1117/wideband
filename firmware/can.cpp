@@ -2,7 +2,7 @@
 
 #include "can.h"
 
-#include "fault.h"
+#include "status.h"
 #include "can_helper.h"
 #include "heater_control.h"
 #include "lambda_conversion.h"
@@ -187,7 +187,7 @@ void SendRusefiFormat(uint8_t ch)
         frame.get().Esr = sampler.GetSensorInternalResistance();
         frame.get().NernstDc = nernstDc * 1000;
         frame.get().PumpDuty = pumpDuty * 255;
-        frame.get().Status = GetCurrentFault(ch);
+        frame.get().status = GetCurrentStatus(ch);
         frame.get().HeaterDuty = GetHeaterDuty(ch) * 255;
     }
 }

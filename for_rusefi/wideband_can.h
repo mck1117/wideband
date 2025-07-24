@@ -31,7 +31,7 @@
 
 namespace wbo
 {
-enum class Fault : uint8_t
+enum class Status : uint8_t
 {
     None = 0,
 
@@ -60,23 +60,23 @@ struct DiagData
     uint16_t Esr;
     uint16_t NernstDc;
     uint8_t PumpDuty;
-    Fault Status;
+    Status status;
 
     uint8_t HeaterDuty;
     uint8_t pad;
 };
 
-static inline const char* describeFault(Fault fault) {
-    switch (fault) {
-        case Fault::None:
+static inline const char* describeStatus(Status status) {
+    switch (status) {
+        case Status::None:
             return "OK";
-        case Fault::SensorDidntHeat:
+        case Status::SensorDidntHeat:
             return "Sensor failed to heat";
-        case Fault::SensorOverheat:
+        case Status::SensorOverheat:
             return "Sensor overheat";
-        case Fault::SensorUnderheat:
+        case Status::SensorUnderheat:
             return "Sensor underheat";
-        case Fault::SensorNoHeatSupply:
+        case Status::SensorNoHeatSupply:
             return "Sensor no heat supply";
     }
 

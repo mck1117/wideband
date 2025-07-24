@@ -1,6 +1,6 @@
 #include "heater_control.h"
 
-#include "fault.h"
+#include "status.h"
 #include "sampling.h"
 
 using namespace wbo;
@@ -119,7 +119,7 @@ HeaterState HeaterControllerBase::GetNextState(HeaterState currentState, HeaterA
             }
             else if (m_warmupTimer.hasElapsedSec(m_warmupTimeSec))
             {
-                SetFault(ch, Fault::SensorDidntHeat);
+                SetStatus(ch, Status::SensorDidntHeat);
                 return HeaterState::Stopped;
             }
 
@@ -138,12 +138,12 @@ HeaterState HeaterControllerBase::GetNextState(HeaterState currentState, HeaterA
 
             if (m_overheatTimer.hasElapsedSec(0.5f))
             {
-                SetFault(ch, Fault::SensorOverheat);
+                SetStatus(ch, Status::SensorOverheat);
                 return HeaterState::Stopped;
             }
             else if (m_underheatTimer.hasElapsedSec(0.5f))
             {
-                SetFault(ch, Fault::SensorUnderheat);
+                SetStatus(ch, Status::SensorUnderheat);
                 return HeaterState::Stopped;
             }
 

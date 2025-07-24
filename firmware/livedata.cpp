@@ -6,7 +6,7 @@
 #include "pump_dac.h"
 #include "heater_control.h"
 #include "max3185x.h"
-#include "fault.h"
+#include "status.h"
 
 #include <rusefi/arrays.h>
 #include <rusefi/fragments.h>
@@ -32,7 +32,7 @@ void SamplingUpdateLiveData()
         data->heaterDuty = GetHeaterDuty(ch) * 1000;    // 0.1 %
         data->heaterEffectiveVoltage = heater.GetHeaterEffectiveVoltage() * 100;
         data->esr = sampler.GetSensorInternalResistance();
-        data->fault = (uint8_t)GetCurrentFault(ch);
+        data->fault = (uint8_t)GetCurrentStatus(ch);
         data->heaterState = (uint8_t)GetHeaterState(ch);
     }
 

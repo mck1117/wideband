@@ -148,7 +148,7 @@ CPPSRC = $(ALLCPPSRC) \
           shared/flash.cpp \
           can.cpp \
           can_helper.cpp \
-          fault.cpp \
+          status.cpp \
           lambda_conversion.cpp \
           pwm.cpp \
           dac.cpp \

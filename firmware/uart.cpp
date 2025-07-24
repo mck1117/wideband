@@ -6,7 +6,7 @@
 #include "sampling.h"
 #include "heater_control.h"
 #include "max3185x.h"
-#include "fault.h"
+#include "status.h"
 #include "uart.h"
 #include "pump_dac.h"
 
@@ -74,7 +74,7 @@ static void UartThread(void*)
                 pumpDuty,
                 heaterVoltageMv,
                 describeHeaterState(GetHeaterState(ch)), heaterDuty,
-                describeFault(GetCurrentFault(ch)));
+                describeStatus(GetCurrentStatus(ch)));
             chnWrite(&SD1, (const uint8_t *)printBuffer, writeCount);
         }
 

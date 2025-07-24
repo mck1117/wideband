@@ -1,7 +1,7 @@
 #include "ch.h"
 #include "hal.h"
 
-#include "fault.h"
+#include "status.h"
 #include "heater_control.h"
 
 #include "indication.h"
@@ -41,9 +41,9 @@ static void IndicationThread(void *ptr)
 
     while(true)
     {
-        auto fault = GetCurrentFault(data->idx);
+        auto status = GetCurrentStatus(data->idx);
 
-        if (fault == Fault::None)
+        if (status == Status::None)
         {
             // Green is blinking
             palToggleLine(data->line);
