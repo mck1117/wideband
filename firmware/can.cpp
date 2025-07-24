@@ -9,6 +9,9 @@
 #include "sampling.h"
 #include "pump_dac.h"
 #include "port.h"
+#include "pump_control.h"
+
+#include <rusefi/math.h>
 
 // this same header is imported by rusEFI to get struct layouts and firmware version
 #include "../for_rusefi/wideband_can.h"
@@ -78,9 +81,12 @@ void CanRxThread(void*)
             continue;
         }
 
-        if (frame.DLC == 2 && CAN_ID(frame) == WB_MGS_ECU_STATUS)
+        if (frame.DLC >= 2 && CAN_ID(frame) == WB_MGS_ECU_STATUS)
         {
-            // This is status from ECU - battery voltage and heater enable signal
+            // This is status from ECU
+            // - battery voltage
+            // - heater enable signal
+            // - optionally pump control gain
 
             // data1 contains heater enable bit
             if ((frame.data8[1] & 0x1) == 0x1)
@@ -102,6 +108,12 @@ void CanRxThread(void*)
             else
             {
                 remoteBatteryVoltage = vbatt;
+            }
+
+            if (frame.DLC >= 3) {
+                // data2 contains heater gain in percent (0-200)
+                float pumpGain = frame.data8[1] * 0.01f;
+                SetPumpGainAdjust(clampF(0, pumpGain, 1));
             }
         }
         // If it's a bootloader entry request, reboot to the bootloader!
