@@ -57,7 +57,7 @@ static void IndicationThread(void *ptr)
             palClearLine(data->line);
 
             // Blink out the error code
-            for (int i = 0; i < 2 * static_cast<int>(fault); i++)
+            for (uint8_t i = 0; i < 2 * static_cast<uint8_t>(status); i++)
             {
                 // Blue is blinking
                 palToggleLine(data->line);
