@@ -14,6 +14,8 @@
 
 #include <rusefi/math.h>
 #include "analog.h"
+#include "pump_control.h"
+#include <rusefi/math.h>
 
 // this same header is imported by rusEFI to get struct layouts and firmware version
 #include "../for_rusefi/wideband_can.h"
