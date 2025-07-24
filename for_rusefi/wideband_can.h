@@ -33,13 +33,15 @@ namespace wbo
 {
 enum class Status : uint8_t
 {
-    None = 0,
+    Preheat = 0,
+    Warmup = 1,
+    RunningClosedLoop = 2,
 
     // First fault code at 3 so it's easier to see blink code
     SensorDidntHeat = 3,
     SensorOverheat = 4,
     SensorUnderheat = 5,
-    SensorNoHeatSupply = 6,
+    SensorNoHeaterSupply = 6,
 };
 
 struct StandardData
@@ -68,16 +70,20 @@ struct DiagData
 
 static inline const char* describeStatus(Status status) {
     switch (status) {
-        case Status::None:
-            return "OK";
+        case Status::Preheat:
+            return "Preheat (waiting)";
+        case Status::Warmup:
+            return "Warming up";
+        case Status::RunningClosedLoop:
+            return "Running";
         case Status::SensorDidntHeat:
             return "Sensor failed to heat";
         case Status::SensorOverheat:
             return "Sensor overheat";
         case Status::SensorUnderheat:
             return "Sensor underheat";
-        case Status::SensorNoHeatSupply:
-            return "Sensor no heat supply";
+        case Status::SensorNoHeaterSupply:
+            return "Sensor no heater supply";
     }
 
     return "Unknown";

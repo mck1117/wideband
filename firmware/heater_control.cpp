@@ -62,6 +62,7 @@ HeaterState HeaterControllerBase::GetNextState(HeaterState currentState, HeaterA
         if (heaterSupplyVoltage < HEATER_BATTETY_OFF_VOLTAGE)
         {
             m_batteryStableTimer.reset();
+            SetStatus(ch, Status::SensorNoHeaterSupply);
             return HeaterState::NoHeaterSupply;
         }
         else if (heaterSupplyVoltage > HEATER_BATTERY_ON_VOLTAGE)
@@ -75,6 +76,7 @@ HeaterState HeaterControllerBase::GetNextState(HeaterState currentState, HeaterA
     {
         // ECU hasn't allowed preheat yet, reset timer, and force preheat state
         m_preheatTimer.reset();
+        SetStatus(ch, Status::Preheat);
         return HeaterState::Preheat;
     }
 
@@ -93,6 +95,7 @@ HeaterState HeaterControllerBase::GetNextState(HeaterState currentState, HeaterA
                 // Reset the timer for the warmup phase
                 m_warmupTimer.reset();
 
+                SetStatus(ch, Status::Warmup);
                 return HeaterState::WarmupRamp;
             }
             #endif
@@ -107,6 +110,7 @@ HeaterState HeaterControllerBase::GetNextState(HeaterState currentState, HeaterA
                 // Reset the timer for the warmup phase
                 m_warmupTimer.reset();
 
+                SetStatus(ch, Status::Warmup);
                 return HeaterState::WarmupRamp;
             }
 
@@ -115,6 +119,7 @@ HeaterState HeaterControllerBase::GetNextState(HeaterState currentState, HeaterA
         case HeaterState::WarmupRamp:
             if (sensorTemp > closedLoopTemp)
             {
+                SetStatus(ch, Status::RunningClosedLoop);
                 return HeaterState::ClosedLoop;
             }
             else if (m_warmupTimer.hasElapsedSec(m_warmupTimeSec))

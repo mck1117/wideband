@@ -60,7 +60,7 @@ int main() {
         /* TODO: show EGT errors */
         auto status = GetCurrentStatus(0);
 
-        if (status == Status::None)
+        if (status < Status::SensorDidntHeat)
         {
             // blue is off
             palClearPad(LED_BLUE_PORT, LED_BLUE_PIN);
@@ -69,7 +69,7 @@ int main() {
             palTogglePad(LED_GREEN_PORT, LED_GREEN_PIN);
 
             // Slow blink if closed loop, fast if not
-            chThdSleepMilliseconds(GetHeaterController(0).IsRunningClosedLoop() ? 700 : 50);
+            chThdSleepMilliseconds(status == Status::RunningClosedLoop ? 700 : 50);
         }
         else
         {
