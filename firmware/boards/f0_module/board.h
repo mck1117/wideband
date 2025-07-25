@@ -165,10 +165,12 @@
  * GPIOA setup:
  *
  * PA0  - Un_sense                  (analog in).
- * PA1  - Vm_sense                  (analog in).
+ * PA1  - LSU_vm                    (analog in).
  * PA2  - Ip_sense                  (analog in).
+ * PA3  - Vm_sense                  (analog in).
  * PA6  - Ip_dac (PWM)              (output pushpull, alternate 1).
  * PA7  - Heater PWM                (output pushpull, alternate 2).
+ * PA8  - SEL2                      (digital input)
  * PA9  - UART TX                   (alternate 1).
  * PA10 - UART RX                   (alternate 1).
  * PA11 - CAN RX                    (alternate 4).
@@ -179,19 +181,19 @@
  */
 #define VAL_GPIOA_MODER             (PIN_MODE_ANALOG(GPIOA_PIN0) |         \
                                      PIN_MODE_ANALOG(GPIOA_PIN1) |         \
-                                     PIN_MODE_ANALOG(GPIOA_PIN2) |     \
-                                     PIN_MODE_INPUT(GPIOA_PIN3) |         \
-                                     PIN_MODE_INPUT(GPIOA_PIN4) |         \
-                                     PIN_MODE_INPUT(GPIOA_PIN5) |         \
-                                     PIN_MODE_ALTERNATE(GPIOA_PIN6) |         \
-                                     PIN_MODE_ALTERNATE(GPIOA_PIN7) |         \
-                                     PIN_MODE_INPUT(GPIOA_PIN8) |         \
-                                     PIN_MODE_ALTERNATE(GPIOA_PIN9) |         \
-                                     PIN_MODE_ALTERNATE(GPIOA_PIN10) |         \
-                                     PIN_MODE_ALTERNATE(GPIOA_PIN11) |        \
-                                     PIN_MODE_ALTERNATE(GPIOA_PIN12) |         \
-                                     PIN_MODE_ALTERNATE(GPIOA_SWDIO) |      \
-                                     PIN_MODE_ALTERNATE(GPIOA_SWCLK) |      \
+                                     PIN_MODE_ANALOG(GPIOA_PIN2) |         \
+                                     PIN_MODE_ANALOG(GPIOA_PIN3) |         \
+                                     PIN_MODE_INPUT(GPIOA_PIN4) |          \
+                                     PIN_MODE_INPUT(GPIOA_PIN5) |          \
+                                     PIN_MODE_ALTERNATE(GPIOA_PIN6) |      \
+                                     PIN_MODE_ALTERNATE(GPIOA_PIN7) |      \
+                                     PIN_MODE_INPUT(GPIOA_PIN8) |          \
+                                     PIN_MODE_ALTERNATE(GPIOA_PIN9) |      \
+                                     PIN_MODE_ALTERNATE(GPIOA_PIN10) |     \
+                                     PIN_MODE_ALTERNATE(GPIOA_PIN11) |     \
+                                     PIN_MODE_ALTERNATE(GPIOA_PIN12) |     \
+                                     PIN_MODE_ALTERNATE(GPIOA_SWDIO) |     \
+                                     PIN_MODE_ALTERNATE(GPIOA_SWCLK) |     \
                                      PIN_MODE_ALTERNATE(GPIOA_PIN15))
 #define VAL_GPIOA_OTYPER            (PIN_OTYPE_PUSHPULL(GPIOA_PIN0) |     \
                                      PIN_OTYPE_PUSHPULL(GPIOA_PIN1) |     \
