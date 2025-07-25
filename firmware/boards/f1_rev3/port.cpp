@@ -18,7 +18,9 @@ static chibios_rt::BinarySemaphore adcDoneSemaphore(/* taken =*/ true);
 
 static void adcDoneCallback(ADCDriver*)
 {
+    chSysLockFromISR();
     adcDoneSemaphore.signalI();
+    chSysUnlockFromISR();
 }
 
 const ADCConversionGroup convGroup =
