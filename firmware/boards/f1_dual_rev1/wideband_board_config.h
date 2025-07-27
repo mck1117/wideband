@@ -28,6 +28,7 @@
 // *******************************
 // 100K + 10K divider
 #define BATTERY_INPUT_DIVIDER (10.0 / (10.0 + 100.0))
+#define BOARD_HAS_VOLTAGE_SENSE
 
 // *******************************
 //     Heater low side Sensing
