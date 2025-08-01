@@ -3,7 +3,7 @@
 /* for VCC_VOLTS */
 #include "wideband_config.h"
 
-#include <rusefi/math.h>
+#include <rusefi/rusefi_math.h>
 
 #if HAL_USE_DAC
 
