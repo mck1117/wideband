@@ -50,11 +50,16 @@ enum class Status : uint8_t
     RunningClosedLoop = 2,
 
     // First fault code at 3 so it's easier to see blink code
+    FirstError = 3,
     SensorDidntHeat = 3,
     SensorOverheat = 4,
     SensorUnderheat = 5,
     SensorNoHeaterSupply = 6,
 };
+
+static bool isStatusError(Status s) {
+    return s >= Status::FirstError;
+}
 
 struct StandardData
 {
