@@ -57,7 +57,7 @@ enum class Status : uint8_t
     SensorNoHeaterSupply = 6,
 };
 
-static bool isStatusError(Status s) {
+static inline bool isStatusError(Status s) {
     return s >= Status::FirstError;
 }
 
