@@ -43,7 +43,7 @@ private:
 template <typename TData>
 class CanTxTyped final : public CanTxMessage
 {
-    static_assert(sizeof(TData) == sizeof(CANTxFrame::data8));
+    static_assert(sizeof(TData) <= sizeof(CANTxFrame::data8));
 
 public:
     explicit CanTxTyped(uint32_t eid) : CanTxMessage(eid) { }

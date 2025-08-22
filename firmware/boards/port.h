@@ -12,16 +12,25 @@ struct AnalogChannelResult
     float PumpCurrentVoltage;
     /* for dual version - this is voltage on Heater-, switches between zero and Vbatt with heater PWM,
         * used for both Vbatt measurement and Heater diagnostic */
-    float BatteryVoltage;
+    float HeaterSupplyVoltage;
 };
 
 struct AnalogResult
 {
     AnalogChannelResult ch[AFR_CHANNELS];
     float VirtualGroundVoltageInt;
+
+    #ifdef BOARD_HAS_VOLTAGE_SENSE
+    float SupplyVoltage;
+    #endif
+
+    float McuTemp;
 };
 
-AnalogResult AnalogSample();
+// Enable ADCs, configure pins, etc
+void PortPrepareAnalogSampling();
+void AnalogSampleStart();
+AnalogResult AnalogSampleFinish();
 
 enum class SensorType : uint8_t {
     LSU49 = 0,

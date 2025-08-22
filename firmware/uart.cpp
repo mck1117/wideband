@@ -6,19 +6,24 @@
 #include "sampling.h"
 #include "heater_control.h"
 #include "max3185x.h"
-#include "fault.h"
+#include "status.h"
 #include "uart.h"
+#include "pump_dac.h"
 
 #include "tunerstudio.h"
 #include "tunerstudio_io.h"
 #include "wideband_board_config.h"
+
+#ifndef PORT_EXTRA_SERIAL_CR2
+#define PORT_EXTRA_SERIAL_CR2 0
+#endif
 
 #ifdef DEBUG_SERIAL_PORT
 
 SerialConfig cfg = {
     .speed = DEBUG_SERIAL_BAUDRATE,
     .cr1 = 0,
-    .cr2 = USART_CR2_STOP1_BITS | USART_CR2_LINEN,
+    .cr2 = USART_CR2_STOP1_BITS | PORT_EXTRA_SERIAL_CR2,
     .cr3 = 0
 };
 
@@ -35,31 +40,47 @@ static void UartThread(void*)
     {
         int ch;
 
+        #ifdef BOARD_HAS_VOLTAGE_SENSE
+        {
+            float vbatt = GetSupplyVoltage();
+
+            int vbattIntPart = vbatt;
+            int vbattTenths = (vbatt - vbattIntPart) * 10;
+
+            int tempC = GetMcuTemperature();
+
+            size_t writeCount = chsnprintf(printBuffer, sizeof(printBuffer), "Board: VBatt %d.%01d Temp %d deg C\r\n", vbattIntPart, vbattTenths, tempC);
+            chnWrite(&SD1, (const uint8_t *)printBuffer, writeCount);
+        }
+        #endif
+
         for (ch = 0; ch < AFR_CHANNELS; ch++) {
             float lambda = GetLambda(ch);
             int lambdaIntPart = lambda;
             int lambdaThousandths = (lambda - lambdaIntPart) * 1000;
-            int batteryVoltageMv = GetSampler(ch).GetInternalBatteryVoltage() * 1000;
-            int duty = GetHeaterDuty(ch) * 100;
+            int heaterVoltageMv = GetSampler(ch).GetInternalHeaterVoltage() * 1000;
+            int heaterDuty = GetHeaterDuty(ch) * 100;
+            int pumpDuty = GetPumpOutputDuty(ch) * 100;
 
-            size_t writeCount = chsnprintf(printBuffer, 200,
-                "[AFR%d]: %d.%03d DC: %4d mV AC: %4d mV ESR: %5d T: %4d C Ipump: %6d uA Vheater: %5d heater: %s (%d)\tfault: %s\r\n",
+            size_t writeCount = chsnprintf(printBuffer, sizeof(printBuffer),
+                "[AFR%d]: %d.%03d DC: %4d mV AC: %4d mV ESR: %5d T: %4d C Ipump: %6d uA PumpDac: %3d Vheater: %5d heater: %s (%d)\tfault: %s\r\n",
                 ch,
                 lambdaIntPart, lambdaThousandths,
-                (int)(GetSampler(ch).GetNernstDc(ch) * 1000.0),
-                (int)(GetSampler(ch).GetNernstAc(ch) * 1000.0),
-                (int)GetSampler(ch).GetSensorInternalResistance(ch),
-                (int)GetSampler(ch).GetSensorTemperature(ch),
-                (int)(GetSampler(ch).GetPumpNominalCurrent(ch) * 1000),
-                batteryVoltageMv,
-                describeHeaterState(GetHeaterState(ch)), duty,
-                describeFault(GetCurrentFault(ch)));
+                (int)(GetSampler(ch).GetNernstDc() * 1000.0),
+                (int)(GetSampler(ch).GetNernstAc() * 1000.0),
+                (int)GetSampler(ch).GetSensorInternalResistance(),
+                (int)GetSampler(ch).GetSensorTemperature(),
+                (int)(GetSampler(ch).GetPumpNominalCurrent() * 1000),
+                pumpDuty,
+                heaterVoltageMv,
+                describeHeaterState(GetHeaterState(ch)), heaterDuty,
+                describeStatus(GetCurrentStatus(ch)));
             chnWrite(&SD1, (const uint8_t *)printBuffer, writeCount);
         }
 
 #if (EGT_CHANNELS > 0)
         for (ch = 0; ch < EGT_CHANNELS; ch++) {
-            size_t writeCount = chsnprintf(printBuffer, 200,
+            size_t writeCount = chsnprintf(printBuffer, sizeof(printBuffer),
                 "EGT[%d]: %d C (int %d C)\r\n",
                 (int)getEgtDrivers()[ch].temperature,
                 (int)getEgtDrivers()[ch].coldJunctionTemperature);

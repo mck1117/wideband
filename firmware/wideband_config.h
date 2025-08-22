@@ -35,6 +35,8 @@
 // *******************************
 #define NERNST_TARGET (0.45f)
 
+#define PUMP_CONTROL_PERIOD 2
+
 // *******************************
 //    Heater controller config
 // *******************************
@@ -50,8 +52,7 @@
 #define HEATER_BATTETY_OFF_VOLTAGE  8.5
 
 // *******************************
-//    TunerStudio configuration
+// Start driving the pump just before we're at target temperature
+// minus this offset to avoid Vnerns voltage clamp near 0V
 // *******************************
-#if defined(TS_PRIMARY_UART_PORT) || defined(TS_PRIMARY_SERIAL_PORT)
-#define TS_ENABLED
-#endif
+#define START_PUMP_TEMP_OFFSET	(200.0)

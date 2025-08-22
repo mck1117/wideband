@@ -60,7 +60,6 @@ endif
 
 # Compiler options here.
 ifeq ($(USE_OPT),)
-# -O2 is needed for mingw, without it there is a linking issue to isnanf?!?!
   #USE_OPT = $(RFLAGS) -O2 -fgnu89-inline -ggdb -fomit-frame-pointer -falign-functions=16 -std=gnu99 -Werror-implicit-function-declaration -Werror -Wno-error=pointer-sign -Wno-error=unused-function -Wno-error=unused-variable -Wno-error=sign-compare -Wno-error=unused-parameter -Wno-error=missing-field-initializers
   USE_OPT = -c -Wall -O0 -ggdb -g
   USE_OPT += -Werror=missing-field-initializers
@@ -75,7 +74,7 @@ endif
 
 # C++ specific options here (added to USE_OPT).
 ifeq ($(USE_CPPOPT),)
-  USE_CPPOPT = -std=c++17 -fno-rtti -fno-use-cxa-atexit
+  USE_CPPOPT = -std=c++20 -fno-rtti -fno-use-cxa-atexit
 endif
 
 USE_CPPOPT += -DMOCK_TIMER

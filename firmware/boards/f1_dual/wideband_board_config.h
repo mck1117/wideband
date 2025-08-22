@@ -16,13 +16,14 @@
 // *******************************
 //    Nernst voltage & ESR sense
 // *******************************
-#define NERNST_INPUT_GAIN (1 / 3.0f)
+#define NERNST_INPUT_GAIN (3.0f)
 
 // *******************************
 //        Battery Sensing
 // *******************************
 // 100K + 10K divider
 #define BATTERY_INPUT_DIVIDER (10.0 / (10.0 + 100.0))
+#define BOARD_HAS_VOLTAGE_SENSE
 
 // *******************************
 //     Heater low side Sensing

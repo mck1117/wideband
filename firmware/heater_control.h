@@ -24,6 +24,7 @@ struct IHeaterController
     virtual bool IsRunningClosedLoop() const = 0;
     virtual float GetHeaterEffectiveVoltage() const = 0;
     virtual HeaterState GetHeaterState() const = 0;
+    virtual float GetTargetTemp() const = 0;
 };
 
 class HeaterControllerBase : public IHeaterController
@@ -36,6 +37,7 @@ public:
     bool IsRunningClosedLoop() const override;
     float GetHeaterEffectiveVoltage() const override;
     HeaterState GetHeaterState() const override;
+    float GetTargetTemp() const override;
 
     virtual void SetDuty(float duty) const = 0;
 
@@ -45,14 +47,7 @@ public:
     float GetVoltageForState(HeaterState state, float sensorEsr);
 
 private:
-    Pid heaterPid =
-        {
-            0.3f,      // kP
-            0.3f,      // kI
-            0.01f,     // kD
-            3.0f,      // Integrator clamp (volts)
-            HEATER_CONTROL_PERIOD
-        };
+    Pid m_pid;
 
     float rampVoltage = 0;
     float heaterVoltage = 0;
@@ -72,6 +67,12 @@ private:
     Timer m_batteryStableTimer;
     Timer m_preheatTimer;
     Timer m_warmupTimer;
+
+    // Stores the time since a non-over/underheat condition
+    // If the timer reaches a threshold, an over/underheat has
+    //    occured
+    Timer m_underheatTimer;
+    Timer m_overheatTimer;
 
     static const int batteryStabTimeCounter = HEATER_BATTERY_STAB_TIME / HEATER_CONTROL_PERIOD;
 };

@@ -26,6 +26,8 @@ struct livedata_egt_s {
 			float temperature;
 			float coldJunctionTemperature;
 			uint8_t state;
+			uint8_t pad0[3];
+			uint32_t commErrors;
 		} __attribute__((packed));
 		uint8_t pad[16];
 	};
@@ -41,22 +43,22 @@ const struct livedata_egt_s * getEgtLiveDataStructAddr(const int ch);
 
 class Max3185x {
 public:
-    Max3185x(SPIConfig *spi) {
+    Max3185x(const SPIConfig *spi) {
         this->spi = spi;
     }
 	livedata_egt_s livedata;
 	/* do we need float temperatures? */
 	float coldJunctionTemperature;
 	float temperature;
-	Max3185xType type;
-	int readPacket();
+	Max3185xType type = UNKNOWN_TYPE;
+	Max3185xState readPacket();
 private:
-    SPIConfig *spi;
-    int detect();
-	int readPacket31855();
-	int readPacket31856();
+    const SPIConfig *spi;
+    Max3185xType detect();
+	Max3185xState readPacket31855();
+	Max3185xState readPacket31856();
 	int spi_rx32(uint32_t *data);
-	int spi_txrx(uint8_t tx[], uint8_t rx[], size_t n);
+	int spi_txrx(const uint8_t tx[], uint8_t rx[], size_t n);
 };
 
 class Max3185xThread : public ThreadController<MAX3185X_THREAD_STACK> {

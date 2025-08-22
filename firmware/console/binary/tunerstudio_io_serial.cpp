@@ -61,11 +61,15 @@ int SerialTsChannel::bt_disconnect(void)
 	return bt_wait_ok();
 }
 
+#ifndef PORT_EXTRA_SERIAL_CR2
+#define PORT_EXTRA_SERIAL_CR2 0
+#endif
+
 int SerialTsChannel::start(uint32_t newBaud) {
 	SerialConfig cfg = {
 		.speed = newBaud,
 		.cr1 = 0,
-		.cr2 = USART_CR2_STOP1_BITS | USART_CR2_LINEN,
+		.cr2 = USART_CR2_STOP1_BITS | PORT_EXTRA_SERIAL_CR2,
 		.cr3 = 0
 	};
 
@@ -82,7 +86,7 @@ int SerialTsChannel::reStart() {
 	SerialConfig cfg = {
 		.speed = baud,
 		.cr1 = 0,
-		.cr2 = USART_CR2_STOP1_BITS | USART_CR2_LINEN,
+		.cr2 = USART_CR2_STOP1_BITS | PORT_EXTRA_SERIAL_CR2,
 		.cr3 = 0
 	};
 

@@ -16,8 +16,8 @@ MEMORY
     flash5 (rx) : org = 0x00000000, len = 0
     flash6 (rx) : org = 0x00000000, len = 0
     flash7 (rx) : org = 0x00000000, len = 0
-    ram_vectors (wx) : org = 0x20000000, len = 256
-    ram0   (wx) : org = 0x20000200, len = 6k - 256
+    ram_vectors (wx) : org = 0x20000000, len = 0x100
+    ram0   (wx) : org = 0x20000100, len = 6k - 0x100
     ram1   (wx) : org = 0x00000000, len = 0
     ram2   (wx) : org = 0x00000000, len = 0
     ram3   (wx) : org = 0x00000000, len = 0

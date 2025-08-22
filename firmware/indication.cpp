@@ -1,7 +1,7 @@
 #include "ch.h"
 #include "hal.h"
 
-#include "fault.h"
+#include "status.h"
 #include "heater_control.h"
 
 #include "indication.h"
@@ -41,15 +41,15 @@ static void IndicationThread(void *ptr)
 
     while(true)
     {
-        auto fault = GetCurrentFault(data->idx);
+        auto status = GetCurrentStatus(data->idx);
 
-        if (fault == Fault::None)
+        if (status < Status::SensorDidntHeat)
         {
             // Green is blinking
             palToggleLine(data->line);
 
             // Slow blink if closed loop, fast if not
-            chThdSleepMilliseconds(GetHeaterController(data->idx).IsRunningClosedLoop() ? LED_BLINK_SLOW : LED_BLINK_FAST);
+            chThdSleepMilliseconds(status == Status::RunningClosedLoop ? LED_BLINK_SLOW : LED_BLINK_FAST);
         }
         else
         {
@@ -57,7 +57,7 @@ static void IndicationThread(void *ptr)
             palClearLine(data->line);
 
             // Blink out the error code
-            for (int i = 0; i < 2 * static_cast<int>(fault); i++)
+            for (uint8_t i = 0; i < 2 * static_cast<uint8_t>(status); i++)
             {
                 // Blue is blinking
                 palToggleLine(data->line);

@@ -23,7 +23,7 @@ endif
 
 # C++ specific options here (added to USE_OPT).
 ifeq ($(USE_CPPOPT),)
-  USE_CPPOPT = -fno-rtti -fno-exceptions -ffast-math -funsafe-math-optimizations -fno-threadsafe-statics -fno-use-cxa-atexit -std=c++17
+  USE_CPPOPT = -fno-rtti -fno-exceptions -ffast-math -funsafe-math-optimizations -fno-threadsafe-statics -fno-use-cxa-atexit -std=c++20
 endif
 
 # Enable this if you want the linker to remove unused code and data.
@@ -148,7 +148,7 @@ CPPSRC = $(ALLCPPSRC) \
           shared/flash.cpp \
           can.cpp \
           can_helper.cpp \
-          fault.cpp \
+          status.cpp \
           lambda_conversion.cpp \
           pwm.cpp \
           dac.cpp \
@@ -157,15 +157,20 @@ CPPSRC = $(ALLCPPSRC) \
           max3185x.cpp \
           uart.cpp \
           auxout.cpp \
-          livedata.cpp \
           indication.cpp \
-          console/binary/tunerstudio.cpp \
-          console/binary/tunerstudio_io.cpp \
-          console/binary/tunerstudio_io_serial.cpp \
-          console/binary/tunerstudio_commands.cpp \
           sampling_thread.cpp \
           heater_thread.cpp \
           main.cpp
+
+ifneq ($(ENABLE_TS),)
+CPPSRC += console/binary/tunerstudio.cpp \
+          console/binary/tunerstudio_io.cpp \
+          console/binary/tunerstudio_io_serial.cpp \
+          console/binary/tunerstudio_commands.cpp \
+          livedata.cpp \
+
+DDEFS += -DTS_ENABLED=TRUE
+endif
 
 # List ASM source files here.
 ASMSRC = $(ALLASMSRC)

@@ -2,7 +2,7 @@
 #include "hal.h"
 
 #include "can.h"
-#include "fault.h"
+#include "status.h"
 #include "heater_control.h"
 #include "pump_control.h"
 #include "pump_dac.h"
@@ -38,7 +38,9 @@ int main() {
     StartPumpControl();
     InitAuxDac();
 
+#if TS_ENABLED
     startTunerStudioConnectivity();
+#endif
 
     InitCan();
     InitUart();
@@ -56,9 +58,9 @@ int main() {
 #else
         /* TODO: show error for all AFR channels */
         /* TODO: show EGT errors */
-        auto fault = GetCurrentFault(0);
+        auto status = GetCurrentStatus(0);
 
-        if (fault == Fault::None)
+        if (status < Status::SensorDidntHeat)
         {
             // blue is off
             palClearPad(LED_BLUE_PORT, LED_BLUE_PIN);
@@ -67,7 +69,7 @@ int main() {
             palTogglePad(LED_GREEN_PORT, LED_GREEN_PIN);
 
             // Slow blink if closed loop, fast if not
-            chThdSleepMilliseconds(GetHeaterController(0).IsRunningClosedLoop() ? 700 : 50);
+            chThdSleepMilliseconds(status == Status::RunningClosedLoop ? 700 : 50);
         }
         else
         {
@@ -75,7 +77,7 @@ int main() {
             palClearPad(LED_GREEN_PORT, LED_GREEN_PIN);
 
             // Blink out the error code
-            for (int i = 0; i < 2 * static_cast<int>(fault); i++)
+            for (uint8_t i = 0; i < 2 * static_cast<uint8_t>(status); i++)
             {
                 // Blue is blinking
                 palTogglePad(LED_BLUE_PORT, LED_BLUE_PIN);

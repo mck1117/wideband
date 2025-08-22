@@ -9,7 +9,7 @@ struct ISampler
     virtual float GetNernstDc() const = 0;
     virtual float GetNernstAc() const = 0;
     virtual float GetPumpNominalCurrent() const = 0;
-    virtual float GetInternalBatteryVoltage() const = 0;
+    virtual float GetInternalHeaterVoltage() const = 0;
     virtual float GetSensorTemperature() const = 0;
     virtual float GetSensorInternalResistance() const = 0;
 };
@@ -25,7 +25,7 @@ public:
     float GetNernstDc() const override;
     float GetNernstAc() const override;
     float GetPumpNominalCurrent() const override;
-    float GetInternalBatteryVoltage() const override;
+    float GetInternalHeaterVoltage() const override;
     float GetSensorTemperature() const override;
     float GetSensorInternalResistance() const override;
 
@@ -37,8 +37,8 @@ private:
     float nernstDc = 0;
     float pumpCurrentSenseVoltage = 0;
 
-#ifdef BATTERY_INPUT_DIVIDER
-    float internalBatteryVoltage = 0;
+#ifdef BOARD_HAS_VOLTAGE_SENSE
+    float internalHeaterVoltage = 0;
 #endif
 
     Timer m_startupTimer;
@@ -46,5 +46,11 @@ private:
 
 // Get the sampler for a particular channel
 const ISampler& GetSampler(int ch);
+
+#ifdef BOARD_HAS_VOLTAGE_SENSE
+float GetSupplyVoltage();
+#endif
+
+float GetMcuTemperature();
 
 void StartSampling();

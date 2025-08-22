@@ -11,33 +11,55 @@
 #define WB_ERASE_TAG 0x5A5A
 #define WB_OPCODE_DATA 2
 #define WB_OPCODE_REBOOT 3
+#define WB_OPCODE_SET_INDEX 4
+#define WB_OPCODE_ECU_STATUS 5
 
 #define WB_BL_BASE (WB_BL_HEADER << 4)
+#define WB_BL_CMD(opcode, extra) (((WB_BL_BASE | (opcode)) << 16) | (extra))
+
+#define WB_BL_CMD_MASK  0X0FFF0000
+
+#define WB_MSG_GET_HEADER(id)   (((id) >> 20) & 0XFFF)
+#define WB_MSG_GET_OPCODE(id)   (((id) >> 16) & 0XF)
+#define WB_MSG_GET_EXTRA(id)    ((id) & 0XFFFF)
 
 // 0xEF0'0000
-#define WB_BL_ENTER ((WB_BL_BASE + WB_OPCODE_START) << 16)
+#define WB_BL_ENTER WB_BL_CMD(WB_OPCODE_START, 0)
 // 0xEF1'5A5A
-#define WB_BL_ERASE ((WB_BL_BASE + WB_OPCODE_ERASE) << 16 + WB_ERASE_TAG)
+#define WB_BL_ERASE WB_BL_CMD(WB_OPCODE_ERASE, WB_ERASE_TAG)
 // 0xEF2'0000
-#define WB_BL_DATA_BASE ((WB_BL_BASE + WB_OPCODE_DATA) << 16)
+#define WB_BL_DATA_BASE WB_BL_CMD(WB_OPCODE_DATA, 0)
 // 0xEF3'0000
-#define WB_BL_REBOOT ((WB_BL_BASE + WB_OPCODE_REBOOT) << 16)
-#define WB_MSG_SET_INDEX 0xEF4'0000
-#define WB_MGS_ECU_STATUS 0xEF5'0000
+#define WB_BL_REBOOT WB_BL_CMD(WB_OPCODE_REBOOT, 0)
+// 0xEF4'0000
+#define WB_MSG_SET_INDEX WB_BL_CMD(WB_OPCODE_SET_INDEX, 0)
+// 0xEF5'0000
+#define WB_MGS_ECU_STATUS WB_BL_CMD(WB_OPCODE_ECU_STATUS, 0)
+
 #define WB_DATA_BASE_ADDR 0x190
+
+// we transmit every 10ms
+#define WBO_TX_PERIOD_MS 10
 
 namespace wbo
 {
-enum class Fault : uint8_t
+enum class Status : uint8_t
 {
-    None = 0,
+    Preheat = 0,
+    Warmup = 1,
+    RunningClosedLoop = 2,
 
     // First fault code at 3 so it's easier to see blink code
+    FirstError = 3,
     SensorDidntHeat = 3,
     SensorOverheat = 4,
     SensorUnderheat = 5,
-    SensorNoHeatSupply = 6,
+    SensorNoHeaterSupply = 6,
 };
+
+static inline bool isStatusError(Status s) {
+    return s >= Status::FirstError;
+}
 
 struct StandardData
 {
@@ -57,24 +79,28 @@ struct DiagData
     uint16_t Esr;
     uint16_t NernstDc;
     uint8_t PumpDuty;
-    Fault Status;
+    Status status;
 
     uint8_t HeaterDuty;
     uint8_t pad;
 };
 
-static inline const char* describeFault(Fault fault) {
-    switch (fault) {
-        case Fault::None:
-            return "OK";
-        case Fault::SensorDidntHeat:
+static inline const char* describeStatus(Status status) {
+    switch (status) {
+        case Status::Preheat:
+            return "Preheat (waiting)";
+        case Status::Warmup:
+            return "Warming up";
+        case Status::RunningClosedLoop:
+            return "Running";
+        case Status::SensorDidntHeat:
             return "Sensor failed to heat";
-        case Fault::SensorOverheat:
+        case Status::SensorOverheat:
             return "Sensor overheat";
-        case Fault::SensorUnderheat:
+        case Status::SensorUnderheat:
             return "Sensor underheat";
-        case Fault::SensorNoHeatSupply:
-            return "Sensor no heat supply";
+        case Status::SensorNoHeaterSupply:
+            return "Sensor no heater supply";
     }
 
     return "Unknown";

@@ -131,7 +131,6 @@ else
 endif
 
 $(BINARY_OUTPUT): $(OBJS)
-	rm -rf $(BUILDDIR)/obj/*gcda
 ifeq ($(USE_VERBOSE_COMPILE),yes)
 	@echo
 	$(LD) $(OBJS) $(LDFLAGS) $(LIBS) -o $@

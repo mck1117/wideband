@@ -38,13 +38,12 @@ float Sampler::GetPumpNominalCurrent() const
     return pumpCurrentSenseVoltage * ratio;
 }
 
-float Sampler::GetInternalBatteryVoltage() const
+float Sampler::GetInternalHeaterVoltage() const
 {
-#ifdef BATTERY_INPUT_DIVIDER
+#ifdef BOARD_HAS_VOLTAGE_SENSE
     // Dual HW can measure heater voltage for each channel
     // by measuring voltage on Heater- while FET is off
-    // TODO: rename function?
-    return internalBatteryVoltage;
+    return internalHeaterVoltage;
 #else
     // After 5 seconds, pretend that we get battery voltage.
     // This makes the controller usable without CAN control
@@ -115,8 +114,8 @@ void Sampler::ApplySample(AnalogChannelResult& result, float virtualGroundVoltag
         (1 - PUMP_FILTER_ALPHA) * pumpCurrentSenseVoltage +
         PUMP_FILTER_ALPHA * (result.PumpCurrentVoltage - virtualGroundVoltageInt);
 
-#ifdef BATTERY_INPUT_DIVIDER
-    internalBatteryVoltage = result.BatteryVoltage;
+#ifdef BOARD_HAS_VOLTAGE_SENSE
+    internalHeaterVoltage = result.HeaterSupplyVoltage;
 #endif
 
     // Shift history over by one

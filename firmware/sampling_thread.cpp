@@ -16,6 +16,21 @@ const ISampler& GetSampler(int ch)
 
 static THD_WORKING_AREA(waSamplingThread, 256);
 
+#ifdef BOARD_HAS_VOLTAGE_SENSE
+static float supplyVoltage = 0;
+
+float GetSupplyVoltage()
+{
+    return supplyVoltage;
+}
+#endif
+
+static float mcuTemp = 0;
+float GetMcuTemperature()
+{
+    return mcuTemp;
+}
+
 static void SamplingThread(void*)
 {
     chRegSetThreadName("Sampling");
@@ -25,12 +40,21 @@ static void SamplingThread(void*)
     /* GD32: Insert 20us delay after ADC enable */
     chThdSleepMilliseconds(1);
 
+    AnalogSampleStart();
+
     while(true)
     {
-        auto result = AnalogSample();
+        auto result = AnalogSampleFinish();
 
         // Toggle the pin after sampling so that any switching noise occurs while we're doing our math instead of when sampling
         ToggleESRDriver(GetSensorType());
+
+        AnalogSampleStart();
+
+        #ifdef BOARD_HAS_VOLTAGE_SENSE
+        supplyVoltage = result.SupplyVoltage;
+        #endif
+        mcuTemp = result.McuTemp;
 
         for (int ch = 0; ch < AFR_CHANNELS; ch++)
         {
@@ -51,6 +75,7 @@ void StartSampling()
         samplers[i].Init();
     }
 
-    adcStart(&ADCD1, nullptr);
+    PortPrepareAnalogSampling();
+
     chThdCreateStatic(waSamplingThread, sizeof(waSamplingThread), NORMALPRIO + 5, SamplingThread, nullptr);
 }

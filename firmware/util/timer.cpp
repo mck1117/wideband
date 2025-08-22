@@ -9,6 +9,8 @@ Timer::Timer() {
 
 #ifdef MOCK_TIMER
 
+#define CH_CFG_ST_FREQUENCY 1000000
+
 // in mock land, ticks == microseconds
 #define TIME_US2I(us) (us)
 #define TIME_I2US(ticks) (ticks)
@@ -20,6 +22,10 @@ int64_t Timer::getTimestamp() const {
 
 /*static*/ void Timer::setMockTime(int64_t stamp) {
 	Timer::mockTimeStamp = stamp;
+}
+
+/*static*/ void Timer::advanceMockTime(int64_t increment) {
+	Timer::mockTimeStamp += increment;
 }
 
 #else
@@ -54,6 +60,8 @@ bool Timer::hasElapsedMs(float milliseconds) const {
 	return hasElapsedUs(milliseconds * 1000);
 }
 
+static const float usPerTick = 1000000.0 / CH_CFG_ST_FREQUENCY;
+
 bool Timer::hasElapsedUs(float microseconds) const {
 	auto delta = getTimestamp() - m_lastReset;
 
@@ -64,9 +72,8 @@ bool Timer::hasElapsedUs(float microseconds) const {
 
 	auto delta32 = (uint32_t)delta;
 
-	return delta32 > TIME_US2I(microseconds);
+	return delta32 > (microseconds / usPerTick);
 }
-
 
 float Timer::getElapsedSeconds() const {
 	return getElapsedSeconds(getTimestamp());
@@ -96,7 +103,7 @@ float Timer::getElapsedUs(int64_t stamp) const {
 
 	auto delta32 = (uint32_t)deltaNt;
 
-	return TIME_I2US(delta32);
+	return delta32 * usPerTick;
 }
 
 float Timer::getElapsedSecondsAndReset() {
