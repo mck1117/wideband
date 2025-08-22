@@ -217,6 +217,11 @@ void HeaterControllerBase::Update(const ISampler& sampler, HeaterAllow heaterAll
         heaterVoltage = 12;
     }
 
+    // Very low supply voltage -> avoid divide by zero or very high duty
+    if (heaterSupplyVoltage < 3) {
+        heaterSupplyVoltage = 12;
+    }
+
     // duty = (V_eff / V_batt) ^ 2
     float voltageRatio = (heaterSupplyVoltage < 1.0f) ? 0 : heaterVoltage / heaterSupplyVoltage;
     float duty = voltageRatio * voltageRatio;
@@ -231,6 +236,7 @@ void HeaterControllerBase::Update(const ISampler& sampler, HeaterAllow heaterAll
     }
     #endif
 
+    // Protect the sensor in case of very high voltage
     if (heaterSupplyVoltage >= 23)
     {
         duty = 0;
