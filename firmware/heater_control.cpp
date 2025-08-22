@@ -62,8 +62,6 @@ HeaterState HeaterControllerBase::GetNextState(HeaterState currentState, HeaterA
         if (heaterSupplyVoltage < HEATER_BATTETY_OFF_VOLTAGE)
         {
             m_batteryStableTimer.reset();
-            SetStatus(ch, Status::SensorNoHeaterSupply);
-            return HeaterState::NoHeaterSupply;
         }
         else if (heaterSupplyVoltage > HEATER_BATTERY_ON_VOLTAGE)
         {
@@ -156,8 +154,6 @@ HeaterState HeaterControllerBase::GetNextState(HeaterState currentState, HeaterA
 
             break;
         case HeaterState::Stopped:
-        case HeaterState::NoHeaterSupply:
-            /* nop */
             break;
     }
 
@@ -190,9 +186,6 @@ float HeaterControllerBase::GetVoltageForState(HeaterState state, float sensorEs
         case HeaterState::Stopped:
             // Something has gone wrong, turn off the heater.
             return 0;
-        case HeaterState::NoHeaterSupply:
-            // No/too low heater supply - disable output
-            return 0;
     }
 
     // should be unreachable
@@ -224,6 +217,11 @@ void HeaterControllerBase::Update(const ISampler& sampler, HeaterAllow heaterAll
         heaterVoltage = 12;
     }
 
+    // Very low supply voltage -> avoid divide by zero or very high duty
+    if (heaterSupplyVoltage < 3) {
+        heaterSupplyVoltage = 12;
+    }
+
     // duty = (V_eff / V_batt) ^ 2
     float voltageRatio = (heaterSupplyVoltage < 1.0f) ? 0 : heaterVoltage / heaterSupplyVoltage;
     float duty = voltageRatio * voltageRatio;
@@ -238,6 +236,7 @@ void HeaterControllerBase::Update(const ISampler& sampler, HeaterAllow heaterAll
     }
     #endif
 
+    // Protect the sensor in case of very high voltage
     if (heaterSupplyVoltage >= 23)
     {
         duty = 0;
@@ -259,8 +258,6 @@ const char* describeHeaterState(HeaterState state)
             return "ClosedLoop";
         case HeaterState::Stopped:
             return "Stopped";
-        case HeaterState::NoHeaterSupply:
-            return "NoHeaterSupply";
     }
 
     return "Unknown";

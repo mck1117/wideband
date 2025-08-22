@@ -54,7 +54,6 @@ enum class Status : uint8_t
     SensorDidntHeat = 3,
     SensorOverheat = 4,
     SensorUnderheat = 5,
-    SensorNoHeaterSupply = 6,
 };
 
 static inline bool isStatusError(Status s) {
@@ -99,8 +98,6 @@ static inline const char* describeStatus(Status status) {
             return "Sensor overheat";
         case Status::SensorUnderheat:
             return "Sensor underheat";
-        case Status::SensorNoHeaterSupply:
-            return "Sensor no heater supply";
     }
 
     return "Unknown";
