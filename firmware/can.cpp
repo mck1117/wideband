@@ -173,11 +173,9 @@ void SendRusefiFormat(uint8_t ch)
 
     // Lambda is valid if:
     // 1. Nernst voltage is near target
-    // 2. Pump driver isn't slammed in to the stop
-    // 3. Lambda is >0.6 (sensor isn't specified below that)
+    // 2. Lambda is >0.6 (sensor isn't specified below that)
     bool lambdaValid =
             nernstDc > (NERNST_TARGET - 0.1f) && nernstDc < (NERNST_TARGET + 0.1f) &&
-            pumpDuty > 0.1f && pumpDuty < 0.9f &&
             lambda > 0.6f;
 
     {
