@@ -166,7 +166,12 @@ void SetConfiguration()
 
 SensorType GetSensorType()
 {
-    return static_cast<SensorType>(readSelPin(SENSOR_SELECT_PORT, SENSOR_SELECT_PIN));
+    switch (readSelPin(SENSOR_SELECT_PORT, SENSOR_SELECT_PIN)) {
+        case 0:  return SensorType::LSU42;
+        case 1:  return SensorType::LSU49;
+        case 2:  return SensorType::LSUADV;
+        default: return SensorType::LSU49;   // safe default
+    }
 }
 
 void SetupESRDriver(SensorType sensor)
