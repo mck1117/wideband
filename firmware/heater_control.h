@@ -6,7 +6,7 @@
 
 #include "can.h"
 #include "pid.h"
-#include "timer.h"
+#include <rusefi/timer.h>
 
 enum class HeaterState
 {
