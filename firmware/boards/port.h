@@ -6,6 +6,16 @@
 #include "port_shared.h"
 #include "wideband_config.h"
 
+//F0 internal calibration data
+#define TS_CAL1_TEMP 30.0f
+#define TS_CAL2_TEMP 110.0f
+#define TS_CAL1_ADDR ((uint16_t*)0x1FFFF7B8)
+#define TS_CAL2_ADDR ((uint16_t*)0x1FFFF7C2)
+
+//F1 doesnt have factory calibration data, lets use datasheet values
+#define V25 1.43f
+#define AVG_SLOPE 0.0043f
+
 struct AnalogChannelResult
 {
     float NernstVoltage;
