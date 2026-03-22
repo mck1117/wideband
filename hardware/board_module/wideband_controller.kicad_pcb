@@ -6,7 +6,14 @@
 		(thickness 1.6)
 		(legacy_teardrops no)
 	)
-	(paper "A4")
+	(paper "A5")
+	(title_block
+		(title "FOME Open Source Wideband O2 Module")
+		(date "2026-03-22")
+		(rev "C")
+		(company "FOME / Happy Cactus Garage")
+		(comment 1 "github.com/mck1117/wideband")
+	)
 	(layers
 		(0 "F.Cu" signal)
 		(4 "In1.Cu" signal)
@@ -3027,7 +3034,7 @@
 			)
 		)
 		(property ki_fp_filters "SOIC*3.9x8.7mm*P1.27mm* DIP*W7.62mm* TSSOP*4.4x5mm*P0.65mm* SSOP*5.3x6.2mm*P0.65mm* MSOP*3x3mm*P0.5mm*")
-		(path "/00000000-0000-0000-0000-00005f8b9d88")
+		(path "/00000000-0000-0000-0000-00005fbafe30")
 		(sheetname "/")
 		(sheetfile "wideband_controller.kicad_sch")
 		(attr smd)
@@ -13074,6 +13081,18 @@
 				(thickness 0.15)
 			)
 			(justify mirror)
+		)
+	)
+	(gr_text "github.com/\n	mck1117/wideband\nFOME.Tech\nHappy Cactus Garage\nRev C 3/2026"
+		(at 98.7 93.175 270)
+		(layer "B.SilkS")
+		(uuid "62b1f699-9ee0-4309-b551-87a359ff798d")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+			(justify left bottom mirror)
 		)
 	)
 	(gr_text "BOOT0"

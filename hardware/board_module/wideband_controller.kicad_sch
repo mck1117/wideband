@@ -4,6 +4,13 @@
 	(generator_version "9.0")
 	(uuid "bd26f7d8-6f3a-405c-97bd-32fe468079d8")
 	(paper "A4")
+	(title_block
+		(title "FOME Open Source Wideband O2 Module")
+		(date "2026-03-22")
+		(rev "C")
+		(company "FOME / Happy Cactus Garage")
+		(comment 1 "github.com/mck1117/wideband")
+	)
 	(lib_symbols
 		(symbol "Amplifier_Operational:AD8603"
 			(pin_names
