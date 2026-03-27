@@ -15,12 +15,12 @@ include $(FIRMWARE_DIR)/wideband.mk
 
 # C sources that can be compiled in ARM or THUMB mode depending on the global
 # setting.
-CSRC += \
+CSRC = \
 	$(RUSEFI_LIB_C) \
 
 # C++ sources that can be compiled in ARM or THUMB mode depending on the global
 # setting.
-CPPSRC += \
+CPPSRC = \
 	$(RUSEFI_LIB_CPP) \
 	$(RUSEFI_LIB_CPP_TEST) \
 	$(WIDEBANDSRC) \
@@ -30,13 +30,16 @@ CPPSRC += \
 	test_stubs.cpp \
 	tests/test_sampler.cpp \
 	tests/test_heater.cpp \
+	$(RUSEFI_LIB)/util/src/timer.cpp \
+	$(RUSEFI_LIB)/mock/lib-time-mocks.cpp \
 
-INCDIR += \
+INCDIR = \
 	$(PROJECT_DIR)/googletest/googlemock/ \
 	$(PROJECT_DIR)/googletest/googlemock/include \
 	$(PROJECT_DIR)/googletest/googletest \
 	$(PROJECT_DIR)/googletest/googletest/include \
 	$(RUSEFI_LIB_INC) \
+	$(RUSEFI_LIB)/mock \
 	$(FIRMWARE_DIR) \
 	$(FIRMWARE_DIR)/boards \
 	$(FIRMWARE_DIR)/util \
