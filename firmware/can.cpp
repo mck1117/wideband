@@ -190,8 +190,8 @@ void SendRusefiFormat(uint8_t ch)
         // The same header is imported by the ECU and checked against this data in the frame
         frame.get().Version = RUSEFI_WIDEBAND_VERSION;
 
-        uint16_t lambdaInt = lambdaValid ? (lambda * 10000) : 0;
-        frame.get().Lambda = lambdaInt;
+        // Show calculated lambda even it is not valid. User should check Valid flag
+        frame.get().Lambda = lambda * 10000;
         frame.get().TemperatureC = sampler.GetSensorTemperature();
         bool heaterClosedLoop = heater.IsRunningClosedLoop();
         frame.get().Valid = (heaterClosedLoop && lambdaValid) ? 0x01 : 0x00;
