@@ -123,10 +123,12 @@ void CanRxThread(void*)
             }
         }
         // If it's a bootloader entry request, reboot to the bootloader!
-        else if ((frame.DLC == 0 || frame.DLC == 1) && CAN_ID(frame) == WB_BL_ENTER)
+        // DLC=1 required: data[0] is 0xFF (all) or a specific controller index.
+        // DLC=0 is ignored so that only the targeted controller enters bootloader
+        // when multiple controllers share a bus.
+        else if (frame.DLC == 1 && CAN_ID(frame) == WB_BL_ENTER)
         {
-            // If 0xFF (force update all) or our ID, reset to bootloader, otherwise ignore
-            if (frame.DLC == 0 || frame.data8[0] == 0xFF || frame.data8[0] == GetConfiguration()->CanIndexOffset)
+            if (frame.data8[0] == 0xFF || frame.data8[0] == GetConfiguration()->CanIndexOffset)
             {
                 SendAck();
 
