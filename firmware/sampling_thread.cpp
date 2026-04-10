@@ -42,18 +42,19 @@ static void SamplingThread(void*)
 
     AnalogSampleStart();
 
-    while(true)
+    while (true)
     {
         auto result = AnalogSampleFinish();
 
-        // Toggle the pin after sampling so that any switching noise occurs while we're doing our math instead of when sampling
+        // Toggle the pin after sampling so that any switching noise occurs while we're doing our math instead of when
+        // sampling
         ToggleESRDriver(GetSensorType());
 
         AnalogSampleStart();
 
-        #ifdef BOARD_HAS_VOLTAGE_SENSE
+#ifdef BOARD_HAS_VOLTAGE_SENSE
         supplyVoltage = result.SupplyVoltage;
-        #endif
+#endif
         mcuTemp = result.McuTemp;
 
         for (int ch = 0; ch < AFR_CHANNELS; ch++)
