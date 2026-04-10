@@ -10,6 +10,7 @@
 #include "pump_dac.h"
 #include "port.h"
 #include "pump_control.h"
+#include "wideband_config.h"
 
 #include <rusefi/math.h>
 
@@ -94,26 +95,27 @@ void CanRxThread(void*)
             // - heater enable signal
             // - optionally pump control gain
 
-            // data1 contains heater enable bit
-            if ((frame.data8[1] & 0x1) == 0x1)
-            {
-                heaterAllow = HeaterAllow::Allowed;
-            }
-            else
-            {
-                heaterAllow = HeaterAllow::NotAllowed;
-            }
-
             // data0 contains battery voltage in tenths of a volt
             float vbatt = frame.data8[0] * 0.1f;
-            if (vbatt < 5)
+            remoteBatteryVoltage = vbatt;
+
+            if (vbatt < HEATER_BATTERY_OFF_VOLTAGE)
             {
-                // provided vbatt is bogus, default to 14v nominal
-                remoteBatteryVoltage = 14;
+                // Supply voltage too low to heat, override allow state
+                heaterAllow = HeaterAllow::NotAllowed;
             }
             else
             {
-                remoteBatteryVoltage = vbatt;
+                // Voltage is high enough, check if ECU says we're allowed to heat
+                // data1 contains heater enable bit
+                if ((frame.data8[1] & 0x1) == 0x1)
+                {
+                    heaterAllow = HeaterAllow::Allowed;
+                }
+                else
+                {
+                    heaterAllow = HeaterAllow::NotAllowed;
+                }
             }
 
             if (frame.DLC >= 3) {
