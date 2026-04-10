@@ -12,20 +12,18 @@ static const PWMConfig heaterPwmConfig = {
     .frequency = 400'000,
     .period = 1024,
     .callback = nullptr,
-    .channels = {
-        {PWM_OUTPUT_ACTIVE_HIGH | PWM_COMPLEMENTARY_OUTPUT_ACTIVE_LOW, nullptr},
-        {PWM_OUTPUT_ACTIVE_HIGH | PWM_COMPLEMENTARY_OUTPUT_ACTIVE_LOW, nullptr},
-        {PWM_OUTPUT_ACTIVE_HIGH | PWM_COMPLEMENTARY_OUTPUT_ACTIVE_LOW, nullptr},
-        {PWM_OUTPUT_ACTIVE_HIGH | PWM_COMPLEMENTARY_OUTPUT_ACTIVE_LOW, nullptr}
-    },
+    .channels = {{PWM_OUTPUT_ACTIVE_HIGH | PWM_COMPLEMENTARY_OUTPUT_ACTIVE_LOW, nullptr},
+                 {PWM_OUTPUT_ACTIVE_HIGH | PWM_COMPLEMENTARY_OUTPUT_ACTIVE_LOW, nullptr},
+                 {PWM_OUTPUT_ACTIVE_HIGH | PWM_COMPLEMENTARY_OUTPUT_ACTIVE_LOW, nullptr},
+                 {PWM_OUTPUT_ACTIVE_HIGH | PWM_COMPLEMENTARY_OUTPUT_ACTIVE_LOW, nullptr}},
     .cr2 = 0,
 #if STM32_PWM_USE_ADVANCED
     .bdtr = 0,
 #endif
-    .dier = 0
-};
+    .dier = 0};
 
-class HeaterController : public HeaterControllerBase {
+class HeaterController : public HeaterControllerBase
+{
 public:
     HeaterController(int ch, int pwm_ch)
         : HeaterControllerBase(ch, HEATER_PREHEAT_TIME, HEATER_WARMUP_TIMEOUT)
@@ -33,30 +31,26 @@ public:
     {
     }
 
-    void SetDuty(float duty) const override
-    {
-        heaterPwm.SetDuty(pwm_ch, duty);
-    }
+    void SetDuty(float duty) const override { heaterPwm.SetDuty(pwm_ch, duty); }
 
-// TODO: private:
+    // TODO: private:
 public:
     const uint8_t pwm_ch;
 };
 
-HeaterController heaterControllers[AFR_CHANNELS] =
-{
-    { 0, HEATER_PWM_CHANNEL_0 },
+HeaterController heaterControllers[AFR_CHANNELS] = {
+    {0, HEATER_PWM_CHANNEL_0},
 
 #if AFR_CHANNELS >= 2
-    { 1, HEATER_PWM_CHANNEL_1 },
+    {1, HEATER_PWM_CHANNEL_1},
 #endif
 
 #if AFR_CHANNELS >= 3
-    { 2, HEATER_PWM_CHANNEL_2 },
+    {2, HEATER_PWM_CHANNEL_2},
 #endif
 
 #if AFR_CHANNELS >= 4
-    { 3, HEATER_PWM_CHANNEL_3 },
+    {3, HEATER_PWM_CHANNEL_3},
 #endif
 };
 
@@ -80,16 +74,10 @@ static void HeaterThread(void*)
         auto& h = heaterControllers[i];
         switch (GetSensorType())
         {
-            case SensorType::LSU42:
-                h.Configure(730, 80);
-                break;
-            case SensorType::LSUADV:
-                h.Configure(785, 300);
-                break;
-            case SensorType::LSU49:
-            default:
-                h.Configure(780, 300);
-                break;
+        case SensorType::LSU42: h.Configure(730, 80); break;
+        case SensorType::LSUADV: h.Configure(785, 300); break;
+        case SensorType::LSU49:
+        default: h.Configure(780, 300); break;
         }
     }
 

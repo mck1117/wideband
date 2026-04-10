@@ -43,7 +43,8 @@ public:
 
     bool GetIsHeatingEnabled(HeaterAllow heaterAllowState, float batteryVoltage);
 
-    HeaterState GetNextState(HeaterState currentState, HeaterAllow haeterAllowState, float batteryVoltage, float sensorTemp);
+    HeaterState
+    GetNextState(HeaterState currentState, HeaterAllow haeterAllowState, float batteryVoltage, float sensorTemp);
     float GetVoltageForState(HeaterState state, float sensorEsr);
 
 private:

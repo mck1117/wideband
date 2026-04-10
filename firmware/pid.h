@@ -11,7 +11,7 @@ struct PidConfig
 class Pid
 {
 public:
-    Pid(const PidConfig& config, float periodMs) 
+    Pid(const PidConfig& config, float periodMs)
         : m_config(config)
         , m_periodSec(1e-3 * periodMs)
     {

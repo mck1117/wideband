@@ -13,8 +13,14 @@ float Pid::GetOutput(float setpoint, float observation)
     m_lastError = error;
 
     // Clamp to +- 1
-    if (m_integrator > m_config.clamp) m_integrator = m_config.clamp;
-    if (m_integrator < -m_config.clamp) m_integrator = -m_config.clamp;
+    if (m_integrator > m_config.clamp)
+    {
+        m_integrator = m_config.clamp;
+    }
+    if (m_integrator < -m_config.clamp)
+    {
+        m_integrator = -m_config.clamp;
+    }
 
     // Multiply by gains and sum
     return m_config.kP * error + m_integrator + m_config.kD * dEdt;

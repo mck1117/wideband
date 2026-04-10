@@ -7,7 +7,8 @@
 
 #include "ch.h"
 
-struct pump_control_state {
+struct pump_control_state
+{
     Pid pumpPid;
 };
 
@@ -18,8 +19,7 @@ PidConfig pumpPidConfig = {
     .clamp = 10,
 };
 
-static struct pump_control_state state[AFR_CHANNELS] =
-{
+static struct pump_control_state state[AFR_CHANNELS] = {
     {
         Pid(pumpPidConfig, PUMP_CONTROL_PERIOD),
     },
@@ -52,11 +52,11 @@ static void PumpThread(void*)
 {
     chRegSetThreadName("Pump");
 
-    while(true)
+    while (true)
     {
         for (int ch = 0; ch < AFR_CHANNELS; ch++)
         {
-            pump_control_state &s = state[ch];
+            pump_control_state& s = state[ch];
 
             const auto& sampler = GetSampler(ch);
             const auto& heater = GetHeaterController(ch);
