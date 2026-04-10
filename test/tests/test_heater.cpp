@@ -5,7 +5,10 @@
 
 struct MockHeater : public HeaterControllerBase
 {
-    MockHeater() : HeaterControllerBase(0, 5, 10) { }
+    MockHeater()
+        : HeaterControllerBase(0, 5, 10)
+    {
+    }
 
     MOCK_METHOD(void, SetDuty, (float), (const, override));
 };

@@ -1,9 +1,7 @@
 #include "status.h"
 #include "can.h"
 
-void SetStatus(int, wbo::Status)
-{
-}
+void SetStatus(int, wbo::Status) {}
 
 float GetRemoteBatteryVoltage()
 {

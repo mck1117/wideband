@@ -50,7 +50,7 @@ TEST(Sampler, TestAc)
 
     for (size_t i = 0; i < 5000; i++)
     {
-        dut.ApplySample(dataLow,  virtualGroundVoltage);
+        dut.ApplySample(dataLow, virtualGroundVoltage);
         dut.ApplySample(dataHigh, virtualGroundVoltage);
     }
 
