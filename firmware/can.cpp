@@ -27,7 +27,7 @@ void CanTxThread(void*)
     // Current system time.
     systime_t prev = chVTGetSystemTime();
 
-    while(1)
+    while (1)
     {
         for (int ch = 0; ch < AFR_CHANNELS; ch++)
         {
@@ -65,7 +65,7 @@ void CanRxThread(void*)
 {
     chRegSetThreadName("CAN Rx");
 
-    while(1)
+    while (1)
     {
         CANRxFrame frame;
         msg_t msg = canReceiveTimeout(&CAND1, CAN_ANY_MAILBOX, &frame, TIME_INFINITE);
@@ -118,7 +118,8 @@ void CanRxThread(void*)
                 }
             }
 
-            if (frame.DLC >= 3) {
+            if (frame.DLC >= 3)
+            {
                 // data2 contains pump controller gain in percent (0-200)
                 float pumpGain = frame.data8[2] * 0.01f;
                 SetPumpGainAdjust(clampF(0, pumpGain, 1));
@@ -184,9 +185,7 @@ void SendRusefiFormat(uint8_t ch)
     // Lambda is valid if:
     // 1. Nernst voltage is near target
     // 2. Lambda is >0.6 (sensor isn't specified below that)
-    bool lambdaValid =
-            nernstDc > (NERNST_TARGET - 0.1f) && nernstDc < (NERNST_TARGET + 0.1f) &&
-            lambda > 0.6f;
+    bool lambdaValid = nernstDc > (NERNST_TARGET - 0.1f) && nernstDc < (NERNST_TARGET + 0.1f) && lambda > 0.6f;
 
     {
         CanTxTyped<wbo::StandardData> frame(baseAddress + 0);
