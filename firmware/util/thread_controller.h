@@ -1,6 +1,6 @@
 /**
  *  @file thread_controller.h
- * 
+ *
  *  @date Jan 5, 2019
  *  @author Matthew Kennedy, (c) 2019
  */
@@ -9,13 +9,12 @@
 
 /**
  * @brief A base class for a controller that requires its own thread.
- * 
+ *
  * Inherit from ThreadController.  Implement ThreadTask with the logic required for your thread.
  * The template parameter specifies the size of the stack used for the thread.  (because we have to
  * allocate the stack at compile time, it has to be a template parameter instead of a normal parameter)
  */
-template <int TStackSize>
-class ThreadController
+template <int TStackSize> class ThreadController
 {
 private:
     THD_WORKING_AREA(m_threadstack, TStackSize);
@@ -41,7 +40,7 @@ protected:
     virtual void ThreadTask() = 0;
     thread_t* m_thread;
 
-	const char* const m_name;
+    const char* const m_name;
 
 public:
     ThreadController(const char* name, tprio_t priority)
@@ -55,8 +54,9 @@ public:
      */
     void Start()
     {
-        if (m_isStarted) {
-            //warning(CUSTOM_OBD_6003, "Tried to start thread %s but it was already running", m_name);
+        if (m_isStarted)
+        {
+            // warning(CUSTOM_OBD_6003, "Tried to start thread %s but it was already running", m_name);
             return;
         }
 
