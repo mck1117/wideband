@@ -12,15 +12,13 @@ if [ "$1" = "check" ]; then
 fi
 
 # Find all C/C++ files in firmware and test directories
-# Exclude:
-#   - firmware/ext (external submodules)
-#   - unit_tests/googletest (external submodule)
-#   - generated files
 files=$(find firmware test for_rusefi \
     -path "firmware/ChibiOS" -prune -o \
     -path "firmware/ext" -prune -o \
     -path "firmware/cmsis-svd" -prune -o \
     -path "firmware/libfirmware" -prune -o \
+    -path "*cfg*" -prune -o \
+    -path "firmware/boards/f1*" -prune -o \
     -path "test/googletest" -prune -o \
     -path "for_rusefi/wideband_image.h" -prune -o \
     -type f \( -name "*.cpp" -o -name "*.h" -o -name "*.hpp" -o -name "*.c" -o -name "*.cc" \) \
