@@ -49,7 +49,7 @@
 // minimal battery voltage to start heating without CAN command
 #define HEATER_BATTERY_ON_VOLTAGE	9.5
 // mininal battery voltage to continue heating
-#define HEATER_BATTETY_OFF_VOLTAGE  8.5
+#define HEATER_BATTERY_OFF_VOLTAGE  7
 
 // *******************************
 // Start driving the pump just before we're at target temperature
