@@ -12,20 +12,21 @@ using namespace wbo;
 
 #ifdef ADVANCED_INDICATION
 
-#define LED_BLINK_FAST			(50)
-#define LED_BLINK_MEDIUM		(300)
-#define LED_BLINK_SLOW			(700)
-#define LED_OFF_TIME			(2000)
+#define LED_BLINK_FAST (50)
+#define LED_BLINK_MEDIUM (300)
+#define LED_BLINK_SLOW (700)
+#define LED_OFF_TIME (2000)
 
-struct indicationThreadData {
-	uint32_t idx;
-	ioline_t line;
+struct indicationThreadData
+{
+    uint32_t idx;
+    ioline_t line;
 };
 
 indicationThreadData indData[] = {
-	{0, PAL_LINE(LED_GREEN_PORT, LED_GREEN_PIN)},
+    {0, PAL_LINE(LED_GREEN_PORT, LED_GREEN_PIN)},
 #ifdef LED_R_GREEN_PORT
-	{1, PAL_LINE(LED_R_GREEN_PORT, LED_R_GREEN_PIN)},
+    {1, PAL_LINE(LED_R_GREEN_PORT, LED_R_GREEN_PIN)},
 #endif
 };
 
@@ -34,12 +35,12 @@ static THD_WORKING_AREA(waIndicationThread, 128);
 static THD_WORKING_AREA(waIndicationThread2, 128);
 #endif
 
-static void IndicationThread(void *ptr)
+static void IndicationThread(void* ptr)
 {
     chRegSetThreadName("Indication");
-    indicationThreadData *data = (indicationThreadData *)ptr;
+    indicationThreadData* data = (indicationThreadData*)ptr;
 
-    while(true)
+    while (true)
     {
         auto status = GetCurrentStatus(data->idx);
 
@@ -82,36 +83,40 @@ void InitIndication()
 /* Can be calles from two TS channels. */
 void onDataArrived(bool status)
 {
-	/* to avoid blinking when two TS channels available and only one is communicating
-	 * another one will call this function with status = false every timeout */
-	/* TODO: total crap, rework */
-	static int filter = 0;
+    /* to avoid blinking when two TS channels available and only one is communicating
+     * another one will call this function with status = false every timeout */
+    /* TODO: total crap, rework */
+    static int filter = 0;
 
-	if (status) {
-		if (filter < 3) {
-			filter = 3;
-		}
-	} else {
-		if (filter > 0) {
-			filter--;
-		}
-	}
+    if (status)
+    {
+        if (filter < 3)
+        {
+            filter = 3;
+        }
+    }
+    else
+    {
+        if (filter > 0)
+        {
+            filter--;
+        }
+    }
 
-	if (filter) {
-		palSetPad(LED_BLUE_PORT, LED_BLUE_PIN);
-	} else {
-		palClearPad(LED_BLUE_PORT, LED_BLUE_PIN);
-	}
+    if (filter)
+    {
+        palSetPad(LED_BLUE_PORT, LED_BLUE_PIN);
+    }
+    else
+    {
+        palClearPad(LED_BLUE_PORT, LED_BLUE_PIN);
+    }
 }
 
 #else
 
-void InitIndication()
-{
-}
+void InitIndication() {}
 
-void onDataArrived(bool)
-{
-}
+void onDataArrived(bool) {}
 
 #endif

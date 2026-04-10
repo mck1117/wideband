@@ -18,7 +18,7 @@ public:
 
 private:
     PWMDriver* const m_driver;
-    //const uint8_t m_channel;
+    // const uint8_t m_channel;
     /* const */ uint32_t m_counterFrequency;
     /* const */ uint16_t m_counterPeriod;
     float m_dutyFloat[4];

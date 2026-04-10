@@ -29,18 +29,12 @@ static PWMConfig auxPwmConfig = {
     .frequency = STM32_SYSCLK,
     .period = 1 << 12,
     .callback = nullptr,
-    .channels = {
-        [0] = {0, nullptr},
-        [1] = {0, nullptr},
-        [2] = {0, nullptr},
-        [3] = {0, nullptr}
-    },
+    .channels = {[0] = {0, nullptr}, [1] = {0, nullptr}, [2] = {0, nullptr}, [3] = {0, nullptr}},
     .cr2 = 0,
 #if STM32_PWM_USE_ADVANCED
     .bdtr = 0,
 #endif
-    .dier = 0
-};
+    .dier = 0};
 
 static void auxDacFillPwmConfig(void)
 {
@@ -86,7 +80,8 @@ void SetAuxDac(int channel, float voltage)
 
     auxDac.SetDuty(auxOutPwmCh[channel], duty);
     // Ripple cancelation channel
-    if (auxOutPwmChN[channel >= 0]) {
+    if (auxOutPwmChN[channel >= 0])
+    {
         auxDac.SetDuty(auxOutPwmChN[channel], duty);
     }
 }
@@ -95,11 +90,7 @@ void SetAuxDac(int channel, float voltage)
 
 #ifdef AUXOUT_DAC_DEVICE
 
-static DACConfig auxDacConfig = {
-  .init         = 2047U,
-  .datamode     = DAC_DHRM_12BIT_RIGHT,
-  .cr           = 0
-};
+static DACConfig auxDacConfig = {.init = 2047U, .datamode = DAC_DHRM_12BIT_RIGHT, .cr = 0};
 
 static Dac auxDac(AUXOUT_DAC_DEVICE);
 
@@ -125,22 +116,15 @@ static float AuxGetInputSignal(AuxOutputMode sel)
 {
     switch (sel)
     {
-        case AuxOutputMode::Afr0:
-            return 14.7f * GetLambda(0);
-        case AuxOutputMode::Afr1:
-            return 14.7f * GetLambda(1);
-        case AuxOutputMode::Lambda0:
-            return GetLambda(0);
-        case AuxOutputMode::Lambda1:
-            return GetLambda(1);
+    case AuxOutputMode::Afr0: return 14.7f * GetLambda(0);
+    case AuxOutputMode::Afr1: return 14.7f * GetLambda(1);
+    case AuxOutputMode::Lambda0: return GetLambda(0);
+    case AuxOutputMode::Lambda1: return GetLambda(1);
 #if HAL_USE_SPI
-        case AuxOutputMode::Egt0:
-            return getEgtDrivers()[0].temperature;
-        case AuxOutputMode::Egt1:
-            return getEgtDrivers()[1].temperature;
+    case AuxOutputMode::Egt0: return getEgtDrivers()[0].temperature;
+    case AuxOutputMode::Egt1: return getEgtDrivers()[1].temperature;
 #endif
-        default:
-            return 0;
+    default: return 0;
     }
 
     return 0;
@@ -154,7 +138,7 @@ void AuxOutThread(void*)
 
     chRegSetThreadName("Aux out");
 
-    while(1)
+    while (1)
     {
         for (int ch = 0; ch < AFR_CHANNELS; ch++)
         {
@@ -188,8 +172,6 @@ void InitAuxDac()
 
 #else /* (AUXOUT_DAC_PWM_DEVICE || AUXOUT_DAC_DEVICE) */
 
-void InitAuxDac()
-{
-}
+void InitAuxDac() {}
 
 #endif

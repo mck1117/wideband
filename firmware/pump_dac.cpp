@@ -12,20 +12,17 @@
 // 48MHz / 1024 = 46.8khz PWM
 // 64MHz / 1024 = 62.5khz PWM
 // 160MHz / 1024 = 156.25khz PWM
-static const PWMConfig pumpDacConfig = {
-    STM32_SYSCLK,
-    1024,
-    nullptr,
-    {
-        {PWM_OUTPUT_ACTIVE_HIGH | PWM_COMPLEMENTARY_OUTPUT_ACTIVE_LOW, nullptr},
-        {PWM_OUTPUT_ACTIVE_HIGH | PWM_COMPLEMENTARY_OUTPUT_ACTIVE_LOW, nullptr},
-        {PWM_OUTPUT_ACTIVE_HIGH | PWM_COMPLEMENTARY_OUTPUT_ACTIVE_LOW, nullptr},
-        {PWM_OUTPUT_ACTIVE_HIGH | PWM_COMPLEMENTARY_OUTPUT_ACTIVE_LOW, nullptr}
-    },
-    0,
-    0,
+static const PWMConfig pumpDacConfig = {STM32_SYSCLK,
+                                        1024,
+                                        nullptr,
+                                        {{PWM_OUTPUT_ACTIVE_HIGH | PWM_COMPLEMENTARY_OUTPUT_ACTIVE_LOW, nullptr},
+                                         {PWM_OUTPUT_ACTIVE_HIGH | PWM_COMPLEMENTARY_OUTPUT_ACTIVE_LOW, nullptr},
+                                         {PWM_OUTPUT_ACTIVE_HIGH | PWM_COMPLEMENTARY_OUTPUT_ACTIVE_LOW, nullptr},
+                                         {PWM_OUTPUT_ACTIVE_HIGH | PWM_COMPLEMENTARY_OUTPUT_ACTIVE_LOW, nullptr}},
+                                        0,
+                                        0,
 #if STM32_PWM_USE_ADVANCED
-    0
+                                        0
 #endif
 };
 
@@ -56,16 +53,11 @@ static void SetPumpVoltage(int ch, float volts)
 
 #ifdef PUMP_DAC_DAC_DEVICE_0
 
-static DACConfig pumpDacConfig = {
-  .init         = 2047U,    /* half of VCC */
-  .datamode     = DAC_DHRM_12BIT_RIGHT,
-  .cr           = 0
-};
+static DACConfig pumpDacConfig = {.init = 2047U, /* half of VCC */
+                                  .datamode = DAC_DHRM_12BIT_RIGHT,
+                                  .cr = 0};
 
-static Dac pumpDacs[] {
-    Dac(PUMP_DAC_DAC_DEVICE_0),
-    Dac(PUMP_DAC_DAC_DEVICE_1)
-};
+static Dac pumpDacs[]{Dac(PUMP_DAC_DAC_DEVICE_0), Dac(PUMP_DAC_DAC_DEVICE_1)};
 
 static void SetPumpVoltage(int ch, float volts)
 {
@@ -74,7 +66,8 @@ static void SetPumpVoltage(int ch, float volts)
 
 #endif
 
-struct pump_dac_state {
+struct pump_dac_state
+{
     int32_t curIpump;
 };
 

@@ -17,7 +17,8 @@ void Dac::Start(DACConfig& config)
     dacStart(m_driver, &config);
 }
 
-void Dac::SetVoltage(int channel, float voltage) {
+void Dac::SetVoltage(int channel, float voltage)
+{
     voltage = clampF(0, voltage, VCC_VOLTS);
     m_voltageFloat[channel] = voltage;
 

@@ -21,11 +21,7 @@
 #ifdef DEBUG_SERIAL_PORT
 
 SerialConfig cfg = {
-    .speed = DEBUG_SERIAL_BAUDRATE,
-    .cr1 = 0,
-    .cr2 = USART_CR2_STOP1_BITS | PORT_EXTRA_SERIAL_CR2,
-    .cr3 = 0
-};
+    .speed = DEBUG_SERIAL_BAUDRATE, .cr1 = 0, .cr2 = USART_CR2_STOP1_BITS | PORT_EXTRA_SERIAL_CR2, .cr3 = 0};
 
 static char printBuffer[200];
 
@@ -36,11 +32,11 @@ static void UartThread(void*)
 
     sdStart(&SD1, &cfg);
 
-    while(true)
+    while (true)
     {
         int ch;
 
-        #ifdef BOARD_HAS_VOLTAGE_SENSE
+#ifdef BOARD_HAS_VOLTAGE_SENSE
         {
             float vbatt = GetSupplyVoltage();
 
@@ -49,12 +45,18 @@ static void UartThread(void*)
 
             int tempC = GetMcuTemperature();
 
-            size_t writeCount = chsnprintf(printBuffer, sizeof(printBuffer), "Board: VBatt %d.%01d Temp %d deg C\r\n", vbattIntPart, vbattTenths, tempC);
-            chnWrite(&SD1, (const uint8_t *)printBuffer, writeCount);
+            size_t writeCount = chsnprintf(printBuffer,
+                                           sizeof(printBuffer),
+                                           "Board: VBatt %d.%01d Temp %d deg C\r\n",
+                                           vbattIntPart,
+                                           vbattTenths,
+                                           tempC);
+            chnWrite(&SD1, (const uint8_t*)printBuffer, writeCount);
         }
-        #endif
+#endif
 
-        for (ch = 0; ch < AFR_CHANNELS; ch++) {
+        for (ch = 0; ch < AFR_CHANNELS; ch++)
+        {
             float lambda = GetLambda(ch);
             int lambdaIntPart = lambda;
             int lambdaThousandths = (lambda - lambdaIntPart) * 1000;
@@ -62,29 +64,35 @@ static void UartThread(void*)
             int heaterDuty = GetHeaterDuty(ch) * 100;
             int pumpDuty = GetPumpOutputDuty(ch) * 100;
 
-            size_t writeCount = chsnprintf(printBuffer, sizeof(printBuffer),
-                "[AFR%d]: %d.%03d DC: %4d mV AC: %4d mV ESR: %5d T: %4d C Ipump: %6d uA PumpDac: %3d Vheater: %5d heater: %s (%d)\tfault: %s\r\n",
-                ch,
-                lambdaIntPart, lambdaThousandths,
-                (int)(GetSampler(ch).GetNernstDc() * 1000.0),
-                (int)(GetSampler(ch).GetNernstAc() * 1000.0),
-                (int)GetSampler(ch).GetSensorInternalResistance(),
-                (int)GetSampler(ch).GetSensorTemperature(),
-                (int)(GetSampler(ch).GetPumpNominalCurrent() * 1000),
-                pumpDuty,
-                heaterVoltageMv,
-                describeHeaterState(GetHeaterState(ch)), heaterDuty,
-                describeStatus(GetCurrentStatus(ch)));
-            chnWrite(&SD1, (const uint8_t *)printBuffer, writeCount);
+            size_t writeCount = chsnprintf(printBuffer,
+                                           sizeof(printBuffer),
+                                           "[AFR%d]: %d.%03d DC: %4d mV AC: %4d mV ESR: %5d T: %4d C Ipump: %6d uA "
+                                           "PumpDac: %3d Vheater: %5d heater: %s (%d)\tfault: %s\r\n",
+                                           ch,
+                                           lambdaIntPart,
+                                           lambdaThousandths,
+                                           (int)(GetSampler(ch).GetNernstDc() * 1000.0),
+                                           (int)(GetSampler(ch).GetNernstAc() * 1000.0),
+                                           (int)GetSampler(ch).GetSensorInternalResistance(),
+                                           (int)GetSampler(ch).GetSensorTemperature(),
+                                           (int)(GetSampler(ch).GetPumpNominalCurrent() * 1000),
+                                           pumpDuty,
+                                           heaterVoltageMv,
+                                           describeHeaterState(GetHeaterState(ch)),
+                                           heaterDuty,
+                                           describeStatus(GetCurrentStatus(ch)));
+            chnWrite(&SD1, (const uint8_t*)printBuffer, writeCount);
         }
 
 #if (EGT_CHANNELS > 0)
-        for (ch = 0; ch < EGT_CHANNELS; ch++) {
-            size_t writeCount = chsnprintf(printBuffer, sizeof(printBuffer),
-                "EGT[%d]: %d C (int %d C)\r\n",
-                (int)getEgtDrivers()[ch].temperature,
-                (int)getEgtDrivers()[ch].coldJunctionTemperature);
-            chnWrite(&SD1, (const uint8_t *)printBuffer, writeCount);
+        for (ch = 0; ch < EGT_CHANNELS; ch++)
+        {
+            size_t writeCount = chsnprintf(printBuffer,
+                                           sizeof(printBuffer),
+                                           "EGT[%d]: %d C (int %d C)\r\n",
+                                           (int)getEgtDrivers()[ch].temperature,
+                                           (int)getEgtDrivers()[ch].coldJunctionTemperature);
+            chnWrite(&SD1, (const uint8_t*)printBuffer, writeCount);
         }
 #endif /* EGT_CHANNELS > 0 */
 
@@ -104,10 +112,15 @@ static UartTsChannel primaryChannel(TS_PRIMARY_UART_PORT);
 static SerialTsChannel primaryChannel(TS_PRIMARY_SERIAL_PORT);
 #endif
 
-struct PrimaryChannelThread : public TunerstudioThread {
-    PrimaryChannelThread() : TunerstudioThread("Primary TS Channel") { }
+struct PrimaryChannelThread : public TunerstudioThread
+{
+    PrimaryChannelThread()
+        : TunerstudioThread("Primary TS Channel")
+    {
+    }
 
-    TsChannelBase* setupChannel() {
+    TsChannelBase* setupChannel()
+    {
         primaryChannel.start(TS_PRIMARY_BAUDRATE);
 
         return &primaryChannel;
@@ -119,10 +132,15 @@ static PrimaryChannelThread primaryChannelThread;
 #ifdef TS_SECONDARY_SERIAL_PORT
 static SerialTsChannel secondaryChannel(TS_SECONDARY_SERIAL_PORT);
 
-struct SecondaryChannelThread : public TunerstudioThread {
-    SecondaryChannelThread() : TunerstudioThread("Secondary TS Channel") { }
+struct SecondaryChannelThread : public TunerstudioThread
+{
+    SecondaryChannelThread()
+        : TunerstudioThread("Secondary TS Channel")
+    {
+    }
 
-    TsChannelBase* setupChannel() {
+    TsChannelBase* setupChannel()
+    {
         secondaryChannel.start(TS_SECONDARY_BAUDRATE);
 
         return &secondaryChannel;
