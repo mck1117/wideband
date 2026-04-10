@@ -18,7 +18,7 @@ void SamplingUpdateLiveData()
 {
     for (int ch = 0; ch < AFR_CHANNELS; ch++)
     {
-        volatile struct livedata_afr_s *data = &livedata_afr[ch];
+        volatile struct livedata_afr_s* data = &livedata_afr[ch];
 
         const auto& sampler = GetSampler(ch);
         const auto& heater = GetHeaterController(ch);
@@ -29,7 +29,7 @@ void SamplingUpdateLiveData()
         data->nernstAc = sampler.GetNernstAc() * 1000;
         data->pumpCurrentTarget = GetPumpCurrent(ch);
         data->pumpCurrentMeasured = sampler.GetPumpNominalCurrent();
-        data->heaterDuty = GetHeaterDuty(ch) * 1000;    // 0.1 %
+        data->heaterDuty = GetHeaterDuty(ch) * 1000; // 0.1 %
         data->heaterEffectiveVoltage = heater.GetHeaterEffectiveVoltage() * 100;
         data->esr = sampler.GetSensorInternalResistance();
         data->fault = (uint8_t)GetCurrentStatus(ch);
@@ -39,14 +39,12 @@ void SamplingUpdateLiveData()
     livedata_common.vbatt = GetSampler(0).GetInternalHeaterVoltage();
 }
 
-template<>
-const livedata_common_s* getLiveData(size_t)
+template <> const livedata_common_s* getLiveData(size_t)
 {
     return &livedata_common;
 }
 
-template<>
-const struct livedata_afr_s * getLiveData(size_t ch)
+template <> const struct livedata_afr_s* getLiveData(size_t ch)
 {
     if (ch < AFR_CHANNELS)
     {
@@ -64,6 +62,7 @@ static const FragmentEntry fragments[] = {
     decl_frag<livedata_egt_s, 1>{},
 };
 
-FragmentList getFragments() {
-	return { fragments, efi::size(fragments) };
+FragmentList getFragments()
+{
+    return {fragments, efi::size(fragments)};
 }

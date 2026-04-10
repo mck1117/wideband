@@ -17,8 +17,8 @@ files=$(find firmware test for_rusefi \
     -path "firmware/ext" -prune -o \
     -path "firmware/cmsis-svd" -prune -o \
     -path "firmware/libfirmware" -prune -o \
-    -path "*cfg*" -prune -o \
-    -path "firmware/boards/f1*" -prune -o \
+    -path "firmware/boards" -prune -o \
+    -path "firmware/console/binary" -prune -o \
     -path "test/googletest" -prune -o \
     -path "for_rusefi/wideband_image.h" -prune -o \
     -type f \( -name "*.cpp" -o -name "*.h" -o -name "*.hpp" -o -name "*.c" -o -name "*.cc" \) \
