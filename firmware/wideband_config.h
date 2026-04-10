@@ -7,7 +7,7 @@
 //    Defaults
 // *******************************
 #ifndef EGT_CHANNELS
-    #define EGT_CHANNELS 0
+#define EGT_CHANNELS 0
 #endif
 
 // *******************************
@@ -47,12 +47,12 @@
 
 #define HEATER_BATTERY_STAB_TIME 0.5f
 // minimal battery voltage to start heating without CAN command
-#define HEATER_BATTERY_ON_VOLTAGE	9.5
+#define HEATER_BATTERY_ON_VOLTAGE 9.5
 // mininal battery voltage to continue heating
-#define HEATER_BATTERY_OFF_VOLTAGE  7
+#define HEATER_BATTERY_OFF_VOLTAGE 7
 
 // *******************************
 // Start driving the pump just before we're at target temperature
 // minus this offset to avoid Vnerns voltage clamp near 0V
 // *******************************
-#define START_PUMP_TEMP_OFFSET	(200.0)
+#define START_PUMP_TEMP_OFFSET (200.0)

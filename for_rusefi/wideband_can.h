@@ -17,11 +17,11 @@
 #define WB_BL_BASE (WB_BL_HEADER << 4)
 #define WB_BL_CMD(opcode, extra) (((WB_BL_BASE | (opcode)) << 16) | (extra))
 
-#define WB_BL_CMD_MASK  0X0FFF0000
+#define WB_BL_CMD_MASK 0X0FFF0000
 
-#define WB_MSG_GET_HEADER(id)   (((id) >> 20) & 0XFFF)
-#define WB_MSG_GET_OPCODE(id)   (((id) >> 16) & 0XF)
-#define WB_MSG_GET_EXTRA(id)    ((id) & 0XFFFF)
+#define WB_MSG_GET_HEADER(id) (((id) >> 20) & 0XFFF)
+#define WB_MSG_GET_OPCODE(id) (((id) >> 16) & 0XF)
+#define WB_MSG_GET_EXTRA(id) ((id) & 0XFFFF)
 
 // 0xEF0'0000
 #define WB_BL_ENTER WB_BL_CMD(WB_OPCODE_START, 0)
@@ -56,7 +56,8 @@ enum class Status : uint8_t
     SensorUnderheat = 5,
 };
 
-static inline bool isStatusError(Status s) {
+static inline bool isStatusError(Status s)
+{
     return s >= Status::FirstError;
 }
 
@@ -84,20 +85,16 @@ struct DiagData
     uint8_t pad;
 };
 
-static inline const char* describeStatus(Status status) {
-    switch (status) {
-        case Status::Preheat:
-            return "Preheat (waiting)";
-        case Status::Warmup:
-            return "Warming up";
-        case Status::RunningClosedLoop:
-            return "Running";
-        case Status::SensorDidntHeat:
-            return "Sensor failed to heat";
-        case Status::SensorOverheat:
-            return "Sensor overheat";
-        case Status::SensorUnderheat:
-            return "Sensor underheat";
+static inline const char* describeStatus(Status status)
+{
+    switch (status)
+    {
+    case Status::Preheat: return "Preheat (waiting)";
+    case Status::Warmup: return "Warming up";
+    case Status::RunningClosedLoop: return "Running";
+    case Status::SensorDidntHeat: return "Sensor failed to heat";
+    case Status::SensorOverheat: return "Sensor overheat";
+    case Status::SensorUnderheat: return "Sensor underheat";
     }
 
     return "Unknown";
