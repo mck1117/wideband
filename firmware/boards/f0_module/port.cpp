@@ -166,21 +166,78 @@ void SetConfiguration()
 
 SensorType GetSensorType()
 {
-    return SensorType::LSU49;
+    switch (readSelPin(SENSOR_SELECT_PORT, SENSOR_SELECT_PIN)) {
+        case 0:  return SensorType::LSU42;
+        case 1:  return SensorType::LSU49;
+        case 2:  return SensorType::LSUADV;
+        default: return SensorType::LSU49;   // safe default
+    }
 }
 
-void SetupESRDriver(SensorType)
+void SetupESRDriver(SensorType sensor)
 {
-    // NOP
+    ioline_t driver;
+    switch (sensor) {
+        case SensorType::LSU42:
+            driver = PAL_LINE(NERNST_42_ESR_DRIVER_PORT, NERNST_42_ESR_DRIVER_PIN);
+            break;
+        case SensorType::LSU49:
+            driver = PAL_LINE(NERNST_49_ESR_DRIVER_PORT, NERNST_49_ESR_DRIVER_PIN);
+            break;
+        case SensorType::LSUADV:
+            driver = PAL_LINE(NERNST_ADV_ESR_DRIVER_PORT, NERNST_ADV_ESR_DRIVER_PIN);
+            break;
+        default:
+            return;
+    }
+
+    if (sensor != SensorType::LSU49) {
+        palSetPadMode(NERNST_49_BIAS_PORT, NERNST_49_BIAS_PIN, PAL_MODE_INPUT);
+    }
+
+    /* Disable the other drivers before enabling the selected one. */
+    const ioline_t drivers[] = {
+        PAL_LINE(NERNST_42_ESR_DRIVER_PORT, NERNST_42_ESR_DRIVER_PIN),
+        PAL_LINE(NERNST_49_ESR_DRIVER_PORT, NERNST_49_ESR_DRIVER_PIN),
+        PAL_LINE(NERNST_ADV_ESR_DRIVER_PORT, NERNST_ADV_ESR_DRIVER_PIN),
+    };
+    for (auto line : drivers) {
+        if (line != driver) {
+            palSetLineMode(line, PAL_MODE_INPUT);
+        }
+    }
+    palSetLineMode(driver, PAL_MODE_OUTPUT_PUSHPULL);
+
+    if (sensor == SensorType::LSU49) {
+        palSetPadMode(NERNST_49_BIAS_PORT, NERNST_49_BIAS_PIN, PAL_MODE_OUTPUT_PUSHPULL);
+        palSetPad(NERNST_49_BIAS_PORT, NERNST_49_BIAS_PIN);
+    }
 }
 
 int GetESRSupplyR()
 {
-    // Nernst AC injection resistor value
-    return 22000;
+    switch (GetSensorType()) {
+        case SensorType::LSU42:
+            return 6800;
+        case SensorType::LSU49:
+            return 22000;
+        case SensorType::LSUADV:
+            return 47000;
+    }
+    return 0;
 }
 
-void ToggleESRDriver(SensorType)
+void ToggleESRDriver(SensorType sensor)
 {
-    palTogglePad(NERNST_49_ESR_DRIVER_PORT, NERNST_49_ESR_DRIVER_PIN);
+    switch (sensor) {
+        case SensorType::LSU42:
+            palTogglePad(NERNST_42_ESR_DRIVER_PORT, NERNST_42_ESR_DRIVER_PIN);
+        break;
+        case SensorType::LSU49:
+            palTogglePad(NERNST_49_ESR_DRIVER_PORT, NERNST_49_ESR_DRIVER_PIN);
+        break;
+        case SensorType::LSUADV:
+            palTogglePad(NERNST_ADV_ESR_DRIVER_PORT, NERNST_ADV_ESR_DRIVER_PIN);
+        break;
+    }
 }
