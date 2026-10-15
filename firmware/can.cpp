@@ -11,10 +11,6 @@
 #include "port.h"
 #include "pump_control.h"
 #include "wideband_config.h"
-
-#include <rusefi/math.h>
-#include "analog.h"
-#include "pump_control.h"
 #include <rusefi/math.h>
 #include "analog.h"
 
@@ -23,7 +19,7 @@
 
 static Configuration* configuration;
 
-static THD_WORKING_AREA(waCanTxThread, 256);
+static THD_WORKING_AREA(waCanTxThread, 512);
 void CanTxThread(void*)
 {
     chRegSetThreadName("CAN Tx");
