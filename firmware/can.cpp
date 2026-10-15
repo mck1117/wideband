@@ -62,7 +62,7 @@ static void SendAck()
 static HeaterAllow heaterAllow = HeaterAllow::Unknown;
 static float remoteBatteryVoltage = 0;
 
-static THD_WORKING_AREA(waCanRxThread, 512);
+static THD_WORKING_AREA(waCanRxThread, 348);
 void CanRxThread(void*)
 {
     chRegSetThreadName("CAN Rx");
