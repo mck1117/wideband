@@ -176,47 +176,41 @@ SensorType GetSensorType()
 
 void SetupESRDriver(SensorType sensor)
 {
+    ioline_t driver;
     switch (sensor) {
         case SensorType::LSU42:
-            /* disable bias */
-            palSetPadMode(NERNST_49_BIAS_PORT, NERNST_49_BIAS_PIN,
-                PAL_MODE_INPUT);
-            /* disable all others ESR drivers */
-            palSetPadMode(NERNST_49_ESR_DRIVER_PORT, NERNST_49_ESR_DRIVER_PIN,
-                PAL_MODE_INPUT);
-            palSetPadMode(NERNST_ADV_ESR_DRIVER_PORT, NERNST_ADV_ESR_DRIVER_PIN,
-                PAL_MODE_INPUT);
-            /* enable LSU4.2 */
-            palSetPadMode(NERNST_42_ESR_DRIVER_PORT, NERNST_42_ESR_DRIVER_PIN,
-                PAL_MODE_OUTPUT_PUSHPULL);
-        break;
+            driver = PAL_LINE(NERNST_42_ESR_DRIVER_PORT, NERNST_42_ESR_DRIVER_PIN);
+            break;
         case SensorType::LSU49:
-            /* disable all others ESR drivers */
-            palSetPadMode(NERNST_42_ESR_DRIVER_PORT, NERNST_42_ESR_DRIVER_PIN,
-                PAL_MODE_INPUT);
-            palSetPadMode(NERNST_ADV_ESR_DRIVER_PORT, NERNST_ADV_ESR_DRIVER_PIN,
-                PAL_MODE_INPUT);
-            /* enable LSU4.2 */
-            palSetPadMode(NERNST_49_ESR_DRIVER_PORT, NERNST_49_ESR_DRIVER_PIN,
-                PAL_MODE_OUTPUT_PUSHPULL);
-            /* enable bias */
-            palSetPadMode(NERNST_49_BIAS_PORT, NERNST_49_BIAS_PIN,
-                PAL_MODE_OUTPUT_PUSHPULL);
-            palSetPad(NERNST_49_BIAS_PORT, NERNST_49_BIAS_PIN);
-        break;
+            driver = PAL_LINE(NERNST_49_ESR_DRIVER_PORT, NERNST_49_ESR_DRIVER_PIN);
+            break;
         case SensorType::LSUADV:
-            /* disable bias */
-            palSetPadMode(NERNST_49_BIAS_PORT, NERNST_49_BIAS_PIN,
-                PAL_MODE_INPUT);
-            /* disable all others ESR drivers */
-            palSetPadMode(NERNST_49_ESR_DRIVER_PORT, NERNST_49_ESR_DRIVER_PIN,
-                PAL_MODE_INPUT);
-            palSetPadMode(NERNST_42_ESR_DRIVER_PORT, NERNST_42_ESR_DRIVER_PIN,
-                PAL_MODE_INPUT);
-            /* enable LSU4.2 */
-            palSetPadMode(NERNST_ADV_ESR_DRIVER_PORT, NERNST_ADV_ESR_DRIVER_PIN,
-                PAL_MODE_OUTPUT_PUSHPULL);
-        break;
+            driver = PAL_LINE(NERNST_ADV_ESR_DRIVER_PORT, NERNST_ADV_ESR_DRIVER_PIN);
+            break;
+        default:
+            return;
+    }
+
+    if (sensor != SensorType::LSU49) {
+        palSetPadMode(NERNST_49_BIAS_PORT, NERNST_49_BIAS_PIN, PAL_MODE_INPUT);
+    }
+
+    /* Disable the other drivers before enabling the selected one. */
+    const ioline_t drivers[] = {
+        PAL_LINE(NERNST_42_ESR_DRIVER_PORT, NERNST_42_ESR_DRIVER_PIN),
+        PAL_LINE(NERNST_49_ESR_DRIVER_PORT, NERNST_49_ESR_DRIVER_PIN),
+        PAL_LINE(NERNST_ADV_ESR_DRIVER_PORT, NERNST_ADV_ESR_DRIVER_PIN),
+    };
+    for (auto line : drivers) {
+        if (line != driver) {
+            palSetLineMode(line, PAL_MODE_INPUT);
+        }
+    }
+    palSetLineMode(driver, PAL_MODE_OUTPUT_PUSHPULL);
+
+    if (sensor == SensorType::LSU49) {
+        palSetPadMode(NERNST_49_BIAS_PORT, NERNST_49_BIAS_PIN, PAL_MODE_OUTPUT_PUSHPULL);
+        palSetPad(NERNST_49_BIAS_PORT, NERNST_49_BIAS_PIN);
     }
 }
 
