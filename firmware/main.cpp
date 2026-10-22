@@ -14,6 +14,9 @@
 #include "port.h"
 #include "tunerstudio.h"
 #include "indication.h"
+#if (__CORTEX_M == 0)
+#include "analog.h"
+#endif
 
 #include "wideband_config.h"
 
@@ -33,6 +36,9 @@ int main()
     InitConfiguration();
 
     // Fire up all of our threads
+#if (__CORTEX_M == 0)
+	initAnalogOut();
+#endif
     StartSampling();
     InitPumpDac();
     StartHeaterControl();

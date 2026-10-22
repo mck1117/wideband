@@ -226,7 +226,7 @@
                                      PIN_OSPEED_HIGH(GPIOA_PIN12) |        \
                                      PIN_OSPEED_HIGH(GPIOA_SWDIO) |         \
                                      PIN_OSPEED_HIGH(GPIOA_SWCLK) |         \
-                                     PIN_OSPEED_LOW(GPIOA_PIN15))
+                                     PIN_OSPEED_HIGH(GPIOA_PIN15))
 #define VAL_GPIOA_PUPDR             (PIN_PUPDR_PULLUP(GPIOA_PIN0) |       \
                                      PIN_PUPDR_PULLUP(GPIOA_PIN1) |       \
                                      PIN_PUPDR_PULLUP(GPIOA_PIN2) |     \
@@ -242,7 +242,7 @@
                                      PIN_PUPDR_PULLUP(GPIOA_PIN12) |       \
                                      PIN_PUPDR_PULLUP(GPIOA_SWDIO) |        \
                                      PIN_PUPDR_PULLDOWN(GPIOA_SWCLK) |      \
-                                     PIN_PUPDR_FLOATING(GPIOA_PIN15))
+                                     PIN_PUPDR_PULLUP(GPIOA_PIN15))
 #define VAL_GPIOA_ODR               (PIN_ODR_LOW(GPIOA_PIN0) |           \
                                      PIN_ODR_LOW(GPIOA_PIN1) |           \
                                      PIN_ODR_LOW(GPIOA_PIN2) |           \
@@ -274,7 +274,7 @@
                                      PIN_AFIO_AF(GPIOA_PIN12, 4U) |        \
                                      PIN_AFIO_AF(GPIOA_SWDIO, 0U) |         \
                                      PIN_AFIO_AF(GPIOA_SWCLK, 0U) |         \
-                                     PIN_AFIO_AF(GPIOA_PIN15, 0U))
+                                     PIN_AFIO_AF(GPIOA_PIN15, 2U))
 
 /*
  * GPIOB setup:
