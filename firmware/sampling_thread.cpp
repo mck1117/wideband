@@ -61,7 +61,9 @@ static void SamplingThread(void*)
         for (int ch = 0; ch < AFR_CHANNELS; ch++)
         {
             samplers[ch].ApplySample(result.ch[ch], result.VirtualGroundVoltageInt);
+#if (__CORTEX_M == 0)
             setAnalogOut(ch);
+#endif
         }
 
 #if defined(TS_ENABLED)

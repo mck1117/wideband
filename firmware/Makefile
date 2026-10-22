@@ -160,8 +160,11 @@ CPPSRC = $(ALLCPPSRC) \
           indication.cpp \
           sampling_thread.cpp \
           heater_thread.cpp \
-          analog.cpp \
           main.cpp
+
+ifeq ($(BOARD),f0_module)
+CPPSRC += analog.cpp
+endif
 
 ifneq ($(ENABLE_TS),)
 CPPSRC += console/binary/tunerstudio.cpp \
