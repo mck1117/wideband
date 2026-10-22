@@ -2,8 +2,6 @@
 
 void initAnalogOut(void)
 {
-    palSetPadMode(GPIOA, 15U, PAL_MODE_OUTPUT_PUSHPULL); // PWM2
-    palSetPadMode(GPIOA, 15U, PAL_MODE_ALTERNATE(2));    // PWM2
     analogPwm.Start(analogPwmConfig);
 }
 
