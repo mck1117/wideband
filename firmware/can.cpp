@@ -13,7 +13,6 @@
 #include "wideband_config.h"
 
 #include <rusefi/math.h>
-#include "analog.h"
 
 // this same header is imported by rusEFI to get struct layouts and firmware version
 #include "../for_rusefi/wideband_can.h"
@@ -33,7 +32,6 @@ void CanTxThread(void*)
         for (int ch = 0; ch < AFR_CHANNELS; ch++)
         {
             SendCanForChannel(ch);
-            setAnalogOut(ch);
         }
 
         prev = chThdSleepUntilWindowed(prev, chTimeAddX(prev, TIME_MS2I(WBO_TX_PERIOD_MS)));

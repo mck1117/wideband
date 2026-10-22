@@ -6,6 +6,7 @@
 
 #include "sampling.h"
 #include "port.h"
+#include "analog.h"
 
 static Sampler samplers[AFR_CHANNELS];
 
@@ -60,6 +61,7 @@ static void SamplingThread(void*)
         for (int ch = 0; ch < AFR_CHANNELS; ch++)
         {
             samplers[ch].ApplySample(result.ch[ch], result.VirtualGroundVoltageInt);
+            setAnalogOut(ch);
         }
 
 #if defined(TS_ENABLED)
