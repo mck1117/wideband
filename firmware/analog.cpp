@@ -5,6 +5,7 @@
 #include "lambda_conversion.h"
 #include <rusefi/math.h>
 
+#include "wideband_config.h"
 #include "analog.h"
 
 #ifdef ANALOG_PWM_DEVICE
