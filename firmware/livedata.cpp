@@ -1,7 +1,6 @@
 #include "wideband_config.h"
 #include "livedata.h"
 
-#include "lambda_conversion.h"
 #include "sampling.h"
 #include "pump_dac.h"
 #include "heater_control.h"
@@ -23,7 +22,7 @@ void SamplingUpdateLiveData()
         const auto& sampler = GetSampler(ch);
         const auto& heater = GetHeaterController(ch);
 
-        data->lambda = GetLambda(ch);
+        data->lambda = sampler.GetLambda();
         data->temperature = sampler.GetSensorTemperature() * 10;
         data->nernstDc = sampler.GetNernstDc() * 1000;
         data->nernstAc = sampler.GetNernstAc() * 1000;

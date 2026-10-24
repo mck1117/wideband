@@ -2,7 +2,6 @@
 #include "hal.h"
 #include "chprintf.h"
 
-#include "lambda_conversion.h"
 #include "sampling.h"
 #include "heater_control.h"
 #include "max3185x.h"
@@ -57,7 +56,7 @@ static void UartThread(void*)
 
         for (ch = 0; ch < AFR_CHANNELS; ch++)
         {
-            float lambda = GetLambda(ch);
+            float lambda = GetSampler(ch).GetLambda();
             int lambdaIntPart = lambda;
             int lambdaThousandths = (lambda - lambdaIntPart) * 1000;
             int heaterVoltageMv = GetSampler(ch).GetInternalHeaterVoltage() * 1000;

@@ -1,5 +1,6 @@
 #include "sampling.h"
 
+#include "lambda_conversion.h"
 #include "port.h"
 
 #include <rusefi/interpolation.h>
@@ -89,6 +90,11 @@ float Sampler::GetSensorInternalResistance() const
     return totalEsr - VM_RESISTOR_VALUE;
 }
 
+float Sampler::GetLambda() const
+{
+    return lambda;
+}
+
 constexpr float f_abs(float x)
 {
     return x > 0 ? x : -x;
@@ -122,4 +128,6 @@ void Sampler::ApplySample(AnalogChannelResult& result, float virtualGroundVoltag
     // Shift history over by one
     r_3 = r_2;
     r_2 = r_1;
+
+    lambda = ConvertLambda(GetPumpNominalCurrent());
 }

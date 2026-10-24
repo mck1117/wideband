@@ -2,7 +2,7 @@
 #include "ch.h"
 #include "pwm.h"
 #include <cstdint>
-#include "lambda_conversion.h"
+#include "sampling.h"
 #include <rusefi/math.h>
 
 #include "wideband_config.h"
@@ -33,13 +33,12 @@ void initAnalogOut(void)
     analogPwm.Start(analogPwmConfig);
 }
 
-void setAnalogOut(uint8_t ch) {
+void setAnalogOut(uint8_t ch, float lambda) {
     if (ch != 0) {
         // only support single analog output
         return;
     }
 
-    auto lambda = GetLambda(ch);
     lambda = clampF(0.68f, lambda, 1.36f);
     float duty = (lambda - 0.68f) / 0.68f;
     analogPwm.SetDuty(ANALOG_PWM_CHANNEL, duty);

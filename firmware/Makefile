@@ -149,7 +149,6 @@ CPPSRC = $(ALLCPPSRC) \
           can.cpp \
           can_helper.cpp \
           status.cpp \
-          lambda_conversion.cpp \
           pwm.cpp \
           dac.cpp \
           pump_dac.cpp \

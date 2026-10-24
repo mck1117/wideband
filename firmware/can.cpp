@@ -5,7 +5,6 @@
 #include "status.h"
 #include "can_helper.h"
 #include "heater_control.h"
-#include "lambda_conversion.h"
 #include "sampling.h"
 #include "pump_dac.h"
 #include "port.h"
@@ -180,7 +179,7 @@ void SendRusefiFormat(uint8_t ch)
 
     auto nernstDc = sampler.GetNernstDc();
     auto pumpDuty = GetPumpOutputDuty(ch);
-    auto lambda = GetLambda(ch);
+    auto lambda = sampler.GetLambda();
 
     // Lambda is valid if:
     // 1. Nernst voltage is near target

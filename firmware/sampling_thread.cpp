@@ -63,7 +63,7 @@ static void SamplingThread(void*)
             samplers[ch].ApplySample(result.ch[ch], result.VirtualGroundVoltageInt);
 
 #ifdef ANALOG_PWM_DEVICE
-            setAnalogOut(ch);
+            setAnalogOut(ch, samplers[ch].GetLambda());
 #endif // ANALOG_PWM_DEVICE
         }
 

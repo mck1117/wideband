@@ -1,5 +1,4 @@
 #include "lambda_conversion.h"
-#include "sampling.h"
 #include "port.h"
 
 static float GetPhiLsu49(float pumpCurrent)
@@ -83,10 +82,8 @@ static float GetPhi(float pumpCurrent)
     return 1;
 }
 
-float GetLambda(int ch)
+float ConvertLambda(float pumpCurrent)
 {
-    float pumpCurrent = GetSampler(ch).GetPumpNominalCurrent();
-
     // Lambda is reciprocal of phi
     return 1 / GetPhi(pumpCurrent);
 }

@@ -12,6 +12,7 @@ struct ISampler
     virtual float GetInternalHeaterVoltage() const = 0;
     virtual float GetSensorTemperature() const = 0;
     virtual float GetSensorInternalResistance() const = 0;
+    virtual float GetLambda() const = 0;
 };
 
 struct AnalogChannelResult;
@@ -28,6 +29,7 @@ public:
     float GetInternalHeaterVoltage() const override;
     float GetSensorTemperature() const override;
     float GetSensorInternalResistance() const override;
+    float GetLambda() const override;
 
 private:
     float r_2 = 0;
@@ -36,6 +38,8 @@ private:
     float nernstAc = 0;
     float nernstDc = 0;
     float pumpCurrentSenseVoltage = 0;
+
+    float lambda = 0;
 
 #ifdef BOARD_HAS_VOLTAGE_SENSE
     float internalHeaterVoltage = 0;
