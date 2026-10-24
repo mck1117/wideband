@@ -17,3 +17,9 @@
 //    Nernst voltage & ESR sense
 // *******************************
 #define VM_RESISTOR_VALUE (10)
+
+// *******************************
+//          Analog output
+// *******************************
+#define ANALOG_PWM_DEVICE PWMD3
+#define ANALOG_PWM_CHANNEL 0

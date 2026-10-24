@@ -61,9 +61,10 @@ static void SamplingThread(void*)
         for (int ch = 0; ch < AFR_CHANNELS; ch++)
         {
             samplers[ch].ApplySample(result.ch[ch], result.VirtualGroundVoltageInt);
-#if (__CORTEX_M == 0)
+
+#ifdef ANALOG_PWM_DEVICE
             setAnalogOut(ch);
-#endif
+#endif // ANALOG_PWM_DEVICE
         }
 
 #if defined(TS_ENABLED)

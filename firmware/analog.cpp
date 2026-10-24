@@ -7,9 +7,9 @@
 
 #include "analog.h"
 
-#ifdef ANALOG_
+#ifdef ANALOG_PWM_DEVICE
 
-static Pwm analogPwm(PWMD2);
+static Pwm analogPwm(ANALOG_PWM_DEVICE);
 static const PWMConfig analogPwmConfig = {
     .frequency = STM32_SYSCLK,
     .period = 4096,
@@ -41,5 +41,7 @@ void setAnalogOut(uint8_t ch) {
     auto lambda = GetLambda(ch);
     lambda = clampF(0.68f, lambda, 1.36f);
     float duty = (lambda - 0.68f) / 0.68f;
-    analogPwm.SetDuty(0U, duty);
+    analogPwm.SetDuty(ANALOG_PWM_CHANNEL, duty);
 }
+
+#endif // defined ANALOG_PWM_DEVICE
