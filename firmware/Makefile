@@ -162,6 +162,10 @@ CPPSRC = $(ALLCPPSRC) \
           heater_thread.cpp \
           main.cpp
 
+ifeq ($(BOARD),f0_module)
+CPPSRC += analog.cpp
+endif
+
 ifneq ($(ENABLE_TS),)
 CPPSRC += console/binary/tunerstudio.cpp \
           console/binary/tunerstudio_io.cpp \
