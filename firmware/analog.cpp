@@ -1,4 +1,31 @@
+#include "hal.h"
+#include "ch.h"
+#include "pwm.h"
+#include <cstdint>
+#include "lambda_conversion.h"
+#include <rusefi/math.h>
+
 #include "analog.h"
+
+#ifdef ANALOG_
+
+static Pwm analogPwm(PWMD2);
+static const PWMConfig analogPwmConfig = {
+    .frequency = STM32_SYSCLK,
+    .period = 4096,
+    .callback = nullptr,
+    .channels = {
+        {PWM_OUTPUT_ACTIVE_HIGH | PWM_COMPLEMENTARY_OUTPUT_ACTIVE_LOW, nullptr},
+        {PWM_OUTPUT_ACTIVE_HIGH | PWM_COMPLEMENTARY_OUTPUT_ACTIVE_LOW, nullptr},
+        {PWM_OUTPUT_ACTIVE_HIGH | PWM_COMPLEMENTARY_OUTPUT_ACTIVE_LOW, nullptr},
+        {PWM_OUTPUT_ACTIVE_HIGH | PWM_COMPLEMENTARY_OUTPUT_ACTIVE_LOW, nullptr},
+    },
+    .cr2 = 0,
+#if STM32_PWM_USE_ADVANCED
+    .bdtr = 0,
+#endif
+    .dier = 0,
+};
 
 void initAnalogOut(void)
 {
@@ -6,6 +33,11 @@ void initAnalogOut(void)
 }
 
 void setAnalogOut(uint8_t ch) {
+    if (ch != 0) {
+        // only support single analog output
+        return;
+    }
+
     auto lambda = GetLambda(ch);
     lambda = clampF(0.68f, lambda, 1.36f);
     float duty = (lambda - 0.68f) / 0.68f;
