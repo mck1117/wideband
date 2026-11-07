@@ -17,6 +17,12 @@
 #define PUMP_DAC_PWM_DEVICE PWMD3
 #define PUMP_DAC_PWM_CHANNEL_0 0
 
+// *******************************
+//      Analog output - PA15
+// *******************************
+#define ANALOG_PWM_DEVICE PWMD2
+#define ANALOG_PWM_CHANNEL 0
+
 #define ID_SEL1_PORT GPIOB
 #define ID_SEL1_PIN 1
 
