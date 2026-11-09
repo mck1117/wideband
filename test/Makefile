@@ -31,6 +31,7 @@ CPPSRC += \
 	tests/test_sampler.cpp \
 	tests/test_lambda_conversion.cpp \
 	tests/test_sampler_math.cpp \
+	tests/test_pid.cpp \
 	tests/test_heater.cpp \
 
 INCDIR += \
