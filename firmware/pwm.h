@@ -14,6 +14,8 @@ public:
 
     void Start(const PWMConfig& config);
     void SetDuty(int channel, float duty);
+    // Set raw high time in counter ticks (0 .. period). Cheaper than SetDuty, but doesn't update GetLastDuty.
+    void SetHighTime(int channel, pwmcnt_t highTime);
     float GetLastDuty(int channel);
 
 private:

@@ -10,10 +10,12 @@
 
 #ifdef ANALOG_PWM_DEVICE
 
+#define ANALOG_PWM_PERIOD 4096
+
 static Pwm analogPwm(ANALOG_PWM_DEVICE);
 static const PWMConfig analogPwmConfig = {
     .frequency = STM32_SYSCLK,
-    .period = 4096,
+    .period = ANALOG_PWM_PERIOD,
     .callback = nullptr,
     .channels = {
         {PWM_OUTPUT_ACTIVE_HIGH | PWM_COMPLEMENTARY_OUTPUT_ACTIVE_LOW, nullptr},
@@ -39,9 +41,19 @@ void setAnalogOut(uint8_t ch, float lambda) {
         return;
     }
 
-    lambda = clampF(0.68f, lambda, 1.36f);
-    float duty = (lambda - 0.68f) * (1 / 0.68f);
-    analogPwm.SetDuty(ANALOG_PWM_CHANNEL, duty);
+    // Map lambda 0.68 -> 1.36 linearly to 0 -> full scale counts.
+    // One float multiply + conversion, then clamp in integer: soft float compares and
+    // conversions are expensive on M0, so avoid going through float duty + SetDuty.
+    constexpr float countsPerLambda = ANALOG_PWM_PERIOD / 0.68f;
+    int32_t highTime = (int32_t)((lambda - 0.68f) * countsPerLambda);
+
+    if (highTime < 0) {
+        highTime = 0;
+    } else if (highTime > ANALOG_PWM_PERIOD) {
+        highTime = ANALOG_PWM_PERIOD;
+    }
+
+    analogPwm.SetHighTime(ANALOG_PWM_CHANNEL, highTime);
 }
 
 #endif // defined ANALOG_PWM_DEVICE
