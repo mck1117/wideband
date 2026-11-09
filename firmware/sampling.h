@@ -43,7 +43,7 @@ struct AnalogChannelResultT;
  *   writes with a single store (one float/int32), never from multiple members updated separately.
  */
 template <typename Math>
-class Sampler : public ISampler
+class Sampler final : public ISampler
 {
 public:
     using Voltage = typename Math::Voltage;
@@ -78,8 +78,12 @@ private:
     Timer m_startupTimer;
 };
 
-// Get the sampler for a particular channel
-const ISampler& GetSampler(int ch);
+// The sampler type this board uses
+using BoardSampler = Sampler<SamplerMath>;
+
+// Get the sampler for a particular channel. Returns the concrete (final) type rather than ISampler so
+// that calls are resolved at compile time instead of through the vtable.
+const BoardSampler& GetSampler(int ch);
 
 #ifdef BOARD_HAS_VOLTAGE_SENSE
 float GetSupplyVoltage();

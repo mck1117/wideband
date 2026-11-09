@@ -7,6 +7,7 @@
 #include "can.h"
 #include "pid.h"
 #include "timer.h"
+#include "sampling.h"
 
 enum class HeaterState
 {
@@ -16,11 +17,10 @@ enum class HeaterState
     Stopped,
 };
 
-struct ISampler;
-
 struct IHeaterController
 {
-    virtual void Update(const ISampler& sampler, HeaterAllow heaterAllowState) = 0;
+    // Run one control step, returns the heater duty cycle to apply (0-1)
+    virtual float Update(const BoardSampler& sampler, HeaterAllow heaterAllowState) = 0;
     virtual bool IsRunningClosedLoop() const = 0;
     virtual float GetHeaterEffectiveVoltage() const = 0;
     virtual HeaterState GetHeaterState() const = 0;
@@ -32,14 +32,12 @@ class HeaterControllerBase : public IHeaterController
 public:
     HeaterControllerBase(int ch, int preheatTimeSec, int warmupTimeSec);
     void Configure(float targetTempC, float targetEsr);
-    void Update(const ISampler& sampler, HeaterAllow heaterAllowState) override;
+    float Update(const BoardSampler& sampler, HeaterAllow heaterAllowState) override;
 
     bool IsRunningClosedLoop() const override;
     float GetHeaterEffectiveVoltage() const override;
     HeaterState GetHeaterState() const override;
     float GetTargetTemp() const override;
-
-    virtual void SetDuty(float duty) const = 0;
 
     bool GetIsHeatingEnabled(HeaterAllow heaterAllowState, float batteryVoltage);
 
@@ -78,7 +76,22 @@ private:
     static const int batteryStabTimeCounter = HEATER_BATTERY_STAB_TIME / HEATER_CONTROL_PERIOD;
 };
 
-const IHeaterController& GetHeaterController(int ch);
+// A heater controller driving one channel of the heater PWM
+class HeaterController final : public HeaterControllerBase
+{
+public:
+    HeaterController(int ch, int pwm_ch)
+        : HeaterControllerBase(ch, HEATER_PREHEAT_TIME, HEATER_WARMUP_TIMEOUT)
+        , pwm_ch(pwm_ch)
+    {
+    }
+
+    const uint8_t pwm_ch;
+};
+
+// Returns the concrete (final) type rather than IHeaterController so that calls are resolved at
+// compile time instead of through the vtable.
+const HeaterController& GetHeaterController(int ch);
 
 void StartHeaterControl();
 float GetHeaterDuty(int ch);

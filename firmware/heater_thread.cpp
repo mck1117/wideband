@@ -22,22 +22,6 @@ static const PWMConfig heaterPwmConfig = {
 #endif
     .dier = 0};
 
-class HeaterController : public HeaterControllerBase
-{
-public:
-    HeaterController(int ch, int pwm_ch)
-        : HeaterControllerBase(ch, HEATER_PREHEAT_TIME, HEATER_WARMUP_TIMEOUT)
-        , pwm_ch(pwm_ch)
-    {
-    }
-
-    void SetDuty(float duty) const override { heaterPwm.SetDuty(pwm_ch, duty); }
-
-    // TODO: private:
-public:
-    const uint8_t pwm_ch;
-};
-
 HeaterController heaterControllers[AFR_CHANNELS] = {
     {0, HEATER_PWM_CHANNEL_0},
 
@@ -54,7 +38,7 @@ HeaterController heaterControllers[AFR_CHANNELS] = {
 #endif
 };
 
-const IHeaterController& GetHeaterController(int ch)
+const HeaterController& GetHeaterController(int ch)
 {
     return heaterControllers[ch];
 }
@@ -121,7 +105,8 @@ static void HeaterThread(void*)
             const auto& sampler = GetSampler(i);
             auto& heater = heaterControllers[i];
 
-            heater.Update(sampler, heaterAllowState);
+            float duty = heater.Update(sampler, heaterAllowState);
+            heaterPwm.SetDuty(heater.pwm_ch, duty);
         }
 
         // Loop at ~20hz

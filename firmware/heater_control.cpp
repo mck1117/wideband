@@ -194,7 +194,7 @@ float HeaterControllerBase::GetVoltageForState(HeaterState state, float sensorEs
     return 0;
 }
 
-void HeaterControllerBase::Update(const ISampler& sampler, HeaterAllow heaterAllowState)
+float HeaterControllerBase::Update(const BoardSampler& sampler, HeaterAllow heaterAllowState)
 {
     // Read sensor state
     float sensorEsr = sampler.GetSensorInternalResistance();
@@ -248,8 +248,8 @@ void HeaterControllerBase::Update(const ISampler& sampler, HeaterAllow heaterAll
         heaterVoltage = 0;
     }
 
-    // Pipe the output to the heater driver
-    SetDuty(duty);
+    // Caller pipes the output to the heater driver
+    return duty;
 }
 
 const char* describeHeaterState(HeaterState state)

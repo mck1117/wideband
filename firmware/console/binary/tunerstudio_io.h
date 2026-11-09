@@ -94,7 +94,7 @@ public:
 
 #if HAL_USE_SERIAL
 // This class implements a ChibiOS Serial Driver
-class SerialTsChannel : public SerialTsChannelBase {
+class SerialTsChannel final : public SerialTsChannelBase {
 public:
 	SerialTsChannel(SerialDriver& driver) : SerialTsChannelBase("Serial"), m_driver(&driver) { }
 
@@ -119,7 +119,7 @@ private:
 
 #if HAL_USE_UART
 // This class implements a ChibiOS UART Driver
-class UartTsChannel : public SerialTsChannelBase {
+class UartTsChannel final : public SerialTsChannelBase {
 public:
 	UartTsChannel(UARTDriver& driver) : SerialTsChannelBase("UART"), m_driver(&driver) { }
 
