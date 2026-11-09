@@ -40,7 +40,7 @@ void setAnalogOut(uint8_t ch, float lambda) {
     }
 
     lambda = clampF(0.68f, lambda, 1.36f);
-    float duty = (lambda - 0.68f) / 0.68f;
+    float duty = (lambda - 0.68f) * (1 / 0.68f);
     analogPwm.SetDuty(ANALOG_PWM_CHANNEL, duty);
 }
 
