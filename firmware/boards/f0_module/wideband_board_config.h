@@ -13,6 +13,10 @@
 
 #define AFR_CHANNELS 1
 
+// Fixed sampling loop rate, the ESR driver toggles at half this (3khz)
+// Must evenly divide CH_CFG_ST_FREQUENCY
+#define SAMPLE_RATE_HZ 6000
+
 // *******************************
 //    Nernst voltage & ESR sense
 // *******************************

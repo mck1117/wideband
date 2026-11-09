@@ -22,6 +22,12 @@ static THD_WORKING_AREA(waSamplingThread, 256);
 #define ANALOG_OUT_DECIMATION 60
 #endif
 
+#ifdef SAMPLE_RATE_HZ
+static_assert(CH_CFG_ST_FREQUENCY % SAMPLE_RATE_HZ == 0, "sample period must be an integer number of ticks");
+static constexpr sysinterval_t samplePeriod = CH_CFG_ST_FREQUENCY / SAMPLE_RATE_HZ;
+static_assert(samplePeriod > CH_CFG_ST_TIMEDELTA, "sample period too short for tickless timer");
+#endif
+
 #ifdef BOARD_HAS_VOLTAGE_SENSE
 static float supplyVoltage = 0;
 
@@ -48,8 +54,18 @@ static void SamplingThread(void*)
 
     AnalogSampleStart();
 
+#ifdef SAMPLE_RATE_HZ
+    systime_t deadline = chVTGetSystemTimeX();
+#endif
+
     while (true)
     {
+#ifdef SAMPLE_RATE_HZ
+        // Run the loop at a fixed rate. The conversion started last loop completes during this sleep.
+        // If we're running late, this returns immediately.
+        deadline = chThdSleepUntilWindowed(deadline, chTimeAddX(deadline, samplePeriod));
+#endif
+
         auto result = AnalogSampleFinish();
 
         // Toggle the pin after sampling so that any switching noise occurs while we're doing our math instead of when

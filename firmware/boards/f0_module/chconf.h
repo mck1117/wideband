@@ -72,7 +72,8 @@
  *          setting also defines the system tick time unit.
  */
 #if !defined(CH_CFG_ST_FREQUENCY)
-#define CH_CFG_ST_FREQUENCY                 10000
+// 60khz so that the 6khz sampling period (SAMPLE_RATE_HZ) is an integer number of ticks
+#define CH_CFG_ST_FREQUENCY                 60000
 #endif
 
 /**
@@ -100,7 +101,9 @@
  *          this value.
  */
 #if !defined(CH_CFG_ST_TIMEDELTA)
-#define CH_CFG_ST_TIMEDELTA                 4
+// Any alarm closer than this is pushed out to this. 2 ticks = 33us at 60khz,
+// keeps sampling deadlines from being pushed late when there's little slack left.
+#define CH_CFG_ST_TIMEDELTA                 2
 #endif
 
 /** @} */
