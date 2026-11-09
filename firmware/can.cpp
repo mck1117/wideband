@@ -135,7 +135,7 @@ void CanRxThread(void*)
                 SendAck();
 
                 // Let the message get out before we reset the chip
-                chThdSleep(50);
+                chThdSleepMilliseconds(50);
 
                 NVIC_SystemReset();
             }
