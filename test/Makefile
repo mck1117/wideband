@@ -29,6 +29,7 @@ CPPSRC += \
 	gtest_main.cpp \
 	test_stubs.cpp \
 	tests/test_sampler.cpp \
+	tests/test_lambda_conversion.cpp \
 	tests/test_heater.cpp \
 
 INCDIR += \
