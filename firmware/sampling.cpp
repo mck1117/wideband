@@ -21,31 +21,36 @@ static const float lsuAdvTempBins[] = {53,  96,  130, 162, 184,  206,  239,  278
 static const float lsuAdvTempValues[] = {1198, 982, 914, 875, 855, 838, 816, 794, 785, 771, 751,
                                          732,  711, 691, 671, 653, 635, 614, 588, 562, 537, 528};
 
-void Sampler::Init()
+template <typename Math>
+void Sampler<Math>::Init()
 {
     m_startupTimer.reset();
 }
 
-float Sampler::GetNernstDc() const
+template <typename Math>
+float Sampler<Math>::GetNernstDc() const
 {
-    return nernstDc;
+    return Math::ToVolts(nernstDc);
 }
 
-float Sampler::GetNernstAc() const
+template <typename Math>
+float Sampler<Math>::GetNernstAc() const
 {
-    return nernstAc;
+    return Math::ToVolts(nernstAc);
 }
 
-float Sampler::GetPumpNominalCurrent() const
+template <typename Math>
+float Sampler<Math>::GetPumpNominalCurrent() const
 {
     // Gain is 10x, then a 61.9 ohm resistor
     // Effective resistance with the gain is 619 ohms
     // 1000 is to convert to milliamperes
     constexpr float ratio = -1000 / (PUMP_CURRENT_SENSE_GAIN * LSU_SENSE_R);
-    return pumpCurrentSenseVoltage * ratio;
+    return Math::ToVolts(pumpCurrentSenseVoltage) * ratio;
 }
 
-float Sampler::GetInternalHeaterVoltage() const
+template <typename Math>
+float Sampler<Math>::GetInternalHeaterVoltage() const
 {
 #ifdef BOARD_HAS_VOLTAGE_SENSE
     // Dual HW can measure heater voltage for each channel
@@ -61,7 +66,8 @@ float Sampler::GetInternalHeaterVoltage() const
 #endif
 }
 
-float Sampler::GetSensorTemperature() const
+template <typename Math>
+float Sampler<Math>::GetSensorTemperature() const
 {
     float esr = GetSensorInternalResistance();
 
@@ -80,7 +86,8 @@ float Sampler::GetSensorTemperature() const
     return 0;
 }
 
-float Sampler::GetSensorInternalResistance() const
+template <typename Math>
+float Sampler<Math>::GetSensorInternalResistance() const
 {
     // Sensor is the lowside of a divider, top side is GetESRSupplyR(), and 3.3v AC pk-pk is injected
     float ac = GetNernstAc();
@@ -91,38 +98,35 @@ float Sampler::GetSensorInternalResistance() const
     return totalEsr - VM_RESISTOR_VALUE;
 }
 
-float Sampler::GetLambda() const
+template <typename Math>
+float Sampler<Math>::GetLambda() const
 {
     // Computed on demand rather than per-sample: the conversion (incl. a soft-float divide)
     // is expensive on M0, and all consumers read lambda far less often than we sample.
     return ConvertLambda(GetPumpNominalCurrent());
 }
 
-constexpr float f_abs(float x)
+template <typename Math>
+void Sampler<Math>::ApplySample(const Input& result, Voltage virtualGroundVoltageInt)
 {
-    return x > 0 ? x : -x;
-}
-
-void Sampler::ApplySample(const AnalogChannelResult& result, float virtualGroundVoltageInt)
-{
-    float r_1 = result.NernstVoltage;
+    Voltage r_1 = result.NernstVoltage;
 
     // r2_opposite_phase estimates where the previous sample would be had we not been toggling
     // AKA the absolute value of the difference between r2_opposite_phase and r2 is the amplitude
     // of the AC component on the nernst voltage.  We have to pull this trick so as to use the past 3
     // samples to cancel out any slope in the DC (aka actual nernst cell output) from the AC measurement
     // See firmware/sampling.png for a drawing of what's going on here
-    float r2_opposite_phase = (r_1 + r_3) / 2;
+    Voltage r2_opposite_phase = Math::Half(r_1 + r_3);
 
     // Compute AC (difference) and DC (average) components
-    float nernstAcLocal = f_abs(r2_opposite_phase - r_2);
-    nernstDc = (r2_opposite_phase + r_2) / 2;
+    Voltage nernstAcLocal = Math::Abs(r2_opposite_phase - r_2);
+    nernstDc = Math::Half(r2_opposite_phase + r_2);
 
-    nernstAc = (1 - ESR_SENSE_ALPHA) * nernstAc + ESR_SENSE_ALPHA * nernstAcLocal;
+    nernstAc = Math::Filter(nernstAc, nernstAcLocal, EsrAlpha);
 
     // Exponential moving average (aka first order lpf)
-    pumpCurrentSenseVoltage = (1 - PUMP_FILTER_ALPHA) * pumpCurrentSenseVoltage +
-                              PUMP_FILTER_ALPHA * (result.PumpCurrentVoltage - virtualGroundVoltageInt);
+    pumpCurrentSenseVoltage =
+        Math::Filter(pumpCurrentSenseVoltage, result.PumpCurrentVoltage - virtualGroundVoltageInt, PumpAlpha);
 
 #ifdef BOARD_HAS_VOLTAGE_SENSE
     internalHeaterVoltage = result.HeaterSupplyVoltage;
@@ -132,3 +136,7 @@ void Sampler::ApplySample(const AnalogChannelResult& result, float virtualGround
     r_3 = r_2;
     r_2 = r_1;
 }
+
+// All policies are instantiated so they're all built and testable; unused ones are discarded at link time
+template class Sampler<FloatSamplerMath>;
+template class Sampler<FixedSamplerMath>;

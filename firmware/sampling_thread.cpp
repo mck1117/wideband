@@ -8,7 +8,7 @@
 #include "port.h"
 #include "analog.h"
 
-static Sampler samplers[AFR_CHANNELS];
+static Sampler<SamplerMath> samplers[AFR_CHANNELS];
 
 const ISampler& GetSampler(int ch)
 {

@@ -5,20 +5,26 @@
 
 #include "port_shared.h"
 #include "wideband_config.h"
+#include "sampler_math.h"
 
-struct AnalogChannelResult
+// Sampler inputs are in the board's sampler math type (see sampler_math.h): build them with
+// SamplerMath::FromCounts (from integer ADC readings) or SamplerMath::FromVolts.
+template <typename TVoltage>
+struct AnalogChannelResultT
 {
-    float NernstVoltage;
-    float PumpCurrentVoltage;
+    TVoltage NernstVoltage;
+    TVoltage PumpCurrentVoltage;
     /* for dual version - this is voltage on Heater-, switches between zero and Vbatt with heater PWM,
         * used for both Vbatt measurement and Heater diagnostic */
     float HeaterSupplyVoltage;
 };
 
+using AnalogChannelResult = AnalogChannelResultT<SamplerVoltage>;
+
 struct AnalogResult
 {
     AnalogChannelResult ch[AFR_CHANNELS];
-    float VirtualGroundVoltageInt;
+    SamplerVoltage VirtualGroundVoltageInt;
 
     #ifdef BOARD_HAS_VOLTAGE_SENSE
     float SupplyVoltage;
