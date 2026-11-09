@@ -6,21 +6,41 @@
 
 struct ISampler
 {
+    // Nernst cell DC voltage, volts
     virtual float GetNernstDc() const = 0;
+    // Nernst cell AC (ESR injection) peak-to-peak voltage, volts
     virtual float GetNernstAc() const = 0;
+    // Pump cell current, mA (positive = lean)
     virtual float GetPumpNominalCurrent() const = 0;
+    // Heater supply voltage, volts
     virtual float GetInternalHeaterVoltage() const = 0;
+    // Sensor temperature estimated from ESR, deg C (0 if ESR is out of range)
     virtual float GetSensorTemperature() const = 0;
+    // Sensor Nernst cell internal resistance, ohms
     virtual float GetSensorInternalResistance() const = 0;
     virtual float GetLambda() const = 0;
 };
 
 struct AnalogChannelResult;
 
+/**
+ * Per-sample signal processing for one sensor channel. All sampler math lives behind this class:
+ *
+ * Input: ApplySample() is called once per sample period with ADC readings already converted to
+ *   volts by the port. The ESR driver toggles between consecutive samples, so the Nernst input
+ *   alternates between (DC + AC/2) and (DC - AC/2).
+ *
+ * Filtering is defined per sample: ESR_SENSE_ALPHA and PUMP_FILTER_ALPHA are first order IIR
+ *   coefficients applied once per ApplySample() call, so time constants scale with sample rate.
+ *
+ * Output: the ISampler getters. They're called from other (lower priority) threads while
+ *   ApplySample() runs, so each getter must compute its result from state that ApplySample()
+ *   writes with a single store (one float/int32), never from multiple members updated separately.
+ */
 class Sampler : public ISampler
 {
 public:
-    void ApplySample(AnalogChannelResult& result, float virtualGroundVoltageInt);
+    void ApplySample(const AnalogChannelResult& result, float virtualGroundVoltageInt);
     void Init();
 
     float GetNernstDc() const override;

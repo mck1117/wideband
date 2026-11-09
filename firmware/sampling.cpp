@@ -103,7 +103,7 @@ constexpr float f_abs(float x)
     return x > 0 ? x : -x;
 }
 
-void Sampler::ApplySample(AnalogChannelResult& result, float virtualGroundVoltageInt)
+void Sampler::ApplySample(const AnalogChannelResult& result, float virtualGroundVoltageInt)
 {
     float r_1 = result.NernstVoltage;
 
