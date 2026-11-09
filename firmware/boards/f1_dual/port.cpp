@@ -135,21 +135,21 @@ AnalogResult AnalogSampleFinish()
         .ch = {
             {
                 /* left */
-                .NernstVoltage = AverageSamples(adcBuffer, 3) * (1.0 / NERNST_INPUT_GAIN),
-                .PumpCurrentVoltage = AverageSamples(adcBuffer, 2),
+                .NernstVoltage = SamplerMath::FromVolts(AverageSamples(adcBuffer, 3) * (1.0 / NERNST_INPUT_GAIN)),
+                .PumpCurrentVoltage = SamplerMath::FromVolts(AverageSamples(adcBuffer, 2)),
                 .HeaterSupplyVoltage = l_heater_voltage,
             },
             {
                 /* right */
-                .NernstVoltage = AverageSamples(adcBuffer, 1) * (1.0 / NERNST_INPUT_GAIN),
-                .PumpCurrentVoltage = AverageSamples(adcBuffer, 0),
+                .NernstVoltage = SamplerMath::FromVolts(AverageSamples(adcBuffer, 1) * (1.0 / NERNST_INPUT_GAIN)),
+                .PumpCurrentVoltage = SamplerMath::FromVolts(AverageSamples(adcBuffer, 0)),
                 .HeaterSupplyVoltage = r_heater_voltage,
             },
         },
         /* Dual board has separate internal virtual ground = 3.3V / 2
          * VirtualGroundVoltageInt is used to calculate Ip current only as it
          * is used as offset for diffirential amp */
-        .VirtualGroundVoltageInt = HALF_VCC,
+        .VirtualGroundVoltageInt = SamplerMath::FromVolts(HALF_VCC),
     };
 }
 
