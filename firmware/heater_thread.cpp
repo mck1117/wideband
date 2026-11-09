@@ -59,14 +59,42 @@ const IHeaterController& GetHeaterController(int ch)
     return heaterControllers[ch];
 }
 
+/*
+ * Keep the ChibiOS 64 bit timestamp (chVTGetTimeStamp, used by Timer) current.
+ *
+ * The timestamp is extended in software from the system timer counter (16 bits on some boards),
+ * and ONLY when it's read: if nobody reads it for a full counter wrap, that wrap is silently lost and
+ * every Timer reads short. Nothing in the kernel refreshes it for us - sleeps, timeouts and the timer
+ * interrupt all use the wrapping system time directly - and our other Timer users only read it on some
+ * code paths. So this thread deliberately reads it every HEATER_CONTROL_PERIOD, in every state.
+ *
+ * eg. a 16 bit counter at 60khz wraps every 1.09 seconds.
+ *
+ * noinline: chVTGetTimeStamp() inlines a lock, debug checks and 64 bit math (~350 bytes per call site),
+ * and this isn't hot, so keep one copy.
+ */
+__attribute__((noinline)) static void RefreshTimestamp()
+{
+    (void)chVTGetTimeStamp();
+}
+
+// Refresh well within one counter wrap
+static_assert((uint64_t)HEATER_CONTROL_PERIOD * CH_CFG_ST_FREQUENCY / 1000 < (1ull << CH_CFG_ST_RESOLUTION) / 4,
+              "Heater thread doesn't run often enough to keep the system timestamp current");
+
 static THD_WORKING_AREA(waHeaterThread, 256);
 static void HeaterThread(void*)
 {
     chRegSetThreadName("Heater");
 
     // Wait for temperature sensing to stabilize so we don't
-    // immediately think we overshot the target temperature
-    chThdSleepMilliseconds(1000);
+    // immediately think we overshot the target temperature.
+    // Sleep in short chunks so we keep the timestamp current meanwhile (see RefreshTimestamp)
+    for (int i = 0; i < 1000 / HEATER_CONTROL_PERIOD; i++)
+    {
+        RefreshTimestamp();
+        chThdSleepMilliseconds(HEATER_CONTROL_PERIOD);
+    }
 
     // Configure heater controllers for sensor type
     for (int i = 0; i < AFR_CHANNELS; i++)
@@ -83,6 +111,9 @@ static void HeaterThread(void*)
 
     while (true)
     {
+        // Every loop, regardless of heater states
+        RefreshTimestamp();
+
         auto heaterAllowState = GetHeaterAllowed();
 
         for (int i = 0; i < AFR_CHANNELS; i++)
