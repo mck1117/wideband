@@ -17,6 +17,11 @@ const ISampler& GetSampler(int ch)
 
 static THD_WORKING_AREA(waSamplingThread, 256);
 
+#ifdef ANALOG_PWM_DEVICE
+// Update analog output once every N samples (6khz sample rate / 60 = 100hz)
+#define ANALOG_OUT_DECIMATION 60
+#endif
+
 #ifdef BOARD_HAS_VOLTAGE_SENSE
 static float supplyVoltage = 0;
 
@@ -61,11 +66,22 @@ static void SamplingThread(void*)
         for (int ch = 0; ch < AFR_CHANNELS; ch++)
         {
             samplers[ch].ApplySample(result.ch[ch], result.VirtualGroundVoltageInt);
+        }
 
 #ifdef ANALOG_PWM_DEVICE
-            setAnalogOut(ch, samplers[ch].GetLambda());
-#endif // ANALOG_PWM_DEVICE
+        // Analog output is RC filtered, so it doesn't need updating every sample.
+        // Lambda conversion + PWM update is too expensive to run per-sample on M0.
+        static uint8_t analogOutDecimate = 0;
+        if (++analogOutDecimate >= ANALOG_OUT_DECIMATION)
+        {
+            analogOutDecimate = 0;
+
+            for (int ch = 0; ch < AFR_CHANNELS; ch++)
+            {
+                setAnalogOut(ch, samplers[ch].GetLambda());
+            }
         }
+#endif // ANALOG_PWM_DEVICE
 
 #if defined(TS_ENABLED)
         /* tunerstudio */
