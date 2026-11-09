@@ -93,7 +93,9 @@ float Sampler::GetSensorInternalResistance() const
 
 float Sampler::GetLambda() const
 {
-    return lambda;
+    // Computed on demand rather than per-sample: the conversion (incl. a soft-float divide)
+    // is expensive on M0, and all consumers read lambda far less often than we sample.
+    return ConvertLambda(GetPumpNominalCurrent());
 }
 
 constexpr float f_abs(float x)
@@ -129,6 +131,4 @@ void Sampler::ApplySample(AnalogChannelResult& result, float virtualGroundVoltag
     // Shift history over by one
     r_3 = r_2;
     r_2 = r_1;
-
-    lambda = ConvertLambda(GetPumpNominalCurrent());
 }
