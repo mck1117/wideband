@@ -25,7 +25,7 @@ protected:
 	virtual void cmdOutputChannels(TsChannelBase* tsChannel, uint16_t offset, uint16_t count) = 0;
 };
 
-class TunerStudio : public TunerStudioBase {
+class TunerStudio final : public TunerStudioBase {
 public:
 	int handleCrcCommand(TsChannelBase* tsChannel, char *data, size_t incomingPacketSize);
 	bool handlePlainCommand(TsChannelBase* tsChannel, uint8_t command);

@@ -111,7 +111,7 @@ static UartTsChannel primaryChannel(TS_PRIMARY_UART_PORT);
 static SerialTsChannel primaryChannel(TS_PRIMARY_SERIAL_PORT);
 #endif
 
-struct PrimaryChannelThread : public TunerstudioThread
+struct PrimaryChannelThread final : public TunerstudioThread
 {
     PrimaryChannelThread()
         : TunerstudioThread("Primary TS Channel")
@@ -131,7 +131,7 @@ static PrimaryChannelThread primaryChannelThread;
 #ifdef TS_SECONDARY_SERIAL_PORT
 static SerialTsChannel secondaryChannel(TS_SECONDARY_SERIAL_PORT);
 
-struct SecondaryChannelThread : public TunerstudioThread
+struct SecondaryChannelThread final : public TunerstudioThread
 {
     SecondaryChannelThread()
         : TunerstudioThread("Secondary TS Channel")

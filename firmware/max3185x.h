@@ -66,7 +66,7 @@ private:
     int spi_txrx(const uint8_t tx[], uint8_t rx[], size_t n);
 };
 
-class Max3185xThread : public ThreadController<MAX3185X_THREAD_STACK>
+class Max3185xThread final : public ThreadController<MAX3185X_THREAD_STACK>
 {
 public:
     Max3185xThread(Max3185x max3185x[EGT_CHANNELS])

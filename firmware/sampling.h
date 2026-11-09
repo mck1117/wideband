@@ -37,7 +37,7 @@ struct AnalogChannelResult;
  *   ApplySample() runs, so each getter must compute its result from state that ApplySample()
  *   writes with a single store (one float/int32), never from multiple members updated separately.
  */
-class Sampler : public ISampler
+class Sampler final : public ISampler
 {
 public:
     void ApplySample(const AnalogChannelResult& result, float virtualGroundVoltageInt);
@@ -66,8 +66,12 @@ private:
     Timer m_startupTimer;
 };
 
-// Get the sampler for a particular channel
-const ISampler& GetSampler(int ch);
+// The sampler type this board uses
+using BoardSampler = Sampler;
+
+// Get the sampler for a particular channel. Returns the concrete (final) type rather than ISampler so
+// that calls are resolved at compile time instead of through the vtable.
+const BoardSampler& GetSampler(int ch);
 
 #ifdef BOARD_HAS_VOLTAGE_SENSE
 float GetSupplyVoltage();

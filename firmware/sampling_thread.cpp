@@ -8,9 +8,9 @@
 #include "port.h"
 #include "analog.h"
 
-static Sampler samplers[AFR_CHANNELS];
+static BoardSampler samplers[AFR_CHANNELS];
 
-const ISampler& GetSampler(int ch)
+const BoardSampler& GetSampler(int ch)
 {
     return samplers[ch];
 }
