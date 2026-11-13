@@ -9,8 +9,6 @@ struct MockHeater : public HeaterControllerBase
         : HeaterControllerBase(0, 5, 10)
     {
     }
-
-    MOCK_METHOD(void, SetDuty, (float), (const, override));
 };
 
 TEST(HeaterStateOutput, Preheat)
