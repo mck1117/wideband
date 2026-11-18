@@ -1,6 +1,9 @@
 #include "flash.h"
 #include "hal.h"
 
+// This driver targets the F0/F1 flash controller (FLASH->AR, 16-bit programming).
+#if defined(STM32F0XX) || defined(STM32F1XX)
+
 /**
  * @brief Wait for the flash operation to finish.
  */
@@ -92,3 +95,5 @@ void Flash::Write(flashaddr_t address, const uint8_t* buffer, size_t size)
     /* Lock flash again */
     flashLock();
 }
+
+#endif // defined(STM32F0XX) || defined(STM32F1XX)
