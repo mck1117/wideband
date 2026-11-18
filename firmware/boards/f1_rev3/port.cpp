@@ -9,7 +9,7 @@ void PortPrepareAnalogSampling()
     adcStart(&ADCD1, nullptr);
 }
 
-#define ADC_CHANNEL_COUNT 5
+#define ADC_CHANNEL_COUNT (5 + 1) // 5 Channels + mcutemp
 #define ADC_SAMPLE ADC_SAMPLE_7P5
 
 static adcsample_t adcBuffer[ADC_CHANNEL_COUNT * ADC_OVERSAMPLE];
@@ -49,7 +49,8 @@ const ADCConversionGroup convGroup =
         ADC_SQR3_SQ2_N(6) | /* PA6 - ADC12_IN6 - Ip_sense */
         ADC_SQR3_SQ3_N(7) | /* PA7 - ADC12_IN7 - Un_3x_sense */
         ADC_SQR3_SQ4_N(8) | /* PB0 - ADC12_IN8 - Vbatt_sense */
-        ADC_SQR3_SQ5_N(9)   /* PB1 - ADC12_IN9 - Heater_sense */
+        ADC_SQR3_SQ5_N(9) |  /* PB1 - ADC12_IN9 - Heater_sense */
+        ADC_SQR3_SQ6_N(16)   /* internal mcu temp - ADC12_IN16*/
 };
 
 static float AverageSamples(adcsample_t* buffer, size_t idx)
@@ -96,8 +97,7 @@ AnalogResult AnalogSampleFinish()
          * is used as offset for diffirential amp */
         .VirtualGroundVoltageInt = HALF_VCC,
 
-        // TODO!
-        .McuTemp = 0,
+        .McuTemp = (((V25 - ((AverageSamples(adcBuffer, 5) / 4095.0f) * VCC_VOLTS)) / AVG_SLOPE) + 25.0f),
     };
 }
 
