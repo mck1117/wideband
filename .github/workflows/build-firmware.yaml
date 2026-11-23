@@ -27,9 +27,9 @@ jobs:
         env:
           ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
         run: | # Compiler hosted on our other git repo - avoids having to download from the nice folks at ARM every time
-          wget 'https://github.com/rusefi/build_support/raw/master/arm-gnu-toolchain-11.3.rel1-x86_64-arm-none-eabi.tar.xz' -O compiler.tar.xz
+          wget 'https://github.com/rusefi/build_support/raw/master/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi.tar.xz' -O compiler.tar.xz
           tar -xvf compiler.tar.xz
-          echo "::add-path::`pwd`/arm-gnu-toolchain-11.3.rel1-x86_64-arm-none-eabi/bin"
+          echo "::add-path::`pwd`/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin"
 
       # Make sure the compiler we just downloaded works - just print out the version
       - name: Test Compiler
