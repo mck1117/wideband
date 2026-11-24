@@ -145,23 +145,23 @@ AnalogResult AnalogSampleFinish()
     /* Dual board has separate internal virtual ground = 3.3V / 2
      * VirtualGroundVoltageInt is used to calculate Ip current only as it
      * is used as offset for diffirential amp */
-    res.VirtualGroundVoltageInt = HALF_VCC;
+    res.VirtualGroundVoltageInt = SamplerMath::FromVolts(HALF_VCC);
 
     for (int i = 0; i < AFR_CHANNELS; i++) {
         float NernstRaw = AverageSamples(adcBuffer, (i == 0) ? 3 : 1);
         if ((NernstRaw > 0.01) && (NernstRaw < (3.3 - 0.01))) {
             /* not clamped */
-            res.ch[i].NernstVoltage = (NernstRaw - NERNST_INPUT_OFFSET) * (1.0 / NERNST_INPUT_GAIN);
+            res.ch[i].NernstVoltage = SamplerMath::FromVolts((NernstRaw - NERNST_INPUT_OFFSET) * (1.0 / NERNST_INPUT_GAIN));
         } else {
             /* Clamped, use ungained input */
-            res.ch[i].NernstVoltage = AverageSamples(adcBuffer, (i == 0) ? 9 : 8) - HALF_VCC;
+            res.ch[i].NernstVoltage = SamplerMath::FromVolts(AverageSamples(adcBuffer, (i == 0) ? 9 : 8) - HALF_VCC);
         }
     }
     /* left */
-    res.ch[0].PumpCurrentVoltage = AverageSamples(adcBuffer, 2);
+    res.ch[0].PumpCurrentVoltage = SamplerMath::FromVolts(AverageSamples(adcBuffer, 2));
     res.ch[0].HeaterSupplyVoltage = l_heater_voltage;
     /* right */
-    res.ch[1].PumpCurrentVoltage = AverageSamples(adcBuffer, 0);
+    res.ch[1].PumpCurrentVoltage = SamplerMath::FromVolts(AverageSamples(adcBuffer, 0));
     res.ch[1].HeaterSupplyVoltage = r_heater_voltage;
 
     return res;

@@ -36,20 +36,11 @@ const ADCConversionGroup convGroup =
     ADC_CHSELR_CHSEL0 | ADC_CHSELR_CHSEL2 | ADC_CHSELR_CHSEL3
 };
 
-static float AverageSamples(adcsample_t* buffer, size_t idx)
-{
-    uint32_t sum = 0;
-
-    for (size_t i = 0; i < ADC_OVERSAMPLE; i++)
-    {
-        sum += buffer[idx];
-        idx += ADC_CHANNEL_COUNT;
-    }
-
-    constexpr float scale = VCC_VOLTS / (ADC_MAX_COUNT * ADC_OVERSAMPLE);
-
-    return (float)sum * scale;
-}
+// Each channel's reading is the sum of ADC_OVERSAMPLE conversions
+static constexpr uint32_t maxSum = ADC_MAX_COUNT * ADC_OVERSAMPLE;
+static constexpr double voltsPerCount = (double)VCC_VOLTS / maxSum;
+static constexpr auto adcScale = SamplerMath::MakeCountScale(voltsPerCount, maxSum);
+static constexpr auto nernstScale = SamplerMath::MakeCountScale(voltsPerCount / NERNST_INPUT_GAIN, maxSum);
 
 void AnalogSampleStart()
 {
@@ -60,17 +51,30 @@ AnalogResult AnalogSampleFinish()
 {
     adcDoneSemaphore.wait(TIME_INFINITE);
 
+    // Sum each channel in a single pass over the (interleaved) buffer
+    static_assert(ADC_CHANNEL_COUNT == 3);
+    uint32_t nernstSum = 0;
+    uint32_t pumpSum = 0;
+    uint32_t virtualGroundSum = 0;
+
+    for (size_t i = 0; i < ADC_CHANNEL_COUNT * ADC_OVERSAMPLE; i += ADC_CHANNEL_COUNT)
+    {
+        nernstSum += adcBuffer[i];
+        pumpSum += adcBuffer[i + 1];
+        virtualGroundSum += adcBuffer[i + 2];
+    }
+
     return
     {
         .ch =
         {
             {
-                .NernstVoltage = AverageSamples(adcBuffer, 0) * (1.0 / NERNST_INPUT_GAIN),
-                .PumpCurrentVoltage = AverageSamples(adcBuffer, 1),
+                .NernstVoltage = SamplerMath::FromCounts(nernstSum, nernstScale),
+                .PumpCurrentVoltage = SamplerMath::FromCounts(pumpSum, adcScale),
                 .HeaterSupplyVoltage = 0,
             },
         },
-        .VirtualGroundVoltageInt = AverageSamples(adcBuffer, 2),
+        .VirtualGroundVoltageInt = SamplerMath::FromCounts(virtualGroundSum, adcScale),
 
         // TODO!
         .McuTemp = 0,

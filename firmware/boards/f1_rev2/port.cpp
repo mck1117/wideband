@@ -82,8 +82,8 @@ AnalogResult AnalogSampleFinish()
     {
         .ch = {
             {
-                .NernstVoltage = AverageSamples(adcBuffer, 2) * (1.0 / NERNST_INPUT_GAIN),
-                .PumpCurrentVoltage = AverageSamples(adcBuffer, 1),
+                .NernstVoltage = SamplerMath::FromVolts(AverageSamples(adcBuffer, 2) * (1.0 / NERNST_INPUT_GAIN)),
+                .PumpCurrentVoltage = SamplerMath::FromVolts(AverageSamples(adcBuffer, 1)),
                 /* We also can measure output virtual ground voltage for diagnostic purposes */
                 //.VirtualGroundVoltageExt = AverageSamples(adcBuffer, 0) / VM_INPUT_DIVIDER,
                 /* Heater measurement circuit has incorrect RC filter making inposible accurate
@@ -96,7 +96,7 @@ AnalogResult AnalogSampleFinish()
         /* Rev 2 board has separate internal virtual ground = 3.3V / 2
          * VirtualGroundVoltageInt is used to calculate Ip current only as it
          * is used as offset for diffirential amp */
-        .VirtualGroundVoltageInt = HALF_VCC,
+        .VirtualGroundVoltageInt = SamplerMath::FromVolts(HALF_VCC),
     };
 }
 

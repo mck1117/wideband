@@ -1,6 +1,7 @@
 #pragma once
 
 #include "wideband_config.h"
+#include "sampler_math.h"
 
 #include "timer.h"
 
@@ -21,14 +22,18 @@ struct ISampler
     virtual float GetLambda() const = 0;
 };
 
-struct AnalogChannelResult;
+template <typename TVoltage>
+struct AnalogChannelResultT;
 
 /**
  * Per-sample signal processing for one sensor channel. All sampler math lives behind this class:
  *
+ * Math: the Math policy (see sampler_math.h) decides how voltages are represented and computed,
+ *   eg. float on CPUs with an FPU, fixed point without. Boards use Sampler<SamplerMath>.
+ *
  * Input: ApplySample() is called once per sample period with ADC readings already converted to
- *   volts by the port. The ESR driver toggles between consecutive samples, so the Nernst input
- *   alternates between (DC + AC/2) and (DC - AC/2).
+ *   Math::Voltage by the port. The ESR driver toggles between consecutive samples, so the Nernst
+ *   input alternates between (DC + AC/2) and (DC - AC/2).
  *
  * Filtering is defined per sample: ESR_SENSE_ALPHA and PUMP_FILTER_ALPHA are first order IIR
  *   coefficients applied once per ApplySample() call, so time constants scale with sample rate.
@@ -37,10 +42,14 @@ struct AnalogChannelResult;
  *   ApplySample() runs, so each getter must compute its result from state that ApplySample()
  *   writes with a single store (one float/int32), never from multiple members updated separately.
  */
+template <typename Math>
 class Sampler final : public ISampler
 {
 public:
-    void ApplySample(const AnalogChannelResult& result, float virtualGroundVoltageInt);
+    using Voltage = typename Math::Voltage;
+    using Input = AnalogChannelResultT<Voltage>;
+
+    void ApplySample(const Input& result, Voltage virtualGroundVoltageInt);
     void Init();
 
     float GetNernstDc() const override;
@@ -52,12 +61,15 @@ public:
     float GetLambda() const override;
 
 private:
-    float r_2 = 0;
-    float r_3 = 0;
+    static constexpr typename Math::Coefficient EsrAlpha = Math::MakeCoefficient(ESR_SENSE_ALPHA);
+    static constexpr typename Math::Coefficient PumpAlpha = Math::MakeCoefficient(PUMP_FILTER_ALPHA);
 
-    float nernstAc = 0;
-    float nernstDc = 0;
-    float pumpCurrentSenseVoltage = 0;
+    Voltage r_2{};
+    Voltage r_3{};
+
+    Voltage nernstAc{};
+    Voltage nernstDc{};
+    Voltage pumpCurrentSenseVoltage{};
 
 #ifdef BOARD_HAS_VOLTAGE_SENSE
     float internalHeaterVoltage = 0;
@@ -67,7 +79,7 @@ private:
 };
 
 // The sampler type this board uses
-using BoardSampler = Sampler;
+using BoardSampler = Sampler<SamplerMath>;
 
 // Get the sampler for a particular channel. Returns the concrete (final) type rather than ISampler so
 // that calls are resolved at compile time instead of through the vtable.

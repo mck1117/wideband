@@ -4,8 +4,11 @@
 #include <cstdint>
 #include <functional>
 #include <random>
+#include <string>
+#include <type_traits>
 
 #include "sampling.h"
+#include "sampler_math.h"
 #include "port.h"
 #include "lambda_conversion.h"
 #include "timer.h"
@@ -16,8 +19,9 @@
 /**
  * These tests treat Sampler as a black box: they only use ApplySample() and the ISampler getters,
  * and compare against physical expectations or the ideal model in sampler_reference.h.
+ * Every test runs against every math policy (see sampler_math.h).
  *
- * The tolerances below are the contract for any internal representation (float, fixed point).
+ * The tolerances below are the contract for any math policy (float, fixed point).
  * They're derived from the input resolution: one count of the oversampled ADC sum is
  * VCC / (4095 * 24) = 34uV, or 12uV at the Nernst input after its gain.
  */
@@ -76,20 +80,22 @@ double AcForResistance(double ohms)
 
 // The only place the tests construct sampler input. If ApplySample's input type changes
 // (eg. raw ADC counts), this is the only thing that needs to change.
-void Feed(Sampler& dut, float nernst, float pump, float virtualGround)
+template <typename Math>
+void Feed(Sampler<Math>& dut, float nernst, float pump, float virtualGround)
 {
-    AnalogChannelResult result{};
-    result.NernstVoltage = nernst;
-    result.PumpCurrentVoltage = pump;
+    typename Sampler<Math>::Input result{};
+    result.NernstVoltage = Math::FromVolts(nernst);
+    result.PumpCurrentVoltage = Math::FromVolts(pump);
     result.HeaterSupplyVoltage = 0;
 
-    dut.ApplySample(result, virtualGround);
+    dut.ApplySample(result, Math::FromVolts(virtualGround));
 }
 
 // Drives a Sampler with steady inputs, keeping track of ESR toggle phase between calls
+template <typename Math>
 struct Harness
 {
-    Sampler dut;
+    Sampler<Math> dut;
     int sample = 0;
 
     Harness()
@@ -121,9 +127,10 @@ struct Stimulus
 
 // Run the firmware sampler and the ideal model through the same inputs, checking every output
 // after every sample.
+template <typename Math>
 void ExpectMatchesReference(int samples, const std::function<Stimulus(int)>& scenario)
 {
-    Sampler dut;
+    Sampler<Math> dut;
     dut.Init();
     ReferenceSampler ref;
 
@@ -165,17 +172,47 @@ void ExpectMatchesReference(int samples, const std::function<Stimulus(int)>& sce
     }
 }
 
+struct MathPolicyNames
+{
+    template <typename T>
+    static std::string GetName(int)
+    {
+        if constexpr (std::is_same_v<T, FloatSamplerMath>)
+        {
+            return "Float";
+        }
+        else
+        {
+            return "Fixed";
+        }
+    }
+};
+
+using MathPolicies = ::testing::Types<FloatSamplerMath, FixedSamplerMath>;
+
 } // namespace
+
+template <typename Math>
+class SamplerVsReference : public ::testing::Test
+{
+};
+TYPED_TEST_SUITE(SamplerVsReference, MathPolicies, MathPolicyNames);
+
+template <typename Math>
+class SamplerTest : public ::testing::Test
+{
+};
+TYPED_TEST_SUITE(SamplerTest, MathPolicies, MathPolicyNames);
 
 // *******************************
 // Firmware vs. ideal model
 // *******************************
 
-TEST(SamplerVsReference, SensorWarmup)
+TYPED_TEST(SamplerVsReference, SensorWarmup)
 {
     std::mt19937 rng(1);
 
-    ExpectMatchesReference(40000, [&](int i) {
+    ExpectMatchesReference<TypeParam>(40000, [&](int i) {
         // AC decays from cold (~1V) to operating temperature (~45mV) as the sensor heats
         double ac = 0.045 + (1.0 - 0.045) * std::exp(-i / 8000.0);
 
@@ -187,13 +224,13 @@ TEST(SamplerVsReference, SensorWarmup)
     });
 }
 
-TEST(SamplerVsReference, ClosedLoopOperation)
+TYPED_TEST(SamplerVsReference, ClosedLoopOperation)
 {
     std::mt19937 rng(2);
     double nernstDc = 0.45;
     double pump = HALF_VCC;
 
-    ExpectMatchesReference(40000, [&](int i) {
+    ExpectMatchesReference<TypeParam>(40000, [&](int i) {
         // Random walk around the operating point, pump swings rich and lean
         nernstDc = Clamp(nernstDc + Noise(rng, 2) * 4 * NernstLsb, 0.3, 0.6);
         pump = Clamp(pump + Noise(rng, 2) * 20 * AdcLsb, 0.3, 3.0);
@@ -206,9 +243,9 @@ TEST(SamplerVsReference, ClosedLoopOperation)
     });
 }
 
-TEST(SamplerVsReference, DcRampWithAc)
+TYPED_TEST(SamplerVsReference, DcRampWithAc)
 {
-    ExpectMatchesReference(30000, [](int i) {
+    ExpectMatchesReference<TypeParam>(30000, [](int i) {
         return Stimulus{
             WithAc(0.05 + 1.05 * i / 30000.0, 0.1, i),
             HALF_VCC,
@@ -217,11 +254,11 @@ TEST(SamplerVsReference, DcRampWithAc)
     });
 }
 
-TEST(SamplerVsReference, PumpSteps)
+TYPED_TEST(SamplerVsReference, PumpSteps)
 {
     const double levels[] = {HALF_VCC, 0, VCC_VOLTS, HALF_VCC + 0.3, HALF_VCC - 0.3, HALF_VCC};
 
-    ExpectMatchesReference(9000, [&](int i) {
+    ExpectMatchesReference<TypeParam>(9000, [&](int i) {
         return Stimulus{
             WithAc(0.45, 0.05, i),
             levels[i / 1500],
@@ -230,9 +267,9 @@ TEST(SamplerVsReference, PumpSteps)
     });
 }
 
-TEST(SamplerVsReference, Rails)
+TYPED_TEST(SamplerVsReference, Rails)
 {
-    ExpectMatchesReference(15000, [](int i) {
+    ExpectMatchesReference<TypeParam>(15000, [](int i) {
         double nernst;
         if (i < 5000)
         {
@@ -261,11 +298,11 @@ TEST(SamplerVsReference, Rails)
 // Physical behavior
 // *******************************
 
-TEST(Sampler, InitialState)
+TYPED_TEST(SamplerTest, InitialState)
 {
     // Characterizes the state before any samples have been applied. Note that temperature reads
     // hot: with no AC measured yet, the ESR estimate is below the bottom of the table and clamps.
-    Sampler dut;
+    Sampler<TypeParam> dut;
     dut.Init();
 
     EXPECT_NEAR(0, dut.GetNernstDc(), VoltageTolerance);
@@ -276,9 +313,9 @@ TEST(Sampler, InitialState)
     EXPECT_NEAR(1030, dut.GetSensorTemperature(), TemperatureTolerance);
 }
 
-TEST(Sampler, TestDc)
+TYPED_TEST(SamplerTest, TestDc)
 {
-    Harness h;
+    Harness<TypeParam> h;
     h.Run(5000, 0.45, 0, 1.75);
 
     // not exactly 0 because of filtering
@@ -287,9 +324,9 @@ TEST(Sampler, TestDc)
     EXPECT_NEAR(-0.1616, h.dut.GetPumpNominalCurrent(), 1e-3);
 }
 
-TEST(Sampler, TestAc)
+TYPED_TEST(SamplerTest, TestAc)
 {
-    Harness h;
+    Harness<TypeParam> h;
     h.Run(10000, 0.45, 0.2, 1.75);
 
     EXPECT_NEAR(0.2, h.dut.GetNernstAc(), 1e-3);
@@ -297,11 +334,11 @@ TEST(Sampler, TestAc)
     EXPECT_NEAR(-0.1616, h.dut.GetPumpNominalCurrent(), 1e-3);
 }
 
-TEST(Sampler, DcSteadyState)
+TYPED_TEST(SamplerTest, DcSteadyState)
 {
     for (double dc : {0.0, 0.1, 0.45, 0.9, NernstFullScale})
     {
-        Harness h;
+        Harness<TypeParam> h;
         h.Run(5000, dc, 0, HALF_VCC);
 
         EXPECT_NEAR(dc, h.dut.GetNernstDc(), VoltageTolerance) << dc;
@@ -309,11 +346,11 @@ TEST(Sampler, DcSteadyState)
     }
 }
 
-TEST(Sampler, AcAmplitude)
+TYPED_TEST(SamplerTest, AcAmplitude)
 {
     for (double ac : {0.002, 0.01, 0.045, 0.2, 1.0})
     {
-        Harness h;
+        Harness<TypeParam> h;
         // 40 time constants of the ESR filter
         h.Run(20000, 0.6, ac, HALF_VCC);
 
@@ -322,14 +359,14 @@ TEST(Sampler, AcAmplitude)
     }
 }
 
-TEST(Sampler, DcSlopeRejection)
+TYPED_TEST(SamplerTest, DcSlopeRejection)
 {
     // A fast DC ramp under the AC signal: AC must be unaffected, and DC tracks the ramp
     // exactly one sample behind (it's estimated at the previous sample's position).
     constexpr double slope = 2e-4; // volts per sample
     constexpr double ac = 0.05;
 
-    Sampler dut;
+    Sampler<TypeParam> dut;
     dut.Init();
 
     for (int i = 0; i < 4000; i++)
@@ -341,10 +378,10 @@ TEST(Sampler, DcSlopeRejection)
     EXPECT_NEAR(0.15 + slope * 3998, dut.GetNernstDc(), VoltageTolerance);
 }
 
-TEST(Sampler, PumpFilterStepResponse)
+TYPED_TEST(SamplerTest, PumpFilterStepResponse)
 {
     // First order IIR with PUMP_FILTER_ALPHA per sample
-    Harness h;
+    Harness<TypeParam> h;
     h.Run(1000, 0.45, 0.045, HALF_VCC);
 
     constexpr double step = 0.5;
@@ -361,10 +398,10 @@ TEST(Sampler, PumpFilterStepResponse)
     }
 }
 
-TEST(Sampler, EsrFilterStepResponse)
+TYPED_TEST(SamplerTest, EsrFilterStepResponse)
 {
     // First order IIR with ESR_SENSE_ALPHA per sample
-    Harness h;
+    Harness<TypeParam> h;
     h.Run(10000, 0.45, 0.2, HALF_VCC);
 
     constexpr double from = 0.2;
@@ -381,12 +418,12 @@ TEST(Sampler, EsrFilterStepResponse)
     }
 }
 
-TEST(Sampler, SmallSignalsConverge)
+TYPED_TEST(SamplerTest, SmallSignalsConverge)
 {
     // A filter with too little internal resolution (eg. fixed point without enough fractional
     // bits) stalls short of small targets. Approach a small signal from both directions.
     {
-        Harness h;
+        Harness<TypeParam> h;
         h.Run(20000, 0.45, 0.002, HALF_VCC);
         EXPECT_NEAR(0.002, h.dut.GetNernstAc(), 0.03 * 0.002) << "AC rising";
 
@@ -399,7 +436,7 @@ TEST(Sampler, SmallSignalsConverge)
         // One ADC count off virtual ground
         const double oneCount = ExpectedPumpCurrent(HALF_VCC + AdcLsb, HALF_VCC);
 
-        Harness h;
+        Harness<TypeParam> h;
         h.Run(2000, 0.45, 0.045, HALF_VCC + AdcLsb);
         EXPECT_NEAR(oneCount, h.dut.GetPumpNominalCurrent(), 0.03 * std::abs(oneCount)) << "pump rising";
 
@@ -409,13 +446,13 @@ TEST(Sampler, SmallSignalsConverge)
     }
 }
 
-TEST(Sampler, PumpCurrentScaling)
+TYPED_TEST(SamplerTest, PumpCurrentScaling)
 {
     for (double virtualGround : {1.6, static_cast<double>(HALF_VCC), 1.7})
     {
         for (double offset : {-1.5, -0.5, 0.0, 0.5, 1.5})
         {
-            Harness h;
+            Harness<TypeParam> h;
             h.Run(2000, 0.45, 0.045, virtualGround + offset, virtualGround);
 
             EXPECT_NEAR(ExpectedPumpCurrent(virtualGround + offset, virtualGround), h.dut.GetPumpNominalCurrent(),
@@ -425,11 +462,11 @@ TEST(Sampler, PumpCurrentScaling)
     }
 }
 
-TEST(Sampler, InternalResistance)
+TYPED_TEST(SamplerTest, InternalResistance)
 {
     for (double ohms : {80.0, 300.0, 1000.0, 4500.0})
     {
-        Harness h;
+        Harness<TypeParam> h;
         h.Run(20000, 0.45, AcForResistance(ohms), HALF_VCC);
 
         EXPECT_NEAR(ohms, h.dut.GetSensorInternalResistance(), ResistanceTolerance + RelativeResistanceTolerance * ohms)
@@ -437,7 +474,7 @@ TEST(Sampler, InternalResistance)
     }
 }
 
-TEST(Sampler, SensorTemperature)
+TYPED_TEST(SamplerTest, SensorTemperature)
 {
     struct Point
     {
@@ -460,7 +497,7 @@ TEST(Sampler, SensorTemperature)
     {
         ScopedSensorType type(p.type);
 
-        Harness h;
+        Harness<TypeParam> h;
         h.Run(20000, 0.45, AcForResistance(p.ohms), HALF_VCC);
 
         EXPECT_NEAR(p.temperature, h.dut.GetSensorTemperature(), TemperatureTolerance)
@@ -468,7 +505,7 @@ TEST(Sampler, SensorTemperature)
     }
 }
 
-TEST(Sampler, Lambda)
+TYPED_TEST(SamplerTest, Lambda)
 {
     struct Point
     {
@@ -486,19 +523,19 @@ TEST(Sampler, Lambda)
 
     for (const auto& p : points)
     {
-        Harness h;
+        Harness<TypeParam> h;
         h.Run(2000, 0.45, 0.045, HALF_VCC + p.pumpCurrent / PumpMilliampsPerVolt);
 
         EXPECT_NEAR(p.lambda, h.dut.GetLambda(), LambdaTolerance) << p.pumpCurrent;
     }
 }
 
-TEST(Sampler, HeaterVoltageStartupDelay)
+TYPED_TEST(SamplerTest, HeaterVoltageStartupDelay)
 {
     // Without supply voltage sensing, pretend we have battery voltage 5 seconds after Init()
     Timer::setMockTime(1'000'000);
 
-    Sampler dut;
+    Sampler<TypeParam> dut;
     dut.Init();
     EXPECT_EQ(0, dut.GetInternalHeaterVoltage());
 
